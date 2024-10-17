@@ -3,6 +3,10 @@ project(b15f)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(b15f main.cpp crc.cpp)
+add_executable(b15f main.cpp crc.cpp
+        TX.cpp
+        TX.h
+        RX.cpp
+        RX.h)
 
 target_link_libraries(b15f PRIVATE b15fdrv)
