@@ -3,4 +3,4 @@ project(b15f)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(b15f main.cpp)
+add_executable(b15f main.cpp crc.cpp)
