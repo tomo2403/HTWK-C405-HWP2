@@ -6,42 +6,32 @@ CRC::CRC(uint32_t polynomial, uint32_t initialValue)
 	this->initialValue = initialValue;
 }
 
-uint32_t CRC::calculateCRC(std::vector<uint8_t> data)
+uint32_t CRC::calculateCRC(std::vector<uint8_t> data) 
 {
-	uint32_t crc = initialValue;
+    uint32_t crc = initialValue;
 
-	for (uint8_t i = 0; i < 4; i++)
-	{
-		data.push_back(0x0);
-	}
+    for (uint8_t byte : data)
+    {
+        for (uint8_t i = 0; i < 8; i++)
+        {
+            uint8_t currentBit = (byte >> (7 - i)) & 1;
+            if (((crc >> 31) & 1) != currentBit)
+            {
+                crc = (crc << 1) ^ polynomial;
+            } else
+            {
+                crc <<= 1;
+            }
+        }
+    }
 
-	for (uint8_t byte: data)
-	{
-		for (uint8_t i = 0; i < 8; i++)
-		{
-			if (crc & 0x80000000)
-			{
-				crc <<= 1;
-				uint8_t currentBit = (byte >> (7 - i)) & 0x1;
-				crc |= currentBit;
-				crc ^= polynomial;
-			}
-			else
-			{
-				crc <<= 1;
-				uint8_t currentBit = (byte >> (7 - i)) & 0x1;
-				crc |= currentBit;
-			}
-		}
-	}
-
-	return crc;
+    return crc;
 }
 
-bool CRC::validateCRC(const std::vector<uint8_t> &data, uint32_t receivedCRC)
+bool CRC::validateCRC(const std::vector<uint8_t>& data, uint32_t receivedCRC)
 {
-	uint32_t calculatedCRC = calculateCRC(data);
-	return (calculatedCRC == receivedCRC);
+    uint32_t calculatedCRC = calculateCRC(data);
+    return (calculatedCRC == receivedCRC);
 }
 
 /*
