@@ -7,7 +7,7 @@ typedef Vector<uint8_t> myVector8;
 #else
 #include <vector>
 #include <cstdint>
-typedef std::vector myVector;
+typedef std::vector<uint8_t> myVector8;
 #endif
 
 class CRC

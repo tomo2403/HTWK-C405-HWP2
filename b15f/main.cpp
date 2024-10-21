@@ -5,22 +5,22 @@
 
 #include "../lib/crc.hpp"
 
-std::vector<uint8_t> toHalfBytes(std::ifstream *data)
-{
-	std::vector<uint8_t> halfBytes;
-	char byte;
-
-	while (data.get(byte))
-	{
-		uint8_t highNibble = (byte & 0xF0) >> 4; // obere 4 Bit
-		uint8_t lowNibble = byte & 0x0F;         // untere 4 Bit
-
-		halfBytes.push_back(highNibble);
-		halfBytes.push_back(lowNibble);
-	}
-
-	return halfBytes;
-}
+//std::vector<uint8_t> toHalfBytes(std::ifstream *data)
+//{
+//	std::vector<uint8_t> halfBytes;
+//	char byte;
+//
+//	while (data.get(byte))
+//	{
+//		uint8_t highNibble = (byte & 0xF0) >> 4; // obere 4 Bit
+//		uint8_t lowNibble = byte & 0x0F;         // untere 4 Bit
+//
+//		halfBytes.push_back(highNibble);
+//		halfBytes.push_back(lowNibble);
+//	}
+//
+//	return halfBytes;
+//}
 
 int main(int argc, char *argv[])
 {
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 			return 1;
 		}
 
-		std::vector<uint8_t> blocks = toHalfBytes(&file);
+		//std::vector<uint8_t> blocks = toHalfBytes(&file);
 		file.close();
 	}
 	else
@@ -67,14 +67,12 @@ int main(int argc, char *argv[])
 
 	drv.setRegister(&PORTA, 0x05);
 
-//    while (true) {
-//        drv.setRegister(&PORTA, 0x00);
-//        cout << "0" << endl;
-//        //drv.delay_ms(500);
-//        drv.setRegister(&PORTA, 0xA0);
-//        cout << "1" << endl;
-//        //drv.delay_ms(500);
-//    }
+    while (true)
+    {
+        uint8_t output = drv.getRegister(&PINA) >> 4;
+        std::cout << (int)output << std::endl;
+        drv.delay_ms(10);
+    }
 
 	return 0;
 }
