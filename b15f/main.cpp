@@ -4,7 +4,7 @@
 #include <vector>
 #include <string>
 
-#include "crc.hpp"
+#include "../lib/crc.hpp"
 
 int main(int argc, char *argv[])
 {
