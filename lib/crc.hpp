@@ -1,7 +1,14 @@
 #pragma once
 
-#include <cstdint>
+#ifndef ARDUINO
+#include <Arduino.h>
+#include <Vector.h>
+typedef Vector myVector;
+#else
 #include <vector>
+#include <cstdint>
+typedef std::vector myVector;
+#endif
 
 class CRC
 {

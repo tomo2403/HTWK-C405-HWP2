@@ -1,5 +1,4 @@
-#include <Arduino.h>
-#include "../lib/crc.hpp"
+#include "../../lib/crc.hpp"
 
 void setup() {
     Serial.begin(57600);
@@ -36,6 +35,6 @@ void loop() {
     }
 
     digtialWriteAll(0x07);
-
+    
     Serial.println(input);
 }
