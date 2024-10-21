@@ -1,7 +1,8 @@
 #include <Arduino.h>
+#include "../lib/crc.hpp"
 
 void setup() {
-    Serial.begin(9600);
+    Serial.begin(57600);
     pinMode(2, INPUT);
     pinMode(3, INPUT);
     pinMode(4, INPUT);
@@ -14,9 +15,15 @@ void setup() {
 	/// TODO: Ard zu B15 schreiben
 }
 
-void loop() {
-    delay(1000);
+// nur die letzten 4 bits werden beachtet
+void digtialWriteAll(const uint8_t value) {
+    digitalWrite(6, (value & 0x1));
+    digitalWrite(7, (value >> 1 & 0x1));
+    digitalWrite(8, (value >> 2 & 0x1));
+    digitalWrite(9, (value >> 3 & 0x1));
+}
 
+void loop() {
     uint8_t input = 0x0;
 
     for (int i = 0; i < 4; i++) {
@@ -27,6 +34,8 @@ void loop() {
             input |= (0x1 << i);
         }
     }
+
+    digtialWriteAll(0x07);
 
     Serial.println(input);
 }
