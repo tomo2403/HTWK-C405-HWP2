@@ -26,15 +26,13 @@ void loop() {
     uint8_t input = 0x0;
 
     for (int i = 0; i < 4; i++) {
-        // Lese den Zustand des Pins (2+i)
         uint8_t pinValue = digitalRead(2 + i);
-        // Setze das entsprechende Bit in input, wenn der Pin HIGH ist
         if (pinValue == HIGH) {
             input |= (0x1 << i);
         }
     }
 
-	digitalWriteAll(0x07);
+	digitalWriteAll(0x08);
     
     Serial.println(input);
 }
