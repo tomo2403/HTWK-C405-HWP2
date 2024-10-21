@@ -1,9 +1,9 @@
 #pragma once
 
-#ifndef ARDUINO
+#ifdef ARDUINO
 #include <Arduino.h>
 #include <Vector.h>
-typedef Vector myVector;
+typedef Vector<uint8_t> myVector8;
 #else
 #include <vector>
 #include <cstdint>
@@ -15,9 +15,9 @@ class CRC
 public:
 	explicit CRC(uint32_t polynomial, uint32_t initialValue = 0x00000000);
 
-	uint32_t calculateCRC(const std::vector<uint8_t>& data) const;
+	uint32_t calculateCRC(const myVector8& data) const;
 
-	bool validateCRC(const std::vector<uint8_t> &data, uint32_t receivedCRC) const;
+	bool validateCRC(const myVector8 &data, uint32_t receivedCRC) const;
 
 private:
 	uint32_t polynomial;

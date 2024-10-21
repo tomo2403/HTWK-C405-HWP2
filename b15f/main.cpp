@@ -1,10 +1,26 @@
 #include <b15f/b15f.h>
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <string>
 
 #include "../lib/crc.hpp"
+
+std::vector<uint8_t> toHalfBytes(std::ifstream *data)
+{
+	std::vector<uint8_t> halfBytes;
+	char byte;
+
+	while (data.get(byte))
+	{
+		uint8_t highNibble = (byte & 0xF0) >> 4; // obere 4 Bit
+		uint8_t lowNibble = byte & 0x0F;         // untere 4 Bit
+
+		halfBytes.push_back(highNibble);
+		halfBytes.push_back(lowNibble);
+	}
+
+	return halfBytes;
+}
 
 int main(int argc, char *argv[])
 {
@@ -40,6 +56,9 @@ int main(int argc, char *argv[])
 			std::cerr << "Fehler beim Öffnen der Datei: " << path << std::endl;
 			return 1;
 		}
+
+		std::vector<uint8_t> blocks = toHalfBytes(&file);
+		file.close();
 	}
 	else
 	{

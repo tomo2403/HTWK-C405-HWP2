@@ -6,7 +6,7 @@ CRC::CRC(uint32_t polynomial, uint32_t initialValue)
 	this->initialValue = initialValue;
 }
 
-uint32_t CRC::calculateCRC(const std::vector<uint8_t>& data) const
+uint32_t CRC::calculateCRC(const myVector8& data) const
 {
     uint32_t crc = initialValue;
 
@@ -28,7 +28,7 @@ uint32_t CRC::calculateCRC(const std::vector<uint8_t>& data) const
     return crc;
 }
 
-bool CRC::validateCRC(const std::vector<uint8_t>& data, uint32_t receivedCRC) const
+bool CRC::validateCRC(const myVector8& data, uint32_t receivedCRC) const
 {
     uint32_t calculatedCRC = calculateCRC(data);
     return (calculatedCRC == receivedCRC);

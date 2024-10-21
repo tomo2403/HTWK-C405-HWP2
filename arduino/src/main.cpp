@@ -11,15 +11,15 @@ void setup() {
     pinMode(8, OUTPUT);
     pinMode(9, OUTPUT);
 
-	/// TODO: Ard zu B15 schreiben
+	// TODO: Ard zu B15 schreiben
 }
 
 // nur die letzten 4 bits werden beachtet
-void digtialWriteAll(const uint8_t value) {
-    digitalWrite(6, (value & 0x1));
-    digitalWrite(7, (value >> 1 & 0x1));
-    digitalWrite(8, (value >> 2 & 0x1));
-    digitalWrite(9, (value >> 3 & 0x1));
+void digitalWriteAll(const uint8_t value) {
+    digitalWrite(6, (value & 0x01));
+    digitalWrite(7, (value >> 1 & 0x01));
+    digitalWrite(8, (value >> 2 & 0x01));
+    digitalWrite(9, (value >> 3 & 0x01));
 }
 
 void loop() {
@@ -34,7 +34,7 @@ void loop() {
         }
     }
 
-    digtialWriteAll(0x07);
+	digitalWriteAll(0x07);
     
     Serial.println(input);
 }
