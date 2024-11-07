@@ -1,5 +1,8 @@
 #include "../../lib/crc.hpp"
 
+uint8_t lastPinReceived = 0;
+uint8_t usbReceived = 0;
+
 void setup() {
     Serial.begin(57600);
     pinMode(2, INPUT);
@@ -10,29 +13,46 @@ void setup() {
     pinMode(7, OUTPUT);
     pinMode(8, OUTPUT);
     pinMode(9, OUTPUT);
-
-	// TODO: Ard zu B15 schreiben
 }
 
 // nur die letzten 4 bits werden beachtet
 void digitalWriteAll(const uint8_t value) {
-    digitalWrite(6, (value & 0x01));
-    digitalWrite(7, (value >> 1 & 0x01));
-    digitalWrite(8, (value >> 2 & 0x01));
-    digitalWrite(9, (value >> 3 & 0x01));
+    for (int i = 0; i < 4; i++) {
+        digitalWrite(6 + i, (value >> i) & 0x01);
+    }
+}
+
+uint8_t digitalReadAll() {
+    uint8_t value = 0;
+    for (int i = 0; i < 4; i++) {
+        if (digitalRead(2 + i) == HIGH) {
+            value |= (1 << i);
+        }
+    }
+    return value;
+}
+
+void serialWriteAll(const uint8_t value) {
+	Serial.write(value);
+}
+
+uint8_t serialReadAll() {
+	if (Serial.available() > 0) {
+		return Serial.read();
+	}
+	return 0;
 }
 
 void loop() {
-    uint8_t input = 0x0;
+	uint8_t pinReceived = digitalReadAll();
+	if (pinReceived != lastPinReceived) {
+		lastPinReceived = pinReceived;
+		serialWriteAll(pinReceived);
+	}
 
-    for (int i = 0; i < 4; i++) {
-        uint8_t pinValue = digitalRead(2 + i);
-        if (pinValue == HIGH) {
-            input |= (0x1 << i);
-        }
-    }
-
-	digitalWriteAll(0x08);
-    
-    Serial.println(input);
+	while (Serial.available() > 0) {
+		usbReceived = Serial.read();
+		digitalWriteAll(usbReceived >> 4);
+		digitalWriteAll(usbReceived);
+	}
 }
