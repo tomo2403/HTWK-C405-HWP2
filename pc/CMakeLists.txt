@@ -3,4 +3,4 @@ project(pc)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(pc main.cpp)
+add_executable(pc main.cpp ../lib/encoder.cpp ../lib/codec.cpp)

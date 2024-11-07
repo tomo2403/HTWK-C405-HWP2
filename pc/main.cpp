@@ -3,6 +3,11 @@
 #include <termios.h>
 #include <unistd.h>
 #include <cstring>
+#include <cstdint>
+#include <vector>
+
+#include "../lib/encoder.hpp"
+#include <bitset>
 
 int main() {
     // Öffne den seriellen Port
@@ -41,15 +46,21 @@ int main() {
     // Wende die Einstellungen an
     tcsetattr(serial_port, TCSANOW, &tty);
 
-    char buffer[256];
-    while (true) {
-        // Lies Daten vom seriellen Port
-        int n = read(serial_port, buffer, sizeof(buffer) - 1);
-        if (n > 0) {
-            buffer[n] = '\0'; // Null-terminiere den String
-            std::cout << "Empfangen: " << buffer << std::endl;
-        } else if (n < 0) {
-            std::cerr << "Fehler beim Lesen vom seriellen Port!" << std::endl;
+
+    // Vektor der Daten zum Senden enthält
+    std::vector<uint8_t> bytes = {0x02, 0x09, 0x01};
+    encoder enc = encoder(0x80, bytes);
+
+    while (enc.hasData())
+    {
+        uint8_t message = enc.nextByte().value();
+
+        // Sende Daten an den seriellen Port
+        int n = write(serial_port, &message, sizeof(message)); // Übergib die Adresse von message
+        if (n < 0) {
+            std::cerr << "Fehler beim Schreiben auf den seriellen Port!" << std::endl;
+        } else {
+            std::cout << "Gesendet: " << static_cast<int>(message) << std::endl; // Konvertiere zu int für die Ausgabe
         }
     }
 

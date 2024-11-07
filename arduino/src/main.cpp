@@ -32,10 +32,6 @@ uint8_t digitalReadAll() {
     return value;
 }
 
-void serialWriteAll(const uint8_t value) {
-	Serial.write(value);
-}
-
 uint8_t serialReadAll() {
 	if (Serial.available() > 0) {
 		return Serial.read();
@@ -47,11 +43,12 @@ void loop() {
 	uint8_t pinReceived = digitalReadAll();
 	if (pinReceived != lastPinReceived) {
 		lastPinReceived = pinReceived;
-		serialWriteAll(pinReceived);
+		Serial.write(pinReceived);
 	}
 
 	while (Serial.available() > 0) {
 		usbReceived = Serial.read();
+        Serial.println(usbReceived);
 		digitalWriteAll(usbReceived >> 4);
 		digitalWriteAll(usbReceived);
 	}
