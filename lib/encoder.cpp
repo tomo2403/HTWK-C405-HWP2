@@ -116,19 +116,9 @@ std::optional<uint8_t> encoder::nextNibble()
 
 std::optional<uint8_t> encoder::nextByte()
 {
-    uint8_t firstNibble;
-    uint8_t lastNibble;
-    for (uint8_t i = 0; i < 2; i++)
-    {
-        if(i == 0)
-        {
-            firstNibble = nextNibble().value();
-        }
-        else
-        {
-            lastNibble = nextNibble().value();
-        }
-    }
+    uint8_t byte = 0x00;
+    byte = (byte | nextNibble().value()) << 4;
+    byte |= nextNibble().value();
 
-    return (firstNibble << 4) | lastNibble;
+    return byte;
 }
