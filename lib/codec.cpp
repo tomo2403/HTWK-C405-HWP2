@@ -38,11 +38,25 @@ void codec::zeroBuffer()
     buffer = 0x00000000;
 }
 
-uint8_t codec::getByteSlice(const uint8_t &startBit, const uint8_t &endBit)
+uint8_t codec::getByteSlice(const uint8_t &startBit)
 {   
-    if (endBit - startBit != 7 || endBit > 31) {
-        throw std::invalid_argument("Start and end bits must define an 8-bit slice within the buffer.");
+    if (startBit >= 0 && startBit <= 24) {
+        throw std::invalid_argument("Start must define an 8-bit slice within the buffer.");
     }
 
     return static_cast<uint8_t>((buffer >> startBit) & 0x000000FF);
+}
+
+uint8_t codec::getNibbleSlice(const uint8_t &startBit)
+{
+    if (startBit >= 0 && startBit <= 28) {
+        throw std::invalid_argument("Start must define an 4-bit slice within the buffer.");
+    }
+
+    return static_cast<uint8_t>((buffer >> startBit) & 0x0000000F);
+}
+
+bool codec::areNegated(const uint8_t &nibbleOne, const uint8_t &nibbleTwo)
+{
+    return ((~nibbleOne) & 0x0F) == nibbleTwo;
 }

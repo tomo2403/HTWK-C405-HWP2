@@ -60,26 +60,39 @@ void encoder::negateNibbleInBuffer(const uint8_t &startBit)
     buffer |= (static_cast<uint32_t>(negatedNibble) << startBit);
 }
 
-std::optional<uint8_t> encoder::nextNibble()
+bool encoder::fetchDataIfBufferTooSmall()
 {
-    if (bufferEndBit <= 3)
+    const bool bufferContainsOnlyOneNibble = bufferEndBit <= 3;
+    const bool dataVectorHasUnprocessedData = dataVectorOffset_Index < dataVector.size();
+
+    if (bufferContainsOnlyOneNibble)
     {
-        if (dataVectorOffset_Index >= dataVector.size())
+        if (!dataVectorHasUnprocessedData)
         {
-            bufferEndBit = 0;
-            return static_cast<uint8_t>(buffer & 0x0F);
+            return false;
         }
-        else
-        {
-            leftShiftByteIntoBuffer(dataVector.at(dataVectorOffset_Index++));
-            bufferEndBit += 8;
-        }
+
+        leftShiftByteIntoBuffer(dataVector.at(dataVectorOffset_Index++));
+        bufferEndBit += 8;
     }
 
-    if (hasNegatedNibbles(getByteSlice(bufferEndBit - 7, bufferEndBit)) && bitsNotToEscape == 0)
+    return true;
+}
+
+std::optional<uint8_t> encoder::nextNibble()
+{
+    if (!fetchDataIfBufferTooSmall())
     {
-        uint8_t nextQeuedNibble = (buffer >> bufferEndBit-7) & 0x0F;
-        if (nextQeuedNibble == 0x01)
+        bufferEndBit = 0;
+        return static_cast<uint8_t>(buffer & 0x0F);
+    }
+
+    const uint8_t currentNibble = getNibbleSlice(bufferEndBit-3);
+    const uint8_t upcommingNibble = getNibbleSlice(bufferEndBit-7);
+
+    if (areNegated(currentNibble, upcommingNibble) && bitsNotToEscape == 0)
+    {
+        if (upcommingNibble == 0x01)
         {
             insertIntoBuffer(command::preserveNextByteFallback, bufferEndBit + 1);
         }
@@ -102,7 +115,7 @@ std::optional<uint8_t> encoder::nextNibble()
         bitsNotToEscape -= 4;
     }
 
-    if (hasEqualNibbles(getByteSlice(bufferEndBit - 7, bufferEndBit)))
+    if (hasEqualNibbles(getByteSlice(bufferEndBit - 7)))
     {
         negateNibbleInBuffer(bufferEndBit - 3);
         bitsNotToEscape = 4;
