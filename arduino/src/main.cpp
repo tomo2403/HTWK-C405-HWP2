@@ -32,13 +32,6 @@ uint8_t digitalReadAll() {
     return value;
 }
 
-uint8_t serialReadAll() {
-	if (Serial.available() > 0) {
-		return Serial.read();
-	}
-	return 0;
-}
-
 void loop() {
 	uint8_t pinReceived = digitalReadAll();
 	if (pinReceived != lastPinReceived) {
