@@ -6,7 +6,6 @@
 
 class encoder : public codec {
 private:
-    uint8_t bufferEndBit;
     uint32_t dataVectorOffset_Index = 0;
     uint8_t bitsNotToEscape = 0;
     uint8_t previousNibble;
@@ -34,7 +33,7 @@ private:
 
 public:
 
-    encoder(const uint8_t escapeSequence, std::vector<uint8_t> &dataVector);
+    encoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector);
     bool hasData();
 
     std::optional<uint8_t> nextByte();

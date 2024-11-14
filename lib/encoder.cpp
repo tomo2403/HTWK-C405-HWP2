@@ -3,7 +3,7 @@
 
 #include "encoder.hpp"
 
-encoder::encoder(const uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : codec::codec(escapeSequence, dataVector)
+encoder::encoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : codec::codec(escapeSequence, dataVector)
 {
     if (dataVector.size() == 0)
     {

@@ -33,6 +33,12 @@ void codec::leftShiftByteIntoBuffer(const uint8_t &byte)
     buffer |= byte;
 }
 
+void codec::leftShiftNibbleIntoBuffer(const uint8_t &byte)
+{
+    buffer <<= 4;
+    buffer |= (byte & 0x0F);
+}
+
 void codec::zeroBuffer()
 {
     buffer = 0x00000000;
