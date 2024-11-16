@@ -90,6 +90,15 @@ std::optional<uint8_t> encoder::nextNibble()
     const uint8_t currentNibble = getNibbleSlice(bufferEndBit-3);
     const uint8_t upcommingNibble = getNibbleSlice(bufferEndBit-7);
 
+    const uint8_t currentByte = getByteSlice(bufferEndBit - 7);
+
+    if (currentByte == escapeSequence && bitsNotToEscape == 0)
+    {
+        insertIntoBuffer(command::preserveNextByteDefault, bufferEndBit + 1);
+        bufferEndBit += 12;
+        bitsNotToEscape = 20;
+    }
+
     if (areNegated(currentNibble, upcommingNibble) && bitsNotToEscape == 0)
     {
         if (upcommingNibble == 0x01)
