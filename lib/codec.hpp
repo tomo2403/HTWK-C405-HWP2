@@ -9,6 +9,7 @@ protected:
     
     const uint8_t escapeSequence = 0x80;
     std::vector<uint8_t> &dataVector;
+    uint8_t previousNibble = 0x10;
 
     uint8_t bufferEndBit;
 
@@ -20,6 +21,7 @@ protected:
     uint8_t getNibbleSlice(const uint8_t &startBit);
     bool areNegated(const uint8_t &nibbleOne, const uint8_t &nibbleTwo);
     void leftShiftNibbleIntoBuffer(const uint8_t &byte);
+    void negateNibbleInBuffer(const uint8_t &startBit);
 
 public:
     codec(const uint8_t escapeSequence, std::vector<uint8_t> &dataVector);

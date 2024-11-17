@@ -3,6 +3,6 @@ project(lib)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(lib main.cpp codec.cpp crc.cpp encoder.cpp
+add_executable(lib main.cpp codec.cpp crc.cpp encoder.cpp decoder.cpp
         ioManager.cpp
         ioManager.h)

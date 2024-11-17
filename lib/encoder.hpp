@@ -8,9 +8,6 @@ class encoder : public codec {
 private:
     uint32_t dataVectorOffset_Index = 0;
     uint8_t bitsNotToEscape = 0;
-    uint8_t previousNibble;
-
-    void negateNibbleInBuffer(const uint8_t &startBit);
     
     /**
      * @brief Stellt sicher, dass der Buffer immer min. 2 Nibble hält, in dem es ggf. neue Rohdaten anhängt.

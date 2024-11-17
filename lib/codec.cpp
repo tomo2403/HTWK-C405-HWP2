@@ -66,3 +66,19 @@ bool codec::areNegated(const uint8_t &nibbleOne, const uint8_t &nibbleTwo)
 {
     return ((~nibbleOne) & 0x0F) == nibbleTwo;
 }
+
+void codec::negateNibbleInBuffer(const uint8_t &startBit)
+{
+
+    if (startBit > 28) {
+        throw std::out_of_range("Start bit cannot be higher than 28.");
+    }
+
+    const uint8_t originalNibble = static_cast<uint8_t>((buffer >> startBit) & 0x0F);
+    const uint8_t negatedNibble = ~originalNibble & 0x0F;
+
+    const uint32_t mask = ~(0x0F << startBit);
+
+    buffer &= mask;
+    buffer |= (static_cast<uint32_t>(negatedNibble) << startBit);
+}
