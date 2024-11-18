@@ -6,6 +6,11 @@ Decoder::Decoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector, Comma
 	commandSubject.addObserver(commandObserver);
 }
 
+Decoder::Decoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : Codec::Codec(escapeSequence, dataVector)
+{
+	this->bufferEndBit = 0;
+}
+
 void Decoder::processCommand(const uint8_t &command)
 {
 	switch (command & 0x0F)

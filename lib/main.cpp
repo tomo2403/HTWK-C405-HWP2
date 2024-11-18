@@ -7,6 +7,7 @@
 #include <vector>
 #include <cstdint>
 
+/*
 int main() {
     // Dateinamen für Ein- und Ausgabe
     const std::string inputFileName = "../random_data.bin";
@@ -73,8 +74,8 @@ int main() {
     std::cout << "Datei erfolgreich verarbeitet und gespeichert!" << std::endl;
     return 0;
 }
+*/
 
-/*
 int main(int, char**){
     
     std::vector<uint8_t> RawBytes = {0x8F, 0x09};
@@ -97,4 +98,3 @@ int main(int, char**){
 		std::cout << std::bitset<8>(byte) << std::endl;
 	}
 }
-*/
