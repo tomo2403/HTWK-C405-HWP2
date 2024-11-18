@@ -6,8 +6,9 @@
 #include <cstdint>
 #include <vector>
 
-#include "../lib/encoder.hpp"
-#include "../lib/ioManager.h"
+#include "../lib/Encoder.hpp"
+#include "../lib/Decoder.hpp"
+#include "../lib/ioManager.hpp"
 #include <bitset>
 
 void setupSerialPort(int *serial_port) {
@@ -54,11 +55,12 @@ int main() {
 
     // Vektor der Daten zum Senden enthält
 	std::vector<uint8_t> data = ioManager::getBinaryPipeContent();
-    encoder enc = encoder(0x80, data);
-
 	std::vector<uint8_t> receivedDataVector;
+    Encoder enc = Encoder(0x80, data);
+	Decoder dec = Decoder(0x80, receivedDataVector);
 
-    while (enc.hasData())
+	bool finishedDecoding = false;
+    while (enc.hasData() && !finishedDecoding)
     {
         uint8_t message = enc.nextByte().value();
 
@@ -74,9 +76,7 @@ int main() {
 		if (m < 0) {
 			throw std::runtime_error("Fehler beim Lesen vom seriellen Port!");
 		}
-
-		// sammle die empfangenen Daten in einem vektor
-		receivedDataVector.push_back(receivedData);
+		dec.nextNibble(receivedData);
 
 		// TODO: break on finish signal
     }

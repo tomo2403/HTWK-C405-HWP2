@@ -1,11 +1,11 @@
-#include "codec.hpp"
+#include "Codec.hpp"
 #include <iostream>
 #include <bitset>
 
-codec::codec(const uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : escapeSequence(escapeSequence), dataVector(dataVector)
+Codec::Codec(const uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : escapeSequence(escapeSequence), dataVector(dataVector)
 { }
 
-bool codec::hasNegatedNibbles(const uint8_t &byte)
+bool Codec::hasNegatedNibbles(const uint8_t &byte)
 {
 	uint8_t highNibble = byte >> 4;
 	uint8_t negatedLowNibble = ~byte & 0x0F;
@@ -13,7 +13,7 @@ bool codec::hasNegatedNibbles(const uint8_t &byte)
 	return highNibble == negatedLowNibble;
 }
 
-bool codec::hasEqualNibbles(const uint8_t &byte)
+bool Codec::hasEqualNibbles(const uint8_t &byte)
 {
 	uint8_t highNibble = byte >> 4;
 	uint8_t lowNibble = byte & 0x0F;
@@ -21,7 +21,7 @@ bool codec::hasEqualNibbles(const uint8_t &byte)
 	return highNibble == lowNibble;
 }
 
-uint8_t codec::negateLowNibble(const uint8_t &byte)
+uint8_t Codec::negateLowNibble(const uint8_t &byte)
 {
 	uint8_t highNibble = byte | 0x0F;
 	uint8_t lowNibble = byte & 0x0F;
@@ -29,24 +29,24 @@ uint8_t codec::negateLowNibble(const uint8_t &byte)
 	return highNibble & ~lowNibble;
 }
 
-void codec::leftShiftByteIntoBuffer(const uint8_t &byte)
+void Codec::leftShiftByteIntoBuffer(const uint8_t &byte)
 {
 	buffer <<= 8;
 	buffer |= byte;
 }
 
-void codec::leftShiftNibbleIntoBuffer(const uint8_t &byte)
+void Codec::leftShiftNibbleIntoBuffer(const uint8_t &byte)
 {
 	buffer <<= 4;
 	buffer |= (byte & 0x0F);
 }
 
-void codec::zeroBuffer()
+void Codec::zeroBuffer()
 {
 	buffer = 0x00000000;
 }
 
-uint8_t codec::getByteSlice(const uint8_t &startBit) const
+uint8_t Codec::getByteSlice(const uint8_t &startBit) const
 {
 	if (startBit < 0 || startBit > 24)
 	{
@@ -56,7 +56,7 @@ uint8_t codec::getByteSlice(const uint8_t &startBit) const
 	return static_cast<uint8_t>((buffer >> startBit) & 0x000000FF);
 }
 
-uint8_t codec::getNibbleSlice(const uint8_t &startBit) const
+uint8_t Codec::getNibbleSlice(const uint8_t &startBit) const
 {
 	if (startBit < 0 || startBit > 28)
 	{
@@ -66,12 +66,12 @@ uint8_t codec::getNibbleSlice(const uint8_t &startBit) const
 	return static_cast<uint8_t>((buffer >> startBit) & 0x0000000F);
 }
 
-bool codec::areNegated(const uint8_t &nibbleOne, const uint8_t &nibbleTwo)
+bool Codec::areNegated(const uint8_t &nibbleOne, const uint8_t &nibbleTwo)
 {
 	return ((~nibbleOne) & 0x0F) == nibbleTwo;
 }
 
-void codec::negateNibbleInBuffer(const uint8_t &startBit)
+void Codec::negateNibbleInBuffer(const uint8_t &startBit)
 {
 
 	if (startBit > 28)

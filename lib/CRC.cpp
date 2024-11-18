@@ -1,4 +1,4 @@
-#include "crc.hpp"
+#include "CRC.hpp"
 
 CRC::CRC(uint32_t polynomial, uint32_t initialValue)
 {

@@ -2,9 +2,9 @@
 
 #include <optional>
 
-#include "codec.hpp"
+#include "Codec.hpp"
 
-class encoder : public codec
+class Encoder : public Codec
 {
 private:
 	uint32_t dataVectorOffset_Index = 0;
@@ -32,7 +32,7 @@ private:
 
 public:
 
-	encoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector);
+	Encoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector);
 
 	bool hasData();
 

@@ -1,6 +1,6 @@
-#include "codec.hpp"
+#include "Codec.hpp"
 
-class decoder : public codec
+class Decoder : public Codec
 {
 private:
 	bool EscapedModeIsActive = false;
@@ -10,12 +10,12 @@ private:
 	uint8_t dataVectorBuffer = 0x00;
 	uint8_t dataVectorBufferShiftCount = 0;
 
-	void processCommand(const uint8_t &command);
+	bool processCommand(const uint8_t &command);
 
 	void writeToDataVector(const uint8_t &nibble);
 
 public:
-	decoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector);
+	Decoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector);
 
 	void nextNibble(const uint8_t &nibble);
 

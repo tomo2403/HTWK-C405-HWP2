@@ -1,11 +1,11 @@
-#include "decoder.hpp"
+#include "Decoder.hpp"
 
-decoder::decoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : codec::codec(escapeSequence, dataVector)
+Decoder::Decoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : Codec::Codec(escapeSequence, dataVector)
 {
 	this->bufferEndBit = 0;
 }
 
-void decoder::processCommand(const uint8_t &command)
+bool Decoder::processCommand(const uint8_t &command)
 {
 	switch (command & 0x0F)
 	{
@@ -17,13 +17,16 @@ void decoder::processCommand(const uint8_t &command)
 			break;
 		case command::everythingSend:
 			// TODO: Implement
-			break;
+			flushBufferIntoDataVector();
+			return true;
 		default:
 			break;
 	}
+
+	return false;
 }
 
-void decoder::writeToDataVector(const uint8_t &nibble)
+void Decoder::writeToDataVector(const uint8_t &nibble)
 {
 	dataVectorBuffer <<= 4;
 	dataVectorBuffer |= nibble & 0x0F;
@@ -36,7 +39,7 @@ void decoder::writeToDataVector(const uint8_t &nibble)
 	}
 }
 
-void decoder::flushBufferIntoDataVector()
+void Decoder::flushBufferIntoDataVector()
 {
 	while (bufferEndBit > 0)
 	{
@@ -47,7 +50,7 @@ void decoder::flushBufferIntoDataVector()
 	// TODO: Exception, wenn ein Nibble zu wenig!
 }
 
-void decoder::nextNibble(const uint8_t &nibble)
+void Decoder::nextNibble(const uint8_t &nibble)
 {
 	if (nibblesNotToDecode > 0)
 	{

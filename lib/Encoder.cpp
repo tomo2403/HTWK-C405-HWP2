@@ -1,9 +1,9 @@
 #include <iostream>
 #include <bitset>
 
-#include "encoder.hpp"
+#include "Encoder.hpp"
 
-encoder::encoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : codec::codec(escapeSequence, dataVector)
+Encoder::Encoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : Codec::Codec(escapeSequence, dataVector)
 {
 	if (dataVector.empty())
 	{
@@ -16,7 +16,7 @@ encoder::encoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : cod
 	}
 }
 
-void encoder::insertIntoBuffer(const command &command, const uint8_t &atBit)
+void Encoder::insertIntoBuffer(const command &command, const uint8_t &atBit)
 {
 	if (atBit > 20)
 	{
@@ -28,7 +28,7 @@ void encoder::insertIntoBuffer(const command &command, const uint8_t &atBit)
 	buffer |= (static_cast<uint32_t>(command) << atBit);
 }
 
-void encoder::insertIntoBuffer(const uint8_t &byte, const uint8_t &atBit)
+void Encoder::insertIntoBuffer(const uint8_t &byte, const uint8_t &atBit)
 {
 	if (atBit < 0 || atBit > 24)
 	{
@@ -39,12 +39,12 @@ void encoder::insertIntoBuffer(const uint8_t &byte, const uint8_t &atBit)
 	buffer |= (static_cast<uint32_t>(byte) << (atBit));
 }
 
-bool encoder::hasData()
+bool Encoder::hasData()
 {
 	return bufferEndBit != 0 || dataVectorOffset_Index < dataVector.size();
 }
 
-bool encoder::fetchDataIfBufferTooSmall()
+bool Encoder::fetchDataIfBufferTooSmall()
 {
 	const bool bufferContainsOnlyOneNibble = bufferEndBit <= 3;
 	const bool dataVectorHasUnprocessedData = dataVectorOffset_Index < dataVector.size();
@@ -63,7 +63,7 @@ bool encoder::fetchDataIfBufferTooSmall()
 	return true;
 }
 
-std::optional<uint8_t> encoder::nextNibble()
+std::optional<uint8_t> Encoder::nextNibble()
 {
 	if (!fetchDataIfBufferTooSmall())
 	{
@@ -120,7 +120,7 @@ std::optional<uint8_t> encoder::nextNibble()
 	return nextNibble;
 }
 
-std::optional<uint8_t> encoder::nextByte()
+std::optional<uint8_t> Encoder::nextByte()
 {
 	uint8_t byte = 0x00;
 	byte = (byte | nextNibble().value()) << 4;

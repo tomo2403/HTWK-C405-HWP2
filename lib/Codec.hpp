@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <vector>
 
-class codec
+class Codec
 {
 protected:
     uint32_t buffer = 0x00000000;
@@ -25,7 +25,7 @@ protected:
     void negateNibbleInBuffer(const uint8_t &startBit);
 
 public:
-    codec(uint8_t escapeSequence, std::vector<uint8_t> &dataVector);
+    Codec(uint8_t escapeSequence, std::vector<uint8_t> &dataVector);
     
     // Sonderfall nachfolgendes Nibble ist gleich command
     void zeroBuffer();
