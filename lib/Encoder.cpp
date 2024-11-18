@@ -71,7 +71,7 @@ std::optional<uint8_t> Encoder::nextNibble()
 		return static_cast<uint8_t>(buffer & 0x0F);
 	}
 
-	const uint8_t currentNibble = getNibbleSlice(bufferEndBit - 3);
+	uint8_t currentNibble = getNibbleSlice(bufferEndBit - 3);
 	const uint8_t upcommingNibble = getNibbleSlice(bufferEndBit - 7);
 
 	const uint8_t currentByte = getByteSlice(bufferEndBit - 7);
@@ -85,15 +85,15 @@ std::optional<uint8_t> Encoder::nextNibble()
 
 	if (currentNibble == (escapeSequence >> 4))
 	{
-		uint8_t upcommingByte = 0x00 | upcommingNibble;
+		uint8_t upcommingByte;
 
 		if (bufferEndBit >= 11)
 		{
-			upcommingByte = (upcommingByte << 4) | (buffer >> (bufferEndBit-7));
+			upcommingByte = static_cast<uint8_t>((buffer >> (bufferEndBit - 11)) & 0x000000FF);
 		}
 		else if (dataVectorOffset_Index < dataVector.size())
 		{
-			upcommingByte = (upcommingByte << 4) | (dataVector.at(dataVectorOffset_Index) >> 4);
+			upcommingByte = (upcommingNibble << 4)| (dataVector.at(dataVectorOffset_Index) >> 4);
 		}
 		
 		if (hasNegatedNibbles(upcommingByte))

@@ -25,7 +25,7 @@ void Decoder::processCommand(const uint8_t &command)
 
 void Decoder::writeToDataVector(const uint8_t &nibble)
 {
-	if (!partnerIsReady) return;
+	// if (!partnerIsReady) return;
 
 	dataVectorBuffer <<= 4;
 	dataVectorBuffer |= nibble & 0x0F;

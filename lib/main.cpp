@@ -93,7 +93,7 @@ int main(int, char**){
 
 	std::cout << "Decoded:" << std::endl;
 	dec.flushBufferIntoDataVector();
-	for (u_int8_t byte: decodedBytes)
+	for (uint8_t byte: decodedBytes)
 	{
 		std::cout << std::bitset<8>(byte) << std::endl;
 	}
