@@ -5,7 +5,7 @@
 
 encoder::encoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : codec::codec(escapeSequence, dataVector)
 {
-	if (dataVector.size() == 0)
+	if (dataVector.empty())
 	{
 		throw std::invalid_argument("Data-Vector cannot be empty.");
 	}
@@ -115,7 +115,7 @@ std::optional<uint8_t> encoder::nextNibble()
 	}
 
 	bufferEndBit -= 4;
-	uint8_t nextNibble = (buffer >> bufferEndBit + 1) & 0x0F;
+	uint8_t nextNibble = (buffer >> (bufferEndBit + 1)) & 0x0F;
 	previousNibble = nextNibble;
 	return nextNibble;
 }

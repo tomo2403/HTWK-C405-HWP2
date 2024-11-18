@@ -15,7 +15,9 @@ void decoder::processCommand(const uint8_t &command)
 		case command::preserveNextByteFallback:
 			nibblesNotToDecode = 2;
 			break;
-
+		case command::everythingSend:
+			// TODO: Implement
+			break;
 		default:
 			break;
 	}

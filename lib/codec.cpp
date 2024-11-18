@@ -46,9 +46,9 @@ void codec::zeroBuffer()
 	buffer = 0x00000000;
 }
 
-uint8_t codec::getByteSlice(const uint8_t &startBit)
+uint8_t codec::getByteSlice(const uint8_t &startBit) const
 {
-	if (startBit < 0 && startBit > 24)
+	if (startBit < 0 || startBit > 24)
 	{
 		throw std::invalid_argument("Start must define an 8-bit slice within the buffer.");
 	}
@@ -56,9 +56,9 @@ uint8_t codec::getByteSlice(const uint8_t &startBit)
 	return static_cast<uint8_t>((buffer >> startBit) & 0x000000FF);
 }
 
-uint8_t codec::getNibbleSlice(const uint8_t &startBit)
+uint8_t codec::getNibbleSlice(const uint8_t &startBit) const
 {
-	if (startBit < 0 && startBit > 28)
+	if (startBit < 0 || startBit > 28)
 	{
 		throw std::invalid_argument("Start must define an 4-bit slice within the buffer.");
 	}
@@ -79,7 +79,7 @@ void codec::negateNibbleInBuffer(const uint8_t &startBit)
 		throw std::out_of_range("Start bit cannot be higher than 28.");
 	}
 
-	const uint8_t originalNibble = static_cast<uint8_t>((buffer >> startBit) & 0x0F);
+	const auto originalNibble = static_cast<uint8_t>((buffer >> startBit) & 0x0F);
 	const uint8_t negatedNibble = ~originalNibble & 0x0F;
 
 	const uint32_t mask = ~(0x0F << startBit);

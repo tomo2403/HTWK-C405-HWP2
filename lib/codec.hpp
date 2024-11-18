@@ -1,6 +1,7 @@
 #pragma once
 
-#include "global.hpp"
+#include <cstdint>
+#include <vector>
 
 class codec
 {
@@ -11,22 +12,22 @@ protected:
     std::vector<uint8_t> &dataVector;
     uint8_t previousNibble = 0x10;
 
-    uint8_t bufferEndBit;
+    uint8_t bufferEndBit{};
 
-    bool hasNegatedNibbles(const uint8_t &byte);
-    bool hasEqualNibbles(const uint8_t &byte);
-    uint8_t negateLowNibble(const uint8_t &byte);
+    static bool hasNegatedNibbles(const uint8_t &byte);
+    static bool hasEqualNibbles(const uint8_t &byte);
+    static uint8_t negateLowNibble(const uint8_t &byte);
     void leftShiftByteIntoBuffer(const uint8_t &byte);
-    uint8_t getByteSlice(const uint8_t &startBit);
-    uint8_t getNibbleSlice(const uint8_t &startBit);
-    bool areNegated(const uint8_t &nibbleOne, const uint8_t &nibbleTwo);
+    uint8_t getByteSlice(const uint8_t &startBit) const;
+    uint8_t getNibbleSlice(const uint8_t &startBit) const;
+    static bool areNegated(const uint8_t &nibbleOne, const uint8_t &nibbleTwo);
     void leftShiftNibbleIntoBuffer(const uint8_t &byte);
     void negateNibbleInBuffer(const uint8_t &startBit);
 
 public:
-    codec(const uint8_t escapeSequence, std::vector<uint8_t> &dataVector);
+    codec(uint8_t escapeSequence, std::vector<uint8_t> &dataVector);
     
-    // Sodnerfall nachfolgendes Nibble ist gleich command
+    // Sonderfall nachfolgendes Nibble ist gleich command
     void zeroBuffer();
     enum command {
         preserveNextByteDefault = 0x01,
