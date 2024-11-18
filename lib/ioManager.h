@@ -7,9 +7,12 @@
 class ioManager
 {
 public:
-	void send(uint8_t* data[]);
-	void receive(uint8_t* data[]);
+	void send(uint8_t *data[]);
+
+	void receive(uint8_t *data[]);
+
 	static std::vector<uint8_t> getBinaryPipeContent();
-	static void printVector(const std::vector<uint8_t>& data);
+
+	static void printVector(const std::vector<uint8_t> &data);
 };
 

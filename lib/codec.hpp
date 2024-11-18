@@ -31,6 +31,7 @@ public:
     enum command {
         preserveNextByteDefault = 0x01,
         preserveNextByteFallback = 0x02,
-        iAmReady = 0x03
+        iAmReady = 0x03,
+		everythingSend = 0x04,
     };
 };

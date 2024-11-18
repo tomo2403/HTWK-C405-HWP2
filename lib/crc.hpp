@@ -5,8 +5,10 @@
 #include <Vector.h>
 typedef Vector<uint8_t> myVector8;
 #else
+
 #include <vector>
 #include <cstdint>
+
 typedef std::vector<uint8_t> myVector8;
 #endif
 
