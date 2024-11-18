@@ -83,6 +83,26 @@ std::optional<uint8_t> Encoder::nextNibble()
 		bitsNotToEscape = 20;
 	}
 
+	if (currentNibble == (escapeSequence >> 4))
+	{
+		uint8_t upcommingByte = 0x00 | upcommingNibble;
+
+		if (bufferEndBit >= 11)
+		{
+			upcommingByte = (upcommingByte << 4) | (buffer >> (bufferEndBit-7));
+		}
+		else if (dataVectorOffset_Index < dataVector.size())
+		{
+			upcommingByte = (upcommingByte << 4) | (dataVector.at(dataVectorOffset_Index) >> 4);
+		}
+		
+		if (hasNegatedNibbles(upcommingByte))
+		{
+			negateNibbleInBuffer(bufferEndBit - 3);
+		}
+
+	}
+
 	if (areNegated(currentNibble, upcommingNibble) && bitsNotToEscape == 0)
 	{
 		if (upcommingNibble == 0x01)

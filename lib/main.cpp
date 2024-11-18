@@ -7,7 +7,6 @@
 #include <vector>
 #include <cstdint>
 
-/*
 int main() {
     // Dateinamen für Ein- und Ausgabe
     const std::string inputFileName = "../random_data.bin";
@@ -33,12 +32,12 @@ int main() {
     inputFile.close();
 
     // Hier erfolgt die Bearbeitung des Vektors
-    encoder enc = encoder(0x80, data);
+    Encoder enc = Encoder(0x80, data);
 
     std::vector<uint8_t> encData = std::vector<uint8_t>();
     std::vector<uint8_t> decData = std::vector<uint8_t>();
     
-    decoder dec = decoder(0x80, decData);
+    Decoder dec = Decoder(0x80, decData);
     
     uint8_t nextNibble;
     while (enc.hasData())
@@ -74,7 +73,8 @@ int main() {
     std::cout << "Datei erfolgreich verarbeitet und gespeichert!" << std::endl;
     return 0;
 }
-*/
+
+/*
 int main(int, char**){
     
     std::vector<uint8_t> RawBytes = {0x8F, 0x09};
@@ -97,3 +97,4 @@ int main(int, char**){
 		std::cout << std::bitset<8>(byte) << std::endl;
 	}
 }
+*/
