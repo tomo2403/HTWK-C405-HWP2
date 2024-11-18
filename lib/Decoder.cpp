@@ -1,33 +1,37 @@
 #include "Decoder.hpp"
 
-Decoder::Decoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : Codec::Codec(escapeSequence, dataVector)
+Decoder::Decoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector, CommandObserver *commandObserver) : Codec::Codec(escapeSequence, dataVector)
 {
 	this->bufferEndBit = 0;
+	commandSubject.addObserver(commandObserver);
 }
 
-bool Decoder::processCommand(const uint8_t &command)
+void Decoder::processCommand(const uint8_t &command)
 {
 	switch (command & 0x0F)
 	{
-		case command::preserveNextByteDefault:
+		case CodecCommand::preserveNextByteDefault:
 			nibblesNotToDecode = 2;
 			break;
-		case command::preserveNextByteFallback:
+		case CodecCommand::preserveNextByteFallback:
 			nibblesNotToDecode = 2;
 			break;
-		case command::everythingSend:
+		case CodecCommand::iAmReady:
+			partnerIsReady = true;
+			break;
+		case CodecCommand::everythingSend:
 			// TODO: Implement
 			flushBufferIntoDataVector();
-			return true;
+			commandSubject.notifyObservers(command);
 		default:
 			break;
 	}
-
-	return false;
 }
 
 void Decoder::writeToDataVector(const uint8_t &nibble)
 {
+	if (!partnerIsReady) return;
+
 	dataVectorBuffer <<= 4;
 	dataVectorBuffer |= nibble & 0x0F;
 	dataVectorBufferShiftCount++;

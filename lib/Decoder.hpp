@@ -1,8 +1,10 @@
 #include "Codec.hpp"
+#include "CommandObserver.cpp"
 
 class Decoder : public Codec
 {
 private:
+	Subject commandSubject;
 	bool EscapedModeIsActive = false;
 	bool flippedPevNibble = false;
 	uint8_t nibblesNotToDecode = 0;
@@ -10,12 +12,14 @@ private:
 	uint8_t dataVectorBuffer = 0x00;
 	uint8_t dataVectorBufferShiftCount = 0;
 
-	bool processCommand(const uint8_t &command);
+	bool partnerIsReady = false;
+
+	void processCommand(const uint8_t &command);
 
 	void writeToDataVector(const uint8_t &nibble);
 
 public:
-	Decoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector);
+	Decoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector, CommandObserver *commandObserver);
 
 	void nextNibble(const uint8_t &nibble);
 

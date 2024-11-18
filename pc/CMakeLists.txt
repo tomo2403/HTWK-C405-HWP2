@@ -9,4 +9,5 @@ add_executable(pc main.cpp
         ../lib/Decoder.cpp
         ../lib/CRC.cpp
         ../lib/Observer.cpp
-        ../lib/ioManager.cpp)
+        ../lib/ioManager.cpp
+        ../lib/CommandObserver.cpp)
