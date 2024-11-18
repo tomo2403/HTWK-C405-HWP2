@@ -6,24 +6,16 @@
 class Observer {
 public:
 	virtual ~Observer() = default;
-	virtual void update() = 0;
+	virtual void update(uint8_t signal) = 0;
 };
 
 class Subject {
 public:
-	void addObserver(Observer* observer) {
-		observers.push_back(observer);
-	}
+	void addObserver(Observer* observer);
 
-	void removeObserver(Observer* observer) {
-		observers.erase(std::remove(observers.begin(), observers.end(), observer), observers.end());
-	}
+	void removeObserver(Observer* observer);
 
-	void notifyObservers() {
-		for (Observer* observer : observers) {
-			observer->update();
-		}
-	}
+	void notifyObservers(uint8_t signal);
 
 private:
 	std::vector<Observer*> observers;
