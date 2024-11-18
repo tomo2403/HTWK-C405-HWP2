@@ -1,11 +1,5 @@
 #include "Decoder.hpp"
 
-Decoder::Decoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector, CommandObserver *commandObserver) : Codec::Codec(escapeSequence, dataVector)
-{
-	this->bufferEndBit = 0;
-	commandSubject.addObserver(commandObserver);
-}
-
 Decoder::Decoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : Codec::Codec(escapeSequence, dataVector)
 {
 	this->bufferEndBit = 0;
@@ -24,10 +18,6 @@ void Decoder::processCommand(const uint8_t &command)
 		case CodecCommand::iAmReady:
 			partnerIsReady = true;
 			break;
-		case CodecCommand::everythingSend:
-			// TODO: Implement
-			flushBufferIntoDataVector();
-			commandSubject.notifyObservers(command);
 		default:
 			break;
 	}
