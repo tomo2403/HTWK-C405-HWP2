@@ -23,6 +23,10 @@ protected:
     static bool areNegated(const uint8_t &nibbleOne, const uint8_t &nibbleTwo);
     void leftShiftNibbleIntoBuffer(const uint8_t &byte);
     void negateNibbleInBuffer(const uint8_t &startBit);
+    void gracefullyInsertNibbleIntoBuffer(const uint8_t &nibble, const uint8_t &startBit);
+    uint8_t currentNibble();
+    uint8_t upcommingNibble();
+    uint8_t currentByte();
 
 public:
     Codec(uint8_t escapeSequence, std::vector<uint8_t> &dataVector);
@@ -40,12 +44,15 @@ public:
 };
 
 enum CodecCommand {
+    // Do NOT use: 0x00, 0xFF!
 	preserveNextByteDefault = 0x01,
 	preserveNextByteFallback = 0x02,
-    insertEscSeqAsDataDefault = 0x05,
-    insertEscSeqAsDataFallback = 0x06,
 	/** The Communicationpartner is ready to send/receive */
 	iAmReady = 0x03,
 	/** The Communicationpartner has sent everything */
 	everythingSend = 0x04,
+    insertEscSeqAsDataDefault = 0x05,
+    insertEscSeqAsDataFallback = 0x06,
+    unflipPrevNibbleAndPreserveNextByteDefault = 0x07,
+    unflipPrevNibbleAndPreserveNextByteFallback = 0x08,
 };

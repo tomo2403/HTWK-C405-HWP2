@@ -87,3 +87,36 @@ void Codec::negateNibbleInBuffer(const uint8_t &startBit)
 	buffer &= mask;
 	buffer |= (static_cast<uint32_t>(negatedNibble) << startBit);
 }
+
+void Codec::gracefullyInsertNibbleIntoBuffer(const uint8_t &nibble, const uint8_t &startBit)
+{
+	uint32_t bufferTmp = buffer;
+
+	buffer >>= startBit-4;
+	buffer &= 0xFFFFFFF0;
+	buffer |= nibble & 0x0F;
+	buffer <<= startBit;
+
+	uint32_t mask = 0x00000000;
+	for (int i = startBit-4; i >= 0; i = i-4)
+	{
+		mask |= (0x0F << i);
+	}
+
+	bufferTmp &= mask;
+	buffer |= bufferTmp;
+	bufferEndBit += 4;
+}
+
+uint8_t Codec::currentNibble()
+{
+	return getNibbleSlice(bufferEndBit - 3);
+}
+uint8_t Codec::upcommingNibble()
+{
+	return getNibbleSlice(bufferEndBit - 7);
+}
+uint8_t Codec::currentByte()
+{
+	return getByteSlice(bufferEndBit - 7);
+}

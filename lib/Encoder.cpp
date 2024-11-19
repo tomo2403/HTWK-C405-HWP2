@@ -71,19 +71,14 @@ std::optional<uint8_t> Encoder::nextNibble()
 		return static_cast<uint8_t>(buffer & 0x0F);
 	}
 
-	uint8_t currentNibble = getNibbleSlice(bufferEndBit - 3);
-	const uint8_t upcommingNibble = getNibbleSlice(bufferEndBit - 7);
-
-	const uint8_t currentByte = getByteSlice(bufferEndBit - 7);
-
-	if (currentByte == escapeSequence && bitsNotToEscape == 0)
+	if (currentByte() == escapeSequence && bitsNotToEscape == 0)
 	{
 		insertIntoBuffer(command::preserveNextByteDefault, bufferEndBit + 1);
 		bufferEndBit += 12;
 		bitsNotToEscape = 20;
 	}
 
-	if (currentNibble == (escapeSequence >> 4))
+	if (currentNibble() == (escapeSequence >> 4))
 	{
 		uint8_t upcommingByte;
 
@@ -93,7 +88,7 @@ std::optional<uint8_t> Encoder::nextNibble()
 		}
 		else if (dataVectorOffset_Index < dataVector.size())
 		{
-			upcommingByte = (upcommingNibble << 4)| (dataVector.at(dataVectorOffset_Index) >> 4);
+			upcommingByte = (upcommingNibble() << 4)| (dataVector.at(dataVectorOffset_Index) >> 4);
 		}
 		
 		if (hasNegatedNibbles(upcommingByte))
@@ -105,29 +100,14 @@ std::optional<uint8_t> Encoder::nextNibble()
 		{
 			negateNibbleInBuffer(bufferEndBit - 7);
 			
-			uint32_t bufferTmp = buffer;
-
-			buffer >>= bufferEndBit-11;
-			buffer &= 0xFFFFFFF0;
-			buffer |= CodecCommand::insertEscSeqAsDataDefault & 0x0F;
-			buffer <<= bufferEndBit-7;
-
-			uint32_t mask = 0x00000000;
-			for (int i = bufferEndBit-11; i >= 0; i = i-4)
-			{
-				mask |= (0x0F << i);
-			}
-
-			bufferTmp &= mask;
-			buffer |= bufferTmp;
-			bufferEndBit += 4;
+			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataDefault & 0x0F, bufferEndBit-3);
 		}
 
 	}
 
-	if (areNegated(currentNibble, upcommingNibble) && bitsNotToEscape == 0)
+	if (areNegated(currentNibble(), upcommingNibble()) && bitsNotToEscape == 0)
 	{
-		if (upcommingNibble == 0x01)
+		if (currentNibble() == 0x01)
 		{
 			insertIntoBuffer(command::preserveNextByteFallback, bufferEndBit + 1);
 		}
