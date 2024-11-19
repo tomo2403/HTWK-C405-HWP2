@@ -24,8 +24,8 @@ private:
 	 */
 	bool fetchDataIfBufferTooSmall();
 
-	void InsertEscapeIfNecessary();
-
+	uint8_t upcommingByte();
+	
 	void insertIntoBuffer(const command &command, const uint8_t &atBit);
 
 	void insertIntoBuffer(const uint8_t &byte, const uint8_t &atBit);

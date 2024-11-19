@@ -63,6 +63,22 @@ bool Encoder::fetchDataIfBufferTooSmall()
 	return true;
 }
 
+uint8_t Encoder::upcommingByte()
+{
+	if (bufferEndBit >= 11)
+	{
+		return static_cast<uint8_t>((buffer >> (bufferEndBit - 11)) & 0x000000FF);
+	}
+	else if (dataVectorOffset_Index < dataVector.size())
+	{
+		return (upcommingNibble() << 4)| (dataVector.at(dataVectorOffset_Index) >> 4);
+	}
+	else
+	{
+		throw std::out_of_range("No more Data in Datastream.");
+	}
+}
+
 std::optional<uint8_t> Encoder::nextNibble()
 {
 	if (!fetchDataIfBufferTooSmall())
@@ -79,30 +95,17 @@ std::optional<uint8_t> Encoder::nextNibble()
 	}
 
 	if (currentNibble() == (escapeSequence >> 4))
-	{
-		uint8_t upcommingByte;
-
-		if (bufferEndBit >= 11)
-		{
-			upcommingByte = static_cast<uint8_t>((buffer >> (bufferEndBit - 11)) & 0x000000FF);
-		}
-		else if (dataVectorOffset_Index < dataVector.size())
-		{
-			upcommingByte = (upcommingNibble() << 4)| (dataVector.at(dataVectorOffset_Index) >> 4);
-		}
-		
-		if (hasNegatedNibbles(upcommingByte))
+	{	
+		if (hasNegatedNibbles(upcommingByte()))
 		{
 			negateNibbleInBuffer(bufferEndBit - 3);
 		}
 
-		if (upcommingByte == 0xFF)
+		if (upcommingByte() == 0xFF)
 		{
-			negateNibbleInBuffer(bufferEndBit - 7);
-			
+			negateNibbleInBuffer(bufferEndBit - 7);	
 			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataDefault & 0x0F, bufferEndBit-3);
 		}
-
 	}
 
 	if (areNegated(currentNibble(), upcommingNibble()) && bitsNotToEscape == 0)
