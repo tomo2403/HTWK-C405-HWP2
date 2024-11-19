@@ -42,6 +42,8 @@ public:
 enum CodecCommand {
 	preserveNextByteDefault = 0x01,
 	preserveNextByteFallback = 0x02,
+    insertEscSeqAsDataDefault = 0x05,
+    insertEscSeqAsDataFallback = 0x06,
 	/** The Communicationpartner is ready to send/receive */
 	iAmReady = 0x03,
 	/** The Communicationpartner has sent everything */

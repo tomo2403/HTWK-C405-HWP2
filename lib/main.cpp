@@ -6,7 +6,6 @@
 #include <fstream>
 #include <vector>
 #include <cstdint>
-
 /*
 int main() {
     // Dateinamen für Ein- und Ausgabe
@@ -78,7 +77,7 @@ int main() {
 
 int main(int, char**){
     
-    std::vector<uint8_t> RawBytes = {0xDA, 0x4E, 0x08, 0x69};
+    std::vector<uint8_t> RawBytes = {0xDA, 0xCB, 0xC8, 0xFF};
     std::vector<uint8_t> decodedBytes = std::vector<uint8_t>();
     Encoder enc = Encoder(0x80, RawBytes);
     Decoder dec = Decoder(0x80, decodedBytes);

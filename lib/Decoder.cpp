@@ -18,6 +18,12 @@ void Decoder::processCommand(const uint8_t &command)
 		case CodecCommand::iAmReady:
 			partnerIsReady = true;
 			break;
+		case CodecCommand::insertEscSeqAsDataDefault:
+			leftShiftByteIntoBuffer(0x80);
+			bufferEndBit = bufferEndBit == 0 ? 7 : bufferEndBit+8;
+			// TODO decoding muss 1x mehr laufen, aber ohne neues Nibble
+			escAllowed = false;
+			break;
 		default:
 			break;
 	}
@@ -91,14 +97,16 @@ void Decoder::nextNibble(const uint8_t &nibble)
 		flippedPevNibble = false;
 	}
 
-	if (getByteSlice(bufferEndBit - 7) == escapeSequence)
+	if (getByteSlice(bufferEndBit - 7) == escapeSequence && escAllowed)
 	{
 		EscapedModeIsActive = true;
 		bufferEndBit -= 7;
 		return;
 	}
 
+	escAllowed = true;
 	previousNibble = getNibbleSlice(bufferEndBit - 3);
 	writeToDataVector(getNibbleSlice(bufferEndBit - 3));
 	bufferEndBit -= 4;
+	timesToRun--;
 };

@@ -101,6 +101,28 @@ std::optional<uint8_t> Encoder::nextNibble()
 			negateNibbleInBuffer(bufferEndBit - 3);
 		}
 
+		if (upcommingByte == 0xFF)
+		{
+			negateNibbleInBuffer(bufferEndBit - 7);
+			
+			uint32_t bufferTmp = buffer;
+
+			buffer >>= bufferEndBit-11;
+			buffer &= 0xFFFFFFF0;
+			buffer |= CodecCommand::insertEscSeqAsDataDefault & 0x0F;
+			buffer <<= bufferEndBit-7;
+
+			uint32_t mask = 0x00000000;
+			for (int i = bufferEndBit-11; i >= 0; i = i-4)
+			{
+				mask |= (0x0F << i);
+			}
+
+			bufferTmp &= mask;
+			buffer |= bufferTmp;
+			bufferEndBit += 4;
+		}
+
 	}
 
 	if (areNegated(currentNibble, upcommingNibble) && bitsNotToEscape == 0)

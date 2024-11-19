@@ -8,6 +8,8 @@ private:
 	bool EscapedModeIsActive = false;
 	bool flippedPevNibble = false;
 	uint8_t nibblesNotToDecode = 0;
+	bool escAllowed = true;
+	uint8_t timesToRun = 0;
 
 	uint8_t dataVectorBuffer = 0x00;
 	uint8_t dataVectorBufferShiftCount = 0;
