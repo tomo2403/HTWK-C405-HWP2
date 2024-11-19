@@ -75,7 +75,8 @@ uint8_t Encoder::upcommingByte()
 	}
 	else
 	{
-		throw std::out_of_range("No more Data in Datastream.");
+		return 0x10; // fishy
+		// throw std::out_of_range("No more Data in Datastream.");
 	}
 }
 
@@ -103,14 +104,34 @@ std::optional<uint8_t> Encoder::nextNibble()
 
 		if (upcommingByte() == 0xFF)
 		{
-			negateNibbleInBuffer(bufferEndBit - 7);	
-			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataDefault & 0x0F, bufferEndBit-3);
+			negateNibbleInBuffer(bufferEndBit - 7);
+			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataDefault & 0x0F, bufferEndBit-7);
+		}
+	}
+	else if (currentNibble() == ((~escapeSequence >> 4) & 0x0F) && bitsNotToEscape == 0)
+	{
+		if (hasNegatedNibbles(upcommingByte()))
+		{
+			const uint8_t upcommingDataNibbleAfterEsc = upcommingNibble();
+			gracefullyInsertNibbleIntoBuffer(0x08, bufferEndBit-3);
+			gracefullyInsertNibbleIntoBuffer(0x00, bufferEndBit-7);
+
+			if (upcommingDataNibbleAfterEsc == CodecCommand::unflipPrevNibbleAndPreserveNextByteDefault)
+			{
+				gracefullyInsertNibbleIntoBuffer(CodecCommand::unflipPrevNibbleAndPreserveNextByteFallback, bufferEndBit-11);
+			}
+			else
+			{
+				gracefullyInsertNibbleIntoBuffer(CodecCommand::unflipPrevNibbleAndPreserveNextByteDefault, bufferEndBit-11);
+			}
+
+			bitsNotToEscape += 20;
 		}
 	}
 
 	if (areNegated(currentNibble(), upcommingNibble()) && bitsNotToEscape == 0)
 	{
-		if (currentNibble() == 0x01)
+		if (currentNibble() == command::preserveNextByteDefault)
 		{
 			insertIntoBuffer(command::preserveNextByteFallback, bufferEndBit + 1);
 		}

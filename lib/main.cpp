@@ -6,7 +6,7 @@
 #include <fstream>
 #include <vector>
 #include <cstdint>
-/*
+
 int main() {
     // Dateinamen für Ein- und Ausgabe
     const std::string inputFileName = "../random_data.bin";
@@ -73,11 +73,11 @@ int main() {
     std::cout << "Datei erfolgreich verarbeitet und gespeichert!" << std::endl;
     return 0;
 }
-*/
 
+/*
 int main(int, char**){
     
-    std::vector<uint8_t> RawBytes = {0xdf, 0xea, 0x72, 0xd8};
+    std::vector<uint8_t> RawBytes = {0xcb, 0xc8, 0xff, 0xbc};
     std::vector<uint8_t> decodedBytes = std::vector<uint8_t>();
     Encoder enc = Encoder(0x80, RawBytes);
     Decoder dec = Decoder(0x80, decodedBytes);
@@ -97,3 +97,4 @@ int main(int, char**){
 		std::cout << std::bitset<8>(byte) << std::endl;
 	}
 }
+*/
