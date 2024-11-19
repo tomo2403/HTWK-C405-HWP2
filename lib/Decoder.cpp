@@ -12,6 +12,7 @@ void Decoder::processCommand(const uint8_t &command)
 		case CodecCommand::preserveNextByteDefault:
 		case CodecCommand::preserveNextByteFallback:
 			nibblesNotToDecode = 2;
+			nibbleNotToFlip = 3;
 			break;
 		case CodecCommand::iAmReady:
 			partnerIsReady = true;
@@ -95,8 +96,6 @@ void Decoder::nextNibble(const uint8_t &nibble)
 		}
 
 		const uint8_t currentByte = getByteSlice(bufferEndBit - 7);
-		const uint8_t testWTF = ((~currentByte) >> 4) & 0x0F;
-		const bool test = previousNibble == testWTF;
 
 		if (getByteSlice(bufferEndBit - 7) == escapeSequence && escAllowed)
 		{
@@ -105,7 +104,7 @@ void Decoder::nextNibble(const uint8_t &nibble)
 			return;
 		}
 
-		if ((hasNegatedNibbles(currentByte) || test) && !flippedPevNibble)
+		if ((hasNegatedNibbles(currentByte)) && !flippedPevNibble && nibbleNotToFlip == 0)
 		{
 			negateNibbleInBuffer(bufferEndBit - 3);
 			flippedPevNibble = true;
@@ -120,6 +119,7 @@ void Decoder::nextNibble(const uint8_t &nibble)
 		writeToDataVector(getNibbleSlice(bufferEndBit - 3));
 		bufferEndBit -= 4;
 		timesToRun--;
+		nibbleNotToFlip = nibbleNotToFlip == 0 ? 0 : nibbleNotToFlip-1;
 	} while(timesToRun > 0);
 	waitForEsc = true;
 };

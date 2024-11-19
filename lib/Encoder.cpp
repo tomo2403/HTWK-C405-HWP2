@@ -108,7 +108,7 @@ std::optional<uint8_t> Encoder::nextNibble()
 			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataDefault & 0x0F, bufferEndBit-7);
 		}
 	}
-	else if (currentNibble() == ((~escapeSequence >> 4) & 0x0F) && bitsNotToEscape == 0)
+	else if (currentNibble() == ((~escapeSequence >> 4) & 0x0F) && bitsNotToEscape == 0 && upcommingNibble() != 0x08 )
 	{
 		if (hasNegatedNibbles(upcommingByte()))
 		{

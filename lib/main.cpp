@@ -77,7 +77,8 @@ int main() {
 /*
 int main(int, char**){
     
-    std::vector<uint8_t> RawBytes = {0xcb, 0xc8, 0xff, 0xbc};
+    std::vector<uint8_t> RawBytes = {0xcb, 0xc7, 0x87, 0x1e};
+    // std::vector<uint8_t> RawBytes = {0x67, 0xde, 0x1d, 0x29};
     std::vector<uint8_t> decodedBytes = std::vector<uint8_t>();
     Encoder enc = Encoder(0x80, RawBytes);
     Decoder dec = Decoder(0x80, decodedBytes);
