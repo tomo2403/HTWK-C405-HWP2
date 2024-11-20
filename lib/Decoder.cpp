@@ -16,6 +16,9 @@ void Decoder::processCommand(const uint8_t &command)
 		case CodecCommand::iAmReady:
 			partnerIsReady = true;
 			break;
+		case CodecCommand::everythingSend:
+			everythingReceived = true;
+			break;
 		case CodecCommand::insertEscSeqAsDataDefault:
 			leftShiftByteIntoBuffer(0x80);
 			bufferEndBit = bufferEndBit == 0 ? 7 : bufferEndBit+8;
@@ -32,7 +35,7 @@ void Decoder::processCommand(const uint8_t &command)
 
 void Decoder::writeToDataVector(const uint8_t &nibble)
 {
-	// if (!partnerIsReady) return;
+	if (!partnerIsReady) return;
 
 	if (dataVectorBufferShiftCount == 2)
 	{
@@ -111,4 +114,14 @@ void Decoder::nextNibble(const uint8_t &nibble)
 	bufferEndBit -= 4;
 	timesToRun--;
 	nibbleNotToFlip = nibbleNotToFlip == 0 ? 0 : nibbleNotToFlip-1;
+}
+
+bool Decoder::hasData() const
+{
+	return everythingReceived;
+}
+
+bool Decoder::connectionIsOnline() const
+{
+	return partnerIsReady;
 };

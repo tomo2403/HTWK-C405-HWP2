@@ -1,10 +1,8 @@
 #include "Codec.hpp"
-#include "CommandObserver.cpp"
 
 class Decoder : public Codec
 {
 private:
-	Subject commandSubject;
 	bool EscapedModeIsActive = false;
 	bool flippedPevNibble = false;
 	uint8_t nibblesNotToDecode = 0;
@@ -12,6 +10,7 @@ private:
 	bool escAllowed = true;
 	uint8_t timesToRun = 0;
 	bool waitForEsc = true;
+	bool everythingReceived = false;
 
 	uint8_t dataVectorBuffer = 0x00;
 	uint8_t dataVectorBufferShiftCount = 0;
@@ -26,6 +25,10 @@ public:
 	Decoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector);
 
 	void nextNibble(const uint8_t &nibble);
+
+	[[nodiscard]] bool hasData() const;
+
+	[[nodiscard]] bool connectionIsOnline() const;
 
 	void flushBufferIntoDataVector();
 };

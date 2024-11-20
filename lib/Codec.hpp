@@ -56,3 +56,9 @@ enum CodecCommand {
     STOP = 0x07,
     fillerData = 0x08,
 };
+
+struct prePacket {
+	uint8_t index;
+	std::vector<uint8_t> data;
+	uint8_t crc;
+};
