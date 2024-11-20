@@ -7,10 +7,20 @@ IoManager::IoManager(uint8_t escapeSequence, CRC crc) : escapeSequence(escapeSeq
 
 void IoManager::send(std::vector<uint8_t> data)
 {
+	while (!connected) {}
+
 	Encoder enc(escapeSequence, data);
+	std::atomic<bool> timeoutFlag{false};
+	std::thread timeoutThread(&IoManager::checkTimeout, this, std::ref(timeoutFlag), 5000); // 5 seconds timeout
 
 	while (enc.hasData())
 	{
+		if (timeoutFlag.load())
+		{
+			setTimeoutOccurred();
+			break;
+		}
+
 		uint8_t message = enc.nextByte().value();
 		ssize_t n = write(serialPort, &message, sizeof(message));
 		if (n < 0)
@@ -19,14 +29,27 @@ void IoManager::send(std::vector<uint8_t> data)
 		}
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
+
+	timeoutThread.join();
 }
 
 void IoManager::receive(std::vector<uint8_t> &data)
 {
 	Decoder dec(escapeSequence, data);
+	while (dec.connectionIsOnline()) {}
+	connected = true;
+
+	std::atomic<bool> timeoutFlag{false};
+	std::thread timeoutThread(&IoManager::checkTimeout, this, std::ref(timeoutFlag), 5000); // 5 seconds timeout
 
 	while (dec.hasData())
 	{
+		if (timeoutFlag.load())
+		{
+			setTimeoutOccurred();
+			break;
+		}
+
 		uint8_t receivedData;
 		ssize_t m = read(serialPort, &receivedData, sizeof(receivedData));
 		if (m < 0)
@@ -36,6 +59,8 @@ void IoManager::receive(std::vector<uint8_t> &data)
 		dec.nextNibble(receivedData);
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
+
+	timeoutThread.join();
 }
 
 std::vector<uint8_t> IoManager::getBinaryPipeContent()
@@ -95,4 +120,16 @@ void IoManager::openSerialPort()
 int IoManager::closeSerialPort() const
 {
 	return close(serialPort);
+}
+
+void IoManager::checkTimeout(std::atomic<bool> &timeoutFlag, int durationMs)
+{
+	std::this_thread::sleep_for(std::chrono::milliseconds(durationMs));
+	timeoutFlag.store(true);
+}
+
+void IoManager::setTimeoutOccurred()
+{
+	timeoutOccurred.store(true);
+	std::cerr << "Timeout occurred during receive operation!" << std::endl;
 }

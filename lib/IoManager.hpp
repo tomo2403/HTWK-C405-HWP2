@@ -23,6 +23,11 @@ private:
 	uint8_t escapeSequence;
 	int serialPort{};
 	CRC crc;
+	std::atomic<bool> timeoutOccurred{false};
+
+	void checkTimeout(std::atomic<bool> &timeoutFlag, int durationMs);
+
+	void setTimeoutOccurred();
 
 public:
 	explicit IoManager(uint8_t escapeSequence, CRC crc);
@@ -50,4 +55,8 @@ public:
 	 * @param data A reference to the vector containing the data to be printed.
 	 */
 	static void printVector(const std::vector<uint8_t> &data);
+
+	bool hasTimeoutOccurred() const { return timeoutOccurred.load(); }
+
+
 };
