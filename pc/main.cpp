@@ -16,7 +16,7 @@ int main()
 
 	ioManager.preparePackets(inputData);
 
-	std::thread writer(&IoManager::send, &ioManager, std::ref(inputData));
+	std::thread writer(&IoManager::send, &ioManager);
 	std::thread reader(&IoManager::receive, &ioManager, std::ref(outputData));
 
 	writer.join();

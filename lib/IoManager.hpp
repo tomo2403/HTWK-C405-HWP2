@@ -24,11 +24,18 @@ private:
 	int serialPort{};
 	CRC crc;
 	std::atomic<bool> timeoutOccurred{false};
-	std::vector<prePacket> packets{};
+	std::vector<PrePacket> packets{};
+	uint8_t outboundChannel;
 
 	void checkTimeout(std::atomic<bool> &timeoutFlag, int durationMs);
 
 	void setTimeoutOccurred();
+
+	void sendPacket(const StreamPacket &sp);
+
+	bool checkResponse();
+
+	void sendResponse(uint8_t channel, u_long packetIndex, bool success);
 
 public:
 	explicit IoManager(uint8_t escapeSequence, CRC crc);
@@ -43,7 +50,7 @@ public:
 
 	void preparePackets(std::vector<uint8_t> &data);
 
-	void send(std::vector<uint8_t> data);
+	void send();
 
 	void receive(std::vector<uint8_t> &data);
 
