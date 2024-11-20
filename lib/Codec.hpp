@@ -56,3 +56,9 @@ enum CodecCommand {
     unflipPrevNibbleAndPreserveNextByteDefault = 0x07,
     unflipPrevNibbleAndPreserveNextByteFallback = 0x08,
 };
+
+struct prePacket {
+	uint8_t index;
+	uint8_t data[64];
+	uint8_t crc;
+};
