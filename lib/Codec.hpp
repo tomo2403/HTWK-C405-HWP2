@@ -12,7 +12,7 @@ protected:
     std::vector<uint8_t> &dataVector;
     uint8_t previousNibble = 0x10;
 
-    uint8_t bufferEndBit{};
+    int8_t bufferEndBit = -1;
 
     static bool hasNegatedNibbles(const uint8_t &byte);
     static bool hasEqualNibbles(const uint8_t &byte);
@@ -46,13 +46,13 @@ public:
 enum CodecCommand {
     // Do NOT use: 0x00, 0xFF!
 	preserveNextByteDefault = 0x01,
-	preserveNextByteFallback = 0x02,
+    onlyReadTwoBitsOfNextNibble = 0x02,
 	/** The Communicationpartner is ready to send/receive */
 	iAmReady = 0x03,
 	/** The Communicationpartner has sent everything */
 	everythingSend = 0x04,
-    insertEscSeqAsDataDefault = 0x05,
-    insertEscSeqAsDataFallback = 0x06,
-    unflipPrevNibbleAndPreserveNextByteDefault = 0x07,
-    unflipPrevNibbleAndPreserveNextByteFallback = 0x08,
+    onlyReadOneBitOfNextNibble = 0x05,
+    insertEscSeqAsDataDefault = 0x06,
+    STOP = 0x07,
+    fillerData = 0x08,
 };
