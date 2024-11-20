@@ -24,6 +24,7 @@ private:
 	int serialPort{};
 	CRC crc;
 	std::atomic<bool> timeoutOccurred{false};
+	std::vector<prePacket> packets{};
 
 	void checkTimeout(std::atomic<bool> &timeoutFlag, int durationMs);
 
@@ -39,6 +40,8 @@ public:
 	void openSerialPort();
 
 	int closeSerialPort() const;
+
+	void preparePackets(std::vector<uint8_t> &data);
 
 	void send(std::vector<uint8_t> data);
 

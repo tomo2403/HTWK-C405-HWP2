@@ -18,7 +18,7 @@ public:
 	 * @param polynomial Generator-Polynom, mit welchem die CRC-Werte berechnet werden sollen.
 	 * @param initialValue Initialwert den der CRC-Wert hat, noch bevor irgendeine Brechung durchgeführt wurde. Falls nicht gesetzt, wird dieser Wert "0x00000000".
 	 */
-	explicit CRC(size_t dataLength, uint32_t polynomial, uint32_t initialValue = 0x00000000);
+	explicit CRC(uint32_t polynomial, uint32_t initialValue = 0x00000000);
 
 	/**
 	 * @brief Berechnet 32-Bit CRC-Wert über gegebene Daten.
@@ -30,7 +30,7 @@ public:
 	 * @param data Daten, über welche der CRC-Wert berechnet werden soll.
 	 * @return uint32_t; (Nur) 32bit CRC-Wert der Daten.
 	 */
-	[[nodiscard]] uint32_t calculateCRC(const uint8_t data[]) const;
+	[[nodiscard]] uint32_t calculateCRC(const std::vector<uint8_t> &data) const;
 
 	/**
 	 * @brief Validiert CRC-Wert.
@@ -39,10 +39,9 @@ public:
 	 * @see calculateCRC(myVector8) - Wird zur Berechnung des CRC-Wertes genutzt, mit dem der gegebene CRC-Wert verglichen wird.
 	 * @return bool; TRUE, falls CRC-Wert zu Daten passt; FALSE, sonst
 	 */
-	[[nodiscard]] bool validateCRC(const uint8_t data[], uint32_t receivedCRC) const;
+	[[nodiscard]] bool validateCRC(const std::vector<uint8_t> &data, uint32_t receivedCRC) const;
 
 private:
 	uint32_t polynomial;
 	uint32_t initialValue;
-	size_t dataLength;
 };

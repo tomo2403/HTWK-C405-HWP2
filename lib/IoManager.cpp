@@ -8,35 +8,39 @@ IoManager::IoManager(uint8_t escapeSequence, CRC crc) : escapeSequence(escapeSeq
 void IoManager::send(std::vector<uint8_t> data)
 {
 	while (!connected) {}
+	while (!connected)
+	{ }
 
-	Encoder enc(escapeSequence, data);
-	std::atomic<bool> timeoutFlag{false};
-	std::thread timeoutThread(&IoManager::checkTimeout, this, std::ref(timeoutFlag), 5000); // 5 seconds timeout
+		Encoder enc(escapeSequence, data);
+		std::atomic<bool> timeoutFlag{false};
+		std::thread timeoutThread(&IoManager::checkTimeout, this, std::ref(timeoutFlag), 5000); // 5 seconds timeout
 
-	while (enc.hasData())
-	{
-		if (timeoutFlag.load())
+		while (enc.hasData())
 		{
-			setTimeoutOccurred();
-			break;
-		}
+			if (timeoutFlag.load())
+			{
+				setTimeoutOccurred();
+				break;
+			}
 
-		uint8_t message = enc.nextByte().value();
-		ssize_t n = write(serialPort, &message, sizeof(message));
-		if (n < 0)
-		{
-			throw std::runtime_error("Error writing to serial port!");
+			uint8_t message = enc.nextByte().value();
+			ssize_t n = write(serialPort, &message, sizeof(message));
+			if (n < 0)
+			{
+				throw std::runtime_error("Error writing to serial port!");
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	}
 
 	timeoutThread.join();
+		timeoutThread.join();
 }
 
 void IoManager::receive(std::vector<uint8_t> &data)
 {
 	Decoder dec(escapeSequence, data);
-	while (dec.connectionIsOnline()) {}
+	while (dec.connectionIsOnline())
+	{ }
 	connected = true;
 
 	std::atomic<bool> timeoutFlag{false};
@@ -132,4 +136,25 @@ void IoManager::setTimeoutOccurred()
 {
 	timeoutOccurred.store(true);
 	std::cerr << "Timeout occurred during receive operation!" << std::endl;
+}
+
+void IoManager::preparePackets(std::vector<uint8_t> &data)
+{
+	u_long dataIndex = 0;
+	u_long packetIndex = 0;
+
+	while (dataIndex < data.size())
+	{
+		prePacket p{};
+		p.index = packetIndex++;
+		for (int i = 0; i < 64 && dataIndex < data.size(); i++)
+		{
+			p.data.push_back(data[dataIndex++]);
+		}
+		std::vector<uint8_t> dataVector = {p.index};
+		dataVector.insert(dataVector.end(), p.data.begin(), p.data.end());
+		p.crc = crc.calculateCRC(dataVector);
+
+		packets.push_back(p);
+	}
 }

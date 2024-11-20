@@ -59,6 +59,6 @@ enum CodecCommand {
 
 struct prePacket {
 	uint8_t index;
-	uint8_t data[64];
+	std::vector<uint8_t> data;
 	uint8_t crc;
 };
