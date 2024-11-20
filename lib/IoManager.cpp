@@ -204,4 +204,3 @@ void IoManager::sendResponse(uint8_t channel, u_long packetIndex, bool success)
 	sp.type = PacketType::Response;
 	sp.packet = p;
 }
-

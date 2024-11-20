@@ -9,17 +9,17 @@ void Decoder::processCommand(const uint8_t &command)
 {
 	switch (command & 0x0F)
 	{
-		case CodecCommand::preserveNextByteDefault:
+		case CodecCommand::preserveNextByte:
 			nibblesNotToDecode = 2;
 			// nibbleNotToFlip = 3;
 			break;
 		case CodecCommand::iAmReady:
 			partnerIsReady = true;
 			break;
-		case CodecCommand::everythingSend:
+		case CodecCommand::STOP:
 			everythingReceived = true;
 			break;
-		case CodecCommand::insertEscSeqAsDataDefault:
+		case CodecCommand::insertEscSeqAsData:
 			leftShiftByteIntoBuffer(0x80);
 			bufferEndBit = bufferEndBit == 0 ? 7 : bufferEndBit+8;
 			timesToRun += 2;

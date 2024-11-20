@@ -32,7 +32,7 @@ private:
 	 */
 	uint8_t getNewRawNibble();
 	
-	void insertIntoBuffer(const command &command, const uint8_t &atBit);
+	void insertIntoBuffer(const CodecCommand &command, const uint8_t &atBit);
 
 	void insertIntoBuffer(const uint8_t &byte, const uint8_t &atBit);
 
