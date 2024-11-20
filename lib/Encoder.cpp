@@ -9,11 +9,8 @@ Encoder::Encoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : Cod
 	{
 		throw std::invalid_argument("Data-Vector cannot be empty.");
 	}
-	else
-	{
-		leftShiftByteIntoBuffer(dataVector.at(dataVectorOffset_Index++));
-		bufferEndBit = 7;
-	}
+
+	clock = 0;
 }
 
 void Encoder::insertIntoBuffer(const command &command, const uint8_t &atBit)
@@ -41,147 +38,98 @@ void Encoder::insertIntoBuffer(const uint8_t &byte, const uint8_t &atBit)
 
 bool Encoder::hasData()
 {
-	return bufferEndBit != 0 || dataVectorOffset_Index < dataVector.size();
+	return !(stopSoon && bufferEndBit == -1) || !stopSoon;
 }
 
-bool Encoder::fetchDataIfBufferTooSmall()
+uint8_t Encoder::getNewRawNibble()
 {
-	const bool bufferContainsOnlyOneNibble = bufferEndBit <= 3;
-	const bool dataVectorHasUnprocessedData = dataVectorOffset_Index < dataVector.size();
-
-	if (bufferContainsOnlyOneNibble)
-	{
-		if (!dataVectorHasUnprocessedData)
-		{
-			return false;
-		}
-
-		leftShiftByteIntoBuffer(dataVector.at(dataVectorOffset_Index++));
-		bufferEndBit += 8;
-	}
-
-	return true;
-}
-
-uint8_t Encoder::upcommingByte()
-{
-	if (bufferEndBit >= 11)
-	{
-		return static_cast<uint8_t>((buffer >> (bufferEndBit - 11)) & 0x000000FF);
-	}
-	else if (dataVectorOffset_Index < dataVector.size())
-	{
-		return (upcommingNibble() << 4)| (dataVector.at(dataVectorOffset_Index) >> 4);
-	}
-	else
-	{
-		return 0x10; // fishy
-		// throw std::out_of_range("No more Data in Datastream.");
-	}
-}
-
-std::optional<uint8_t> Encoder::nextNibble()
-{
-	if (!fetchDataIfBufferTooSmall())
-	{
-		bufferEndBit = 0;
-		return static_cast<uint8_t>(buffer & 0x0F);
-	}
-
-	if (currentByte() == escapeSequence && bitsNotToEscape == 0)
-	{
-		insertIntoBuffer(command::preserveNextByteDefault, bufferEndBit + 1);
-		bufferEndBit += 12;
-		bitsNotToEscape = 20;
-	}
-
-	if (currentNibble() == (escapeSequence >> 4))
+	if(escScannerNibbleCount < 2 && dataVectorOffset_Index < dataVector.size())
 	{	
-		if (hasNegatedNibbles(upcommingByte()))
-		{
-			negateNibbleInBuffer(bufferEndBit - 3);
-		}
-
-		if (upcommingByte() == 0xFF)
-		{
-			negateNibbleInBuffer(bufferEndBit - 7);
-			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataDefault & 0x0F, bufferEndBit-7);
-		}
-		else if (upcommingNibble() == 0x00)
-		{
-			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataDefault, bufferEndBit-7);
-		}
-	}
-	else if (currentNibble() == ((~escapeSequence >> 4) & 0x0F) && bitsNotToEscape == 0 && bitsNotToFlipBackEsc == 0)
+		uint8_t newByte = dataVector.at(dataVectorOffset_Index++);
+		escScanningBuffer <<= 8;
+		escScanningBuffer |= newByte;
+		escScannerNibbleCount += 2;
+	} else if (escScannerNibbleCount < 2 && !dataVectorOffset_Index < dataVector.size())
 	{
-		if (hasNegatedNibbles(upcommingByte()))
-		{
-			const uint8_t upcommingDataNibbleAfterEsc = upcommingNibble();
-			gracefullyInsertNibbleIntoBuffer(0x08, bufferEndBit-3);
-			gracefullyInsertNibbleIntoBuffer(0x00, bufferEndBit-7);
-
-			if (upcommingDataNibbleAfterEsc == CodecCommand::unflipPrevNibbleAndPreserveNextByteDefault)
-			{
-				gracefullyInsertNibbleIntoBuffer(CodecCommand::unflipPrevNibbleAndPreserveNextByteFallback, bufferEndBit-11);
-			}
-			else
-			{
-				gracefullyInsertNibbleIntoBuffer(CodecCommand::unflipPrevNibbleAndPreserveNextByteDefault, bufferEndBit-11);
-			}
-
-			bitsNotToEscape += 20;
-			bitsNotToFlipBackEsc += 24;
-		}
+		escScanningBufferHasData = false;
+		return escScanningBuffer & 0x0F;
 	}
 
-	if (areNegated(currentNibble(), upcommingNibble()) && bitsNotToEscape == 0)
+	const uint8_t upcommingByte = escScanningBuffer >> (escScannerNibbleCount - 2);
+	
+	if (upcommingByte == escapeSequence && escScannerNibbleNotToEscape == 0)
 	{
-		if (currentNibble() == command::preserveNextByteDefault)
+		if (escScannerNibbleCount == 2)
 		{
-			insertIntoBuffer(command::preserveNextByteFallback, bufferEndBit + 1);
+			escScanningBuffer <<= 4;
+			escScanningBuffer |= CodecCommand::insertEscSeqAsDataDefault;
 		}
-		else
+		else if (escScannerNibbleCount == 3)
 		{
-			insertIntoBuffer(command::preserveNextByteDefault, bufferEndBit + 1);
+			uint16_t escScanningBufferTmp = escScanningBuffer;
+			escScanningBuffer &= 0x000F;
+			escScanningBuffer |= CodecCommand::insertEscSeqAsDataDefault;
+			escScanningBuffer <<= 4;
+			escScanningBuffer |= escScanningBufferTmp & 0x000F;
 		}
-
-		bufferEndBit += 12;
-		bitsNotToEscape = 20;
-		bitsNotToFlipBackEsc += 24;
-
-		if (previousNibble == 0x08)
-		{
-			negateNibbleInBuffer(bufferEndBit - 3);
-		}
+		escScannerNibbleCount += 1;
+		escScannerNibbleNotToEscape += 3;
 	}
 
-	if (bitsNotToEscape > 0)
-	{
-		bitsNotToEscape -= 4;
-	}
-
-	if (bitsNotToFlipBackEsc > 0)
-	{
-		bitsNotToFlipBackEsc -= 4;
-	}
-
-	if (hasEqualNibbles(getByteSlice(bufferEndBit - 7)) && previousNibble != ((~getNibbleSlice(bufferEndBit - 3)) & 0x0F))
-	{
-		negateNibbleInBuffer(bufferEndBit - 3);
-		bitsNotToEscape = 4;
-	}
-
-	bufferEndBit -= 4;
-	uint8_t nextNibble = (buffer >> (bufferEndBit + 1)) & 0x0F;
-	previousNibble = nextNibble;
-	return nextNibble;
+	escScannerNibbleCount--;
+	uint8_t ret = (escScanningBuffer >> (escScannerNibbleCount*4)) & 0x0F;
+	return ret;
 }
 
-std::optional<uint8_t> Encoder::nextByte()
+uint8_t Encoder::currentThreeBit()
+{
+	return static_cast<uint8_t>((buffer >> (bufferEndBit-3)) & 0x00000007);
+}
+
+uint8_t Encoder::nextNibble()
+{
+	if (bufferEndBit < 2)
+	{
+		if(escScanningBufferHasData)
+		{
+			leftShiftNibbleIntoBuffer(getNewRawNibble());
+			bufferEndBit += 4;
+		}
+		else if (bufferEndBit == -1)
+		{
+			leftShiftByteIntoBuffer(escapeSequence);
+			leftShiftNibbleIntoBuffer(CodecCommand::STOP);
+			bufferEndBit = 11;
+			stopSoon = true;
+		}
+		else if (bufferEndBit == 0)
+		{
+			const uint8_t remainingBit = static_cast<uint8_t>(buffer & 0x1);
+			leftShiftByteIntoBuffer(escapeSequence);
+			leftShiftNibbleIntoBuffer(CodecCommand::onlyReadOneBitOfNextNibble);
+			buffer = (buffer << 3) | remainingBit;
+			bufferEndBit = 14;
+		}
+		else if (bufferEndBit == 1)
+		{
+			const uint8_t remainingTwoBits = static_cast<uint8_t>(buffer & 0x3);
+			leftShiftByteIntoBuffer(escapeSequence);
+			leftShiftNibbleIntoBuffer(CodecCommand::onlyReadTwoBitsOfNextNibble);
+			buffer = (buffer << 3) | remainingTwoBits;
+			bufferEndBit = 14;
+		}
+	}
+
+	const uint8_t ret = static_cast<uint8_t>((buffer >> (bufferEndBit-2)) & 0x00000007);
+	bufferEndBit -= 3;
+	return ret;
+}
+
+uint8_t Encoder::nextByte()
 {
 	uint8_t byte = 0x00;
-	byte = (byte | nextNibble().value()) << 4;
-	byte |= nextNibble().value();
+	byte = (byte | nextNibble()) << 4;
+	byte |= nextNibble();
 
 	return byte;
 }

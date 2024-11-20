@@ -78,14 +78,7 @@ int main() {
 
 int main(int, char**){
     
-    // std::vector<uint8_t> RawBytes = {0xc7, 0x87, 0x1e, 0x1e};
-    // std::vector<uint8_t> RawBytes = {0xcb, 0xc7, 0x87, 0x1e};
-    // std::vector<uint8_t> RawBytes = {0x67, 0xde, 0x1d, 0x29};
-    // std::vector<uint8_t> RawBytes = {0xd1, 0x23, 0xc1, 0x1c};
-    // std::vector<uint8_t> RawBytes = {0xff, 0xbc, 0xc0, 0x4c, 0xff, 0xbb, 0x48, 0x82, 0xb0, 0xdc, 0xca, 0x5b, 0x78, 0x90, 0x81, 0x75};
-    // std::vector<uint8_t> RawBytes = {0xdc, 0xca, 0x5b, 0x78};
-    // std::vector<uint8_t> RawBytes = {0x3a, 0x88, 0x0d};
-    std::vector<uint8_t> RawBytes = {0x98, 0x0e, 0x26};
+    std::vector<uint8_t> RawBytes = {0x98, 0x0e, 0x26, 0xff};
     std::vector<uint8_t> decodedBytes = std::vector<uint8_t>();
     Encoder enc = Encoder(0x80, RawBytes);
     Decoder dec = Decoder(0x80, decodedBytes);
@@ -93,7 +86,7 @@ int main(int, char**){
 	std::cout << "Encoded:" << std::endl;
 	while (enc.hasData())
 	{
-		uint8_t nextNibble = enc.nextNibble().value();
+		uint8_t nextNibble = enc.nextNibble();
 		std::cout << std::bitset<8>(nextNibble) << std::endl;
 		dec.nextNibble(nextNibble);
 	}

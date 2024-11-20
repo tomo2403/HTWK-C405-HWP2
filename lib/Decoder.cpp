@@ -10,7 +10,6 @@ void Decoder::processCommand(const uint8_t &command)
 	switch (command & 0x0F)
 	{
 		case CodecCommand::preserveNextByteDefault:
-		case CodecCommand::preserveNextByteFallback:
 			nibblesNotToDecode = 2;
 			// nibbleNotToFlip = 3;
 			break;
@@ -26,8 +25,6 @@ void Decoder::processCommand(const uint8_t &command)
 			timesToRun += 2;
 			escAllowed = false;
 			break;
-		case CodecCommand::unflipPrevNibbleAndPreserveNextByteDefault:
-		case CodecCommand::unflipPrevNibbleAndPreserveNextByteFallback:
 			dataVectorBuffer = (dataVectorBuffer & 0xF0) | (~dataVectorBuffer & 0x0F);
 			nibblesNotToDecode = 2;
 			break;
