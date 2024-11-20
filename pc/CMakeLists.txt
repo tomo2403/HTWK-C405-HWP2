@@ -8,6 +8,4 @@ add_executable(pc main.cpp
         ../lib/Codec.cpp
         ../lib/Decoder.cpp
         ../lib/CRC.cpp
-        ../lib/Observer.cpp
-        ../lib/IoManager.cpp
-        ../lib/CommandObserver.cpp)
+        ../lib/IoManager.cpp)

@@ -1,5 +1,4 @@
 #include "Codec.hpp"
-#include "CommandObserver.cpp"
 
 class Decoder : public Codec
 {
