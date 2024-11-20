@@ -108,7 +108,7 @@ std::optional<uint8_t> Encoder::nextNibble()
 			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataDefault & 0x0F, bufferEndBit-7);
 		}
 	}
-	else if (currentNibble() == ((~escapeSequence >> 4) & 0x0F) && bitsNotToEscape == 0 && upcommingNibble() != 0x08 )
+	else if (currentNibble() == ((~escapeSequence >> 4) & 0x0F) && bitsNotToEscape == 0 && bitsNotToFlipBackEsc == 0)
 	{
 		if (hasNegatedNibbles(upcommingByte()))
 		{
@@ -126,6 +126,7 @@ std::optional<uint8_t> Encoder::nextNibble()
 			}
 
 			bitsNotToEscape += 20;
+			bitsNotToFlipBackEsc += 24;
 		}
 	}
 
@@ -142,6 +143,7 @@ std::optional<uint8_t> Encoder::nextNibble()
 
 		bufferEndBit += 12;
 		bitsNotToEscape = 20;
+		bitsNotToFlipBackEsc += 24;
 
 		if (previousNibble == 0x08)
 		{
@@ -152,6 +154,11 @@ std::optional<uint8_t> Encoder::nextNibble()
 	if (bitsNotToEscape > 0)
 	{
 		bitsNotToEscape -= 4;
+	}
+
+	if (bitsNotToFlipBackEsc > 0)
+	{
+		bitsNotToFlipBackEsc -= 4;
 	}
 
 	if (hasEqualNibbles(getByteSlice(bufferEndBit - 7)) && previousNibble != ((~getNibbleSlice(bufferEndBit - 3)) & 0x0F))

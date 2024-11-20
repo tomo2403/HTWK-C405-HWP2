@@ -9,6 +9,7 @@ class Encoder : public Codec
 private:
 	uint32_t dataVectorOffset_Index = 0;
 	uint8_t bitsNotToEscape = 0;
+	uint8_t bitsNotToFlipBackEsc = 0;
 
 	/**
 	 * @brief Stellt sicher, dass der Buffer immer min. 2 Nibble hält, in dem es ggf. neue Rohdaten anhängt.

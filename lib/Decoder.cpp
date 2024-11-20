@@ -37,15 +37,15 @@ void Decoder::writeToDataVector(const uint8_t &nibble)
 {
 	// if (!partnerIsReady) return;
 
-	dataVectorBuffer <<= 4;
-	dataVectorBuffer |= nibble & 0x0F;
-	dataVectorBufferShiftCount++;
-
 	if (dataVectorBufferShiftCount == 2)
 	{
 		dataVector.push_back(dataVectorBuffer);
 		dataVectorBufferShiftCount = 0;
 	}
+
+	dataVectorBuffer <<= 4;
+	dataVectorBuffer |= nibble & 0x0F;
+	dataVectorBufferShiftCount++;
 }
 
 void Decoder::flushBufferIntoDataVector()
@@ -55,6 +55,9 @@ void Decoder::flushBufferIntoDataVector()
 		writeToDataVector(getNibbleSlice(bufferEndBit - 3));
 		bufferEndBit = bufferEndBit == 3 ? 0 : bufferEndBit - 4;
 	}
+
+	dataVector.push_back(dataVectorBuffer);
+	dataVectorBufferShiftCount = 0;
 
 	// TODO: Exception, wenn ein Nibble zu wenig!
 }
@@ -80,46 +83,35 @@ void Decoder::nextNibble(const uint8_t &nibble)
 	leftShiftNibbleIntoBuffer(nibble);
 	bufferEndBit = bufferEndBit == 0 ? 3 : bufferEndBit + 4;
 
-	if (nibble == 0x08 && waitForEsc)
+	// Es gibt nichts zu überprüfen
+	if (bufferEndBit < 7)
 	{
-		timesToRun += 2;
-		waitForEsc = false;
 		return;
 	}
 
-	do
+	const uint8_t currentByte = getByteSlice(bufferEndBit - 7);
+
+	if (getByteSlice(bufferEndBit - 7) == escapeSequence && escAllowed)
 	{
-		// Es gibt nichts zu überprüfen
-		if (bufferEndBit < 7)
-		{
-			return;
-		}
+		EscapedModeIsActive = true;
+		bufferEndBit = bufferEndBit == 7 ? 0 : bufferEndBit-8;
+		return;
+	}
 
-		const uint8_t currentByte = getByteSlice(bufferEndBit - 7);
+	if ((hasNegatedNibbles(currentByte)) && !flippedPevNibble && nibbleNotToFlip == 0)
+	{
+		negateNibbleInBuffer(bufferEndBit - 3);
+		flippedPevNibble = true;
+	}
+	else
+	{
+		flippedPevNibble = false;
+	}
 
-		if (getByteSlice(bufferEndBit - 7) == escapeSequence && escAllowed)
-		{
-			EscapedModeIsActive = true;
-			bufferEndBit = bufferEndBit == 7 ? 0 : bufferEndBit-8;
-			return;
-		}
-
-		if ((hasNegatedNibbles(currentByte)) && !flippedPevNibble && nibbleNotToFlip == 0)
-		{
-			negateNibbleInBuffer(bufferEndBit - 3);
-			flippedPevNibble = true;
-		}
-		else
-		{
-			flippedPevNibble = false;
-		}
-
-		escAllowed = true;
-		previousNibble = getNibbleSlice(bufferEndBit - 3);
-		writeToDataVector(getNibbleSlice(bufferEndBit - 3));
-		bufferEndBit -= 4;
-		timesToRun--;
-		nibbleNotToFlip = nibbleNotToFlip == 0 ? 0 : nibbleNotToFlip-1;
-	} while(timesToRun > 0);
-	waitForEsc = true;
+	escAllowed = true;
+	previousNibble = getNibbleSlice(bufferEndBit - 3);
+	writeToDataVector(getNibbleSlice(bufferEndBit - 3));
+	bufferEndBit -= 4;
+	timesToRun--;
+	nibbleNotToFlip = nibbleNotToFlip == 0 ? 0 : nibbleNotToFlip-1;
 };
