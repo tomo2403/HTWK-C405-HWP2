@@ -13,7 +13,7 @@ Encoder::Encoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : Cod
 	clock = 0;
 }
 
-void Encoder::insertIntoBuffer(const command &command, const uint8_t &atBit)
+void Encoder::insertIntoBuffer(const CodecCommand &command, const uint8_t &atBit)
 {
 	if (atBit > 20)
 	{
@@ -62,13 +62,13 @@ uint8_t Encoder::getNewRawNibble()
 		if (escScannerNibbleCount == 2)
 		{
 			escScanningBuffer <<= 4;
-			escScanningBuffer |= CodecCommand::insertEscSeqAsDataDefault;
+			escScanningBuffer |= CodecCommand::insertEscSeqAsData;
 		}
 		else if (escScannerNibbleCount == 3)
 		{
 			uint16_t escScanningBufferTmp = escScanningBuffer;
 			escScanningBuffer &= 0x000F;
-			escScanningBuffer |= CodecCommand::insertEscSeqAsDataDefault;
+			escScanningBuffer |= CodecCommand::insertEscSeqAsData;
 			escScanningBuffer <<= 4;
 			escScanningBuffer |= escScanningBufferTmp & 0x000F;
 		}

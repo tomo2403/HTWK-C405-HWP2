@@ -33,28 +33,19 @@ public:
     
     // Sonderfall nachfolgendes Nibble ist gleich command
     void zeroBuffer();
-
-
-	enum [[deprecated("Use CodecCommand instead")]] command {
-        preserveNextByteDefault = 0x01,
-        preserveNextByteFallback = 0x02,
-        iAmReady = 0x03,
-		everythingSend = 0x04,
-    };
 };
 
 enum CodecCommand {
     // Do NOT use: 0x00, 0xFF!
-	preserveNextByteDefault = 0x01,
+	preserveNextByte = 0x01,
     onlyReadTwoBitsOfNextNibble = 0x02,
 	/** The Communicationpartner is ready to send/receive */
 	iAmReady = 0x03,
 	/** The Communicationpartner has sent everything */
-	everythingSend = 0x04,
+	STOP = 0x04,
     onlyReadOneBitOfNextNibble = 0x05,
-    insertEscSeqAsDataDefault = 0x06,
-    STOP = 0x07,
-    fillerData = 0x08,
+    insertEscSeqAsData = 0x06,
+    fillerData = 0x07,
 };
 
 struct prePacket {

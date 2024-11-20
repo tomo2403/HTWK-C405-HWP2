@@ -1,4 +1,5 @@
 #include "IoManager.hpp"
+#include <cstring>
 
 IoManager::IoManager(uint8_t escapeSequence, CRC crc) : escapeSequence(escapeSequence), crc(crc)
 {
@@ -23,7 +24,7 @@ void IoManager::send(std::vector<uint8_t> data)
 				break;
 			}
 
-			uint8_t message = enc.nextByte().value();
+			uint8_t message = enc.nextByte();
 			ssize_t n = write(serialPort, &message, sizeof(message));
 			if (n < 0)
 			{
