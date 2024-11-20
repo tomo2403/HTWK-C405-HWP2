@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <vector>
 
+#include "Packets.hpp"
+
 class Codec
 {
 protected:
@@ -47,18 +49,13 @@ enum CodecCommand {
     // Do NOT use: 0x00, 0xFF!
 	preserveNextByteDefault = 0x01,
 	preserveNextByteFallback = 0x02,
-	/** The Communicationpartner is ready to send/receive */
+	/** The communication partner is ready to send/receive */
 	iAmReady = 0x03,
-	/** The Communicationpartner has sent everything */
+	/** The communication partner has sent everything */
 	everythingSend = 0x04,
     insertEscSeqAsDataDefault = 0x05,
     insertEscSeqAsDataFallback = 0x06,
     unflipPrevNibbleAndPreserveNextByteDefault = 0x07,
     unflipPrevNibbleAndPreserveNextByteFallback = 0x08,
-};
-
-struct prePacket {
-	uint8_t index;
-	std::vector<uint8_t> data;
-	uint8_t crc;
+	commandStream = 0x09,
 };

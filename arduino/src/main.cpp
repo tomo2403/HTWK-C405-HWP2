@@ -1,4 +1,4 @@
-#include "../../lib/crc.hpp"
+#include "../../lib/Packets.hpp"
 
 uint8_t lastPinReceived = 0;
 uint8_t usbReceived = 0;

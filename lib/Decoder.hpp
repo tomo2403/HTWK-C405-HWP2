@@ -11,6 +11,7 @@ private:
 	uint8_t timesToRun = 0;
 	bool waitForEsc = true;
 	bool everythingReceived = false;
+	bool commandStreamActive = false;
 
 	uint8_t dataVectorBuffer = 0x00;
 	uint8_t dataVectorBufferShiftCount = 0;

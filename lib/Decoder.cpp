@@ -31,6 +31,9 @@ void Decoder::processCommand(const uint8_t &command)
 			dataVectorBuffer = (dataVectorBuffer & 0xF0) | (~dataVectorBuffer & 0x0F);
 			nibblesNotToDecode = 2;
 			break;
+		case CodecCommand::commandStream:
+			commandStreamActive = true;
+			break;
 		default:
 			break;
 	}
@@ -121,7 +124,7 @@ void Decoder::nextNibble(const uint8_t &nibble)
 
 bool Decoder::hasData() const
 {
-	return everythingReceived;
+	return !everythingReceived;
 }
 
 bool Decoder::connectionIsOnline() const
