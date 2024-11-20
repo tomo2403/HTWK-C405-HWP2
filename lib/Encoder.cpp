@@ -107,6 +107,10 @@ std::optional<uint8_t> Encoder::nextNibble()
 			negateNibbleInBuffer(bufferEndBit - 7);
 			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataDefault & 0x0F, bufferEndBit-7);
 		}
+		else if (upcommingNibble() == 0x00)
+		{
+			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataDefault, bufferEndBit-7);
+		}
 	}
 	else if (currentNibble() == ((~escapeSequence >> 4) & 0x0F) && bitsNotToEscape == 0 && bitsNotToFlipBackEsc == 0)
 	{

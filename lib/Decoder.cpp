@@ -12,7 +12,7 @@ void Decoder::processCommand(const uint8_t &command)
 		case CodecCommand::preserveNextByteDefault:
 		case CodecCommand::preserveNextByteFallback:
 			nibblesNotToDecode = 2;
-			nibbleNotToFlip = 3;
+			// nibbleNotToFlip = 3;
 			break;
 		case CodecCommand::iAmReady:
 			partnerIsReady = true;
