@@ -25,4 +25,6 @@ public:
 	[[nodiscard]] bool connectionIsOnline() const;
 
 	void flushBufferIntoDataVector();
+
+	PrePacket decodeAll(std::vector<uint8_t> &data);
 };

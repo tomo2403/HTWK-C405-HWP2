@@ -100,10 +100,28 @@ void IoManagerPc::receivePacket(StreamPacket &sp)
 	sp.data = data;
 }
 
-void IoManagerPc::processSerialInput()
+void IoManagerPc::processSerialInput(PrePacket &packet)
 {
-	if (isDataAvailable())
-	{
+	if (!isDataAvailable()) return;
 
+	if (awaitingResponse)
+	{
+		StreamPacket sp{};
+		receivePacket(sp);
+		if (sp.channel == outboundChannel){
+			awaitingResponse = false;
+		}
+
+		// TODO: place response in queue
+	}
+	else {
+		StreamPacket sp{};
+		receivePacket(sp);
+		std::vector<uint8_t> data;
+
+		Decoder dec = Decoder(escapeSequence, data);
+		packet = dec.decodeAll(sp.data);
+
+		// TODO: place packet in queue
 	}
 }

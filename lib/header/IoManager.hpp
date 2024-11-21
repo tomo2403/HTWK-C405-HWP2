@@ -20,6 +20,7 @@ class IoManager
 {
 protected:
     bool connected = false; /**< Indicates if the connection is established. */
+    bool awaitingResponse = false; /**< Indicates if a response is awaited. */
     uint8_t escapeSequence; /**< The escape sequence byte. */
     uint8_t outboundChannel; /**< The outbound channel number. */
     int serialPort{}; /**< The file descriptor for the serial port. */
@@ -35,8 +36,9 @@ protected:
     /**
      * @brief Checks the response from the serial port.
      * @return True if the response is valid, false otherwise.
+     * @param sp The packet to check.
      */
-    bool checkResponse();
+    bool checkResponse(StreamPacket &sp);
 
     /**
      * @brief Sends a response packet over the serial port.

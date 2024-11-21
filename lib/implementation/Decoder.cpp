@@ -82,4 +82,27 @@ bool Decoder::hasData() const
 bool Decoder::connectionIsOnline() const
 {
 	return partnerIsReady;
-};
+}
+
+PrePacket Decoder::decodeAll(std::vector<uint8_t> &data)
+{
+	for (uint8_t nibble : data)
+	{
+		nextNibble(nibble);
+	}
+	flushBufferIntoDataVector();
+
+	PrePacket packet;
+	packet.index = dataVector[0];
+	packet.data = dataVector;
+
+	// last 32 bytes are crc
+	uint32_t crc = 0;
+	for (int i = 0; i < 4; i++)
+	{
+		crc <<= 8;
+		crc |= dataVector[dataVector.size() - 4 + i];
+	}
+	packet.crc = crc;
+	return packet;
+}

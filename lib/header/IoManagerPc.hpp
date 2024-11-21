@@ -33,8 +33,9 @@ private:
 
     /**
      * @brief Processes the serial input.
+     *
      */
-    void processSerialInput();
+    void processSerialInput(PrePacket &packet);
 
     /**
      * @brief Checks if data is available in the serial buffer.

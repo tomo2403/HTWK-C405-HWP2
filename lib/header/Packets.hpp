@@ -17,8 +17,8 @@ typedef std::vector<uint8_t> vector8;
 struct PrePacket
 {
 	uint8_t index;
+	uint32_t crc;
 	vector8 data;
-	uint8_t crc;
 };
 
 struct StreamPacket

@@ -71,7 +71,7 @@ void IoManager::preparePackets(std::vector<uint8_t> &data)
 	}
 }
 
-bool IoManager::checkResponse()
+bool IoManager::checkResponse(StreamPacket &sp)
 {
 	// TODO: check if response is valid
 	return true;
@@ -98,4 +98,6 @@ void IoManager::transfer2Way(std::vector<uint8_t> &input, std::vector<uint8_t> &
 	preparePackets(input);
 
 	// TODO: implement
+
+
 }
