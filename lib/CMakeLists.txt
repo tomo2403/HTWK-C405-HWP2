@@ -7,5 +7,4 @@ add_executable(lib main.cpp
         implementation/Codec.cpp
         implementation/CRC.cpp
         implementation/Encoder.cpp
-        implementation/Decoder.cpp
-        implementation/IoManager.cpp)
+        implementation/Decoder.cpp)

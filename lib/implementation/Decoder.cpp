@@ -15,10 +15,12 @@ void Decoder::processCommand(const uint8_t &command)
 		case CodecCommand::STOP:
 			everythingReceived = true;
 			break;
-		case CodecCommand::insertEscSeqAsData:
+		case CodecCommand::insertEscSeqAsDataDefault:
+		case CodecCommand::insertEscSeqAsDataFallback:
 			writeToDataVector(escapeSequence);
 			break;
-		case CodecCommand::insertPrevNibbleAgain:
+		case CodecCommand::insertPrevNibbleAgainDefault:
+		case CodecCommand::insertPrevNibbleAgainFallback:
 			writeToDataVector(previousNibble);
 		default:
 			break;
@@ -43,10 +45,10 @@ void Decoder::writeToDataVector(const uint8_t &nibble)
 
 void Decoder::flushBufferIntoDataVector()
 {
-	while (bufferEndBit > 0)
+	while (bufferEndBit >= 3)
 	{
 		writeToDataVector(getNibbleSlice(bufferEndBit - 3));
-		bufferEndBit = bufferEndBit == 3 ? 0 : bufferEndBit - 4;
+		bufferEndBit -= 4;
 	}
 
 	dataVector.push_back(dataVectorBuffer);

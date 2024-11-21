@@ -112,10 +112,6 @@ uint8_t Codec::currentNibble()
 {
 	return getNibbleSlice(bufferEndBit - 3);
 }
-uint8_t Codec::upcommingNibble()
-{
-	return getNibbleSlice(bufferEndBit - 7);
-}
 uint8_t Codec::currentByte()
 {
 	return getByteSlice(bufferEndBit - 7);

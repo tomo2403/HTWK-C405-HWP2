@@ -27,7 +27,6 @@ protected:
     void negateNibbleInBuffer(const uint8_t &startBit);
     void gracefullyInsertNibbleIntoBuffer(const uint8_t &nibble, const uint8_t &startBit);
     uint8_t currentNibble();
-    uint8_t upcommingNibble();
     uint8_t currentByte();
 
 public:
@@ -39,13 +38,13 @@ public:
 
 enum CodecCommand {
     // Do NOT use: 0x00, 0xFF!
-	insertPrevNibbleAgain = 0x01,
-    onlyReadTwoBitsOfNextNibble = 0x02,
+	insertPrevNibbleAgainDefault = 0x01,
+    insertPrevNibbleAgainFallback = 0x02,
 	/** The communication partner is ready to send/receive */
 	iAmReady = 0x03,
 	/** The communication partner has sent everything */
 	STOP = 0x04,
     onlyReadOneBitOfNextNibble = 0x05,
-    insertEscSeqAsData = 0x06,
-    fillerData = 0x07,
+    insertEscSeqAsDataDefault = 0x06,
+    insertEscSeqAsDataFallback = 0x07,
 };
