@@ -1,7 +1,66 @@
 #include "../../lib/Packets.hpp"
 
-uint8_t lastPinReceived = 0;
-uint8_t usbReceived = 0;
+#define CHANNEL1 2
+#define CHANNEL2 6
+
+uint8_t lastChValueRec[CHANNEL2];
+
+uint8_t digitalReadAll(uint8_t channel) {
+	uint8_t value = 0;
+	for (int i = 0; i < 4; i++) {
+		if (digitalRead(channel + i) == HIGH) {
+			value |= (1 << i);
+		}
+	}
+	return value;
+}
+
+void digitalWriteAll(const uint8_t value) {
+	for (int i = 0; i < 4; i++) {
+		digitalWrite(6 + i, (value >> i) & 0x01);
+	}
+}
+
+void changeChannelDirection(uint8_t channel, uint8_t direction) {
+	for (int i = 0; i < 4; i++) {
+		pinMode(channel + i, direction);
+	}
+}
+
+StreamPacket receiveStreamPacket() {
+	StreamPacket packet;
+
+	// Header lesen
+	while (Serial.available() < 3); // Warten, bis genügend Bytes verfügbar sind
+	packet.channel = Serial.read();
+	packet.type = static_cast<PacketType>(Serial.read());
+	packet.dataLength = Serial.read();
+
+	// Daten lesen
+	while (Serial.available() < packet.dataLength); // Warten, bis alle Daten verfügbar sind
+	Serial.readBytes(packet.data.data(), packet.dataLength);
+
+	return packet;
+}
+
+void processChannel(uint8_t channel) {
+	uint8_t pinReceived = digitalReadAll(channel);
+	if (pinReceived != lastChValueRec[channel]) {
+		lastChValueRec[channel] = pinReceived;
+
+		Serial.write(channel);
+		Serial.write(pinReceived);
+	}
+
+	if (Serial.available() > 4){
+		StreamPacket sp = receiveStreamPacket();
+		changeChannelDirection(channel, OUTPUT);
+		for (uint8_t byte : sp.data) {
+			digitalWriteAll(byte);
+		}
+		changeChannelDirection(channel, INPUT);
+	}
+}
 
 void setup() {
     Serial.begin(57600);
@@ -15,34 +74,7 @@ void setup() {
     pinMode(9, OUTPUT);
 }
 
-// nur die letzten 4 bits werden beachtet
-void digitalWriteAll(const uint8_t value) {
-    for (int i = 0; i < 4; i++) {
-        digitalWrite(6 + i, (value >> i) & 0x01);
-    }
-}
-
-uint8_t digitalReadAll() {
-    uint8_t value = 0;
-    for (int i = 0; i < 4; i++) {
-        if (digitalRead(2 + i) == HIGH) {
-            value |= (1 << i);
-        }
-    }
-    return value;
-}
-
 void loop() {
-	uint8_t pinReceived = digitalReadAll();
-	if (pinReceived != lastPinReceived) {
-		lastPinReceived = pinReceived;
-		Serial.write(pinReceived);
-	}
-
-	while (Serial.available() > 0) {
-		usbReceived = Serial.read();
-        Serial.println(usbReceived);
-		digitalWriteAll(usbReceived >> 4);
-		digitalWriteAll(usbReceived);
-	}
+	processChannel(CHANNEL1);
+	processChannel(CHANNEL2);
 }
