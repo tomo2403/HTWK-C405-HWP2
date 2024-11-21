@@ -1,5 +1,5 @@
-#include "Encoder.hpp"
-#include "Decoder.hpp"
+#include "header/Encoder.hpp"
+#include "header/Decoder.hpp"
 #include <bitset>
 
 #include <iostream>

@@ -1,5 +1,5 @@
 #include <pt.h>
-#include "../../lib/Packets.hpp"
+#include "../../lib/header/Packets.hpp"
 
 #define CHANNEL1 2
 #define CHANNEL2 6

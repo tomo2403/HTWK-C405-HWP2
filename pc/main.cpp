@@ -3,7 +3,9 @@
 #include <thread>
 #include <bitset>
 
-#include "../lib/IoManager.hpp"
+#include "../lib/header/IoManagerPc.hpp"
+
+typedef IoManagerPc ThisIoManager;
 
 int main()
 {

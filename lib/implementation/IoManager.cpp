@@ -1,4 +1,4 @@
-#include "IoManager.hpp"
+#include "../header/IoManager.hpp"
 
 IoManager::IoManager(uint8_t escapeSequence, CRC crc) : escapeSequence(escapeSequence), crc(crc)
 {
