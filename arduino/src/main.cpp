@@ -1,7 +1,10 @@
+#include <pt.h>
 #include "../../lib/Packets.hpp"
 
 #define CHANNEL1 2
 #define CHANNEL2 6
+
+static struct pt thread1, thread2;
 
 uint8_t lastChValueRec[CHANNEL2];
 
@@ -43,7 +46,9 @@ StreamPacket receiveStreamPacket() {
 	return packet;
 }
 
-void processChannel(uint8_t channel) {
+int processChannel(uint8_t channel, struct pt *pt) {
+	PT_BEGIN(pt);
+
 	uint8_t pinReceived = digitalReadAll(channel);
 	if (pinReceived != lastChValueRec[channel]) {
 		lastChValueRec[channel] = pinReceived;
@@ -60,6 +65,7 @@ void processChannel(uint8_t channel) {
 		}
 		changeChannelDirection(channel, INPUT);
 	}
+	PT_END(pt);
 }
 
 void setup() {
@@ -72,9 +78,12 @@ void setup() {
     pinMode(7, OUTPUT);
     pinMode(8, OUTPUT);
     pinMode(9, OUTPUT);
+
+	PT_INIT(&thread1);
+	PT_INIT(&thread2);
 }
 
 void loop() {
-	processChannel(CHANNEL1);
-	processChannel(CHANNEL2);
+	processChannel(CHANNEL1, &thread1);
+	processChannel(CHANNEL2, &thread2);
 }
