@@ -23,4 +23,6 @@ public:
 	uint8_t nextByte();
 
 	uint8_t nextNibble();
+
+	std::vector<uint8_t> encodeAll();
 };

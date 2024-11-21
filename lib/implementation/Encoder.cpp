@@ -73,3 +73,13 @@ uint8_t Encoder::nextByte()
 
 	return byte;
 }
+
+std::vector<uint8_t> Encoder::encodeAll()
+{
+	std::vector<uint8_t> encodedData{};
+	while (hasData())
+	{
+		encodedData.push_back(nextByte());
+	}
+	return encodedData;
+}
