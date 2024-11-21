@@ -31,7 +31,13 @@ protected:
 
 	void setTimeoutOccurred();
 
+	ssize_t serialWrite(uint8_t data) const;
+
+	ssize_t serialRead() const;
+
 	virtual void sendPacket(const StreamPacket &sp) = 0;
+
+	virtual void receivePacket(StreamPacket &sp) = 0;
 
 	virtual bool checkResponse() = 0;
 

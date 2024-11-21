@@ -36,9 +36,8 @@ StreamPacket receiveStreamPacket() {
 	StreamPacket packet;
 
 	// Header lesen
-	while (Serial.available() < 3); // Warten, bis genügend Bytes verfügbar sind
+	while (Serial.available() < 2); // Warten, bis genügend Bytes verfügbar sind
 	packet.channel = Serial.read();
-	packet.type = static_cast<PacketType>(Serial.read());
 	packet.dataLength = Serial.read();
 
 	// Daten lesen

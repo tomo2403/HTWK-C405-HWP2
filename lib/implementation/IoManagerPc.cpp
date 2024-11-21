@@ -7,21 +7,26 @@ IoManagerPc::IoManagerPc(uint8_t escapeSequence, CRC crc, uint8_t outboundChanne
 
 void IoManagerPc::sendPacket(const StreamPacket &sp)
 {
-	std::vector<uint8_t> packetData = {sp.packet.index};
-	packetData.insert(packetData.end(), sp.packet.data.begin(), sp.packet.data.end());
-	packetData.push_back(sp.packet.crc);
-	Encoder enc(escapeSequence, packetData);
-
-	while (enc.hasData())
+	serialWrite(sp.channel);
+	serialWrite(sp.dataLength);
+	for (uint8_t byte : sp.data)
 	{
-		uint8_t message = enc.nextByte().value();
-		ssize_t n = write(serialPort, &message, sizeof(message));
-		if (n < 0)
-		{
-			throw std::runtime_error("Error writing to serial port!");
-		}
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		serialWrite(byte);
 	}
+}
+
+void IoManagerPc::receivePacket(StreamPacket &sp)
+{
+	uint8_t channel = serialRead();
+	uint8_t dataLength = serialRead();
+	std::vector<uint8_t> data;
+	for (int i = 0; i < dataLength; i++)
+	{
+		data.push_back(serialRead());
+	}
+	sp.channel = channel;
+	sp.dataLength = dataLength;
+	sp.data = data;
 }
 
 bool IoManagerPc::checkResponse()
@@ -54,11 +59,15 @@ bool IoManagerPc::checkResponse()
 void IoManagerPc::sendResponse(uint8_t channel, u_long packetIndex, bool success)
 {
 	PrePacket p{};
-	p.data.push_back(packetIndex);
+	p.index = packetIndex;
 	p.data.push_back(success ? 0x01 : 0x00);
+	crc.calculateCRC(p);
+
+	Encoder enc = Encoder(escapeSequence, Encoder::convertPacket(p));
 
 	StreamPacket sp{};
 	sp.channel = channel;
-	sp.type = PacketType::Response;
-	sp.packet = p;
+	sp.data = enc.encodeAll();
+
+	sendPacket(sp);
 }
