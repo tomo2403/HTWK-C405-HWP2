@@ -38,6 +38,20 @@ bool Encoder::hasData()
 	return dataVectorOffset_Index < dataVector.size() || bufferEndBit != -1;
 }
 
+uint8_t Encoder::upcommingNibble()
+{
+	if (bufferEndBit == 3 && dataVectorOffset_Index < dataVector.size())
+	{
+		return dataVector.at(dataVectorOffset_Index+1) >> 4;
+	}
+	else if (bufferEndBit == 3 && dataVectorOffset_Index >= dataVector.size())
+	{
+		return 0x00; // fishy
+	}
+
+	return getNibbleSlice(bufferEndBit - 7);
+}
+
 uint8_t Encoder::nextNibble()
 {
 	if (bufferEndBit < 3 && dataVectorOffset_Index < dataVector.size())
@@ -46,22 +60,39 @@ uint8_t Encoder::nextNibble()
 		bufferEndBit += 8;
 	}
 
-	if (currentNibble() == previousNibble)
+	if (currentNibble() == previousNibble && prevNibbleInitilized)
 	{
-		insertNibbleIntoBuffer(escapeSequence, bufferEndBit-3); // replace current nibble
-		gracefullyInsertNibbleIntoBuffer(CodecCommand::insertPrevNibbleAgain, bufferEndBit-3); // insert cmf after current nibble
+		const uint8_t upcommingNib = upcommingNibble();
+		insertNibbleIntoBuffer(escapeSequence, bufferEndBit-3);
+
+		if (upcommingNib == CodecCommand::insertPrevNibbleAgainDefault)
+		{
+			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertPrevNibbleAgainFallback, bufferEndBit-3);
+		}
+		else
+		{
+			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertPrevNibbleAgainDefault, bufferEndBit-3);
+		}
 		justEscaped = true;
 	}
 
 	if (currentNibble() == escapeSequence && !justEscaped)
 	{
-		gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsData, bufferEndBit-3);
+		if (upcommingNibble() == CodecCommand::insertEscSeqAsDataDefault)
+		{
+			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataFallback, bufferEndBit-3);
+		}
+		else
+		{
+			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataDefault, bufferEndBit-3);
+		}
 	}
 
 	justEscaped = false;
 	const uint8_t currentNib = currentNibble();
 	bufferEndBit -= 4;
 	previousNibble = currentNib;
+	prevNibbleInitilized = true;
 	return currentNib;
 }
 
