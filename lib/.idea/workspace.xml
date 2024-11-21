@@ -24,26 +24,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9787c96d-87ab-46fb-98f0-c53249cbc43b" name="Changes" comment="implemented reading and writing from commandline">
-      <change afterPath="$PROJECT_DIR$/header/IoManagerB15F.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/header/IoManagerPc.hpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/implementation/IoManagerB15F.cpp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/implementation/IoManagerPc.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../arduino/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../arduino/src/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CRC.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/implementation/CRC.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CRC.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/header/CRC.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Codec.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/implementation/Codec.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Codec.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/header/Codec.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Decoder.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/implementation/Decoder.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Decoder.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/header/Decoder.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Encoder.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/implementation/Encoder.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Encoder.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/header/Encoder.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IoManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/implementation/IoManager.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/IoManager.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/header/IoManager.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Packets.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/header/Packets.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pc/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../pc/CMakeLists.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pc/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../pc/main.cpp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/lib.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/lib.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/header/IoManager.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/header/IoManager.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/header/IoManagerPc.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/header/IoManagerPc.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/implementation/IoManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/implementation/IoManager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/implementation/IoManagerPc.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/implementation/IoManagerPc.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,6 +61,12 @@
     &quot;accountId&quot;: &quot;db451270-9572-44eb-8e04-d66b356a2b41&quot;
   }
 }</component>
+  <component name="ProjectApplicationVersion">
+    <option name="ide" value="CLion" />
+    <option name="majorVersion" value="2024" />
+    <option name="minorVersion" value="3" />
+    <option name="productBranch" value="Classic" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -89,6 +82,7 @@
     "RunOnceActivity.cidr.known.project.marker": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "RunOnceActivity.west.config.association.type.startup.service": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
@@ -109,6 +103,11 @@
     </key>
   </component>
   <component name="RunManager">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="lib" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="lib" TARGET_NAME="lib" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="lib" RUN_TARGET_NAME="lib">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -126,7 +125,7 @@
       <workItem from="1729519547515" duration="1744000" />
       <workItem from="1731582167112" duration="3690000" />
       <workItem from="1731940535991" duration="533000" />
-      <workItem from="1732192395994" duration="71000" />
+      <workItem from="1732192395994" duration="993000" />
     </task>
     <task id="LOCAL-00001" summary="implemented reading and writing from commandline">
       <option name="closed" value="true" />

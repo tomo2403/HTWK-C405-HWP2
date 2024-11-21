@@ -10,22 +10,22 @@ typedef IoManagerPc ThisIoManager;
 int main()
 {
 	CRC crc(65, 0x04C11DB7);
-	IoManager ioManager = IoManager(0x80, crc);
+	ThisIoManager ioManager = ThisIoManager(0x80, crc);
 	ioManager.openSerialPort();
 
-	std::vector<uint8_t> inputData = IoManager::getBinaryPipeContent();
+	std::vector<uint8_t> inputData = ThisIoManager::getBinaryPipeContent();
 	std::vector<uint8_t> outputData;
 
 	ioManager.preparePackets(inputData);
 
-	std::thread writer(&IoManager::send, &ioManager);
-	std::thread reader(&IoManager::receive, &ioManager, std::ref(outputData));
+	std::thread writer(&ThisIoManager::send, &ioManager);
+	std::thread reader(&ThisIoManager::receive, &ioManager, std::ref(outputData));
 
 	writer.join();
 	reader.join();
 
 	ioManager.closeSerialPort();
-	IoManager::printVector(outputData);
+	ThisIoManager::printVector(outputData);
 
 	return 0;
 }
