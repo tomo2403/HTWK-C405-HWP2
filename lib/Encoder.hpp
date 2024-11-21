@@ -8,13 +8,6 @@ class Encoder : public Codec
 {
 private:
 	uint32_t dataVectorOffset_Index = 0;
-	uint16_t escScanningBuffer = 0x00;
-	uint8_t escScannerNibbleCount = 0;
-	uint8_t escScannerNibbleNotToEscape = 0;
-	uint64_t globalNibbleCount = 0;
-	bool escScanningBufferHasData = true;
-	uint64_t globalBitCount = 0;
-	bool stopSoon = false;
 	
 	bool clock;
 
@@ -35,10 +28,6 @@ private:
 	void insertIntoBuffer(const CodecCommand &command, const uint8_t &atBit);
 
 	void insertIntoBuffer(const uint8_t &byte, const uint8_t &atBit);
-
-	void insertSTOP();
-
-	uint8_t currentThreeBit();
 
 public:
 

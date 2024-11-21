@@ -10,7 +10,7 @@ class Codec
 protected:
     uint32_t buffer = 0x00000000;
     
-    const uint8_t escapeSequence = 0x80;
+    const uint8_t escapeSequence = 0x00;
     std::vector<uint8_t> &dataVector;
     uint8_t previousNibble = 0x10;
 
@@ -39,7 +39,7 @@ public:
 
 enum CodecCommand {
     // Do NOT use: 0x00, 0xFF!
-	preserveNextByte = 0x01,
+	insertPrevNibbleAgain = 0x01,
     onlyReadTwoBitsOfNextNibble = 0x02,
 	/** The communication partner is ready to send/receive */
 	iAmReady = 0x03,

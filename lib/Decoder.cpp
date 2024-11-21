@@ -9,10 +9,6 @@ void Decoder::processCommand(const uint8_t &command)
 {
 	switch (command & 0x0F)
 	{
-		case CodecCommand::preserveNextByte:
-			nibblesNotToDecode = 2;
-			// nibbleNotToFlip = 3;
-			break;
 		case CodecCommand::iAmReady:
 			partnerIsReady = true;
 			break;
@@ -27,9 +23,6 @@ void Decoder::processCommand(const uint8_t &command)
 			break;
 			dataVectorBuffer = (dataVectorBuffer & 0xF0) | (~dataVectorBuffer & 0x0F);
 			nibblesNotToDecode = 2;
-			break;
-		case CodecCommand::commandStream:
-			commandStreamActive = true;
 			break;
 		default:
 			break;
