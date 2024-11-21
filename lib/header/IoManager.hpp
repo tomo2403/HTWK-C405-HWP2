@@ -19,58 +19,83 @@
 class IoManager
 {
 protected:
-	bool connected = false;
-	uint8_t escapeSequence;
-	int serialPort{};
-	CRC crc;
-	std::atomic<bool> timeoutOccurred{false};
-	std::vector<PrePacket> packets{};
-	uint8_t outboundChannel;
+    bool connected = false; /**< Indicates if the connection is established. */
+    uint8_t escapeSequence; /**< The escape sequence byte. */
+    uint8_t outboundChannel; /**< The outbound channel number. */
+    int serialPort{}; /**< The file descriptor for the serial port. */
+    CRC crc; /**< The CRC object for checksum calculations. */
+    std::vector<PrePacket> packets{}; /**< A vector to store packets. */
 
-	void checkTimeout(std::atomic<bool> &timeoutFlag, int durationMs);
+    /**
+     * @brief Prepares packets from the given data.
+     * @param data A reference to the data vector to be processed.
+     */
+    void preparePackets(std::vector<uint8_t> &data);
 
-	void setTimeoutOccurred();
+    /**
+     * @brief Checks the response from the serial port.
+     * @return True if the response is valid, false otherwise.
+     */
+    bool checkResponse();
 
-	ssize_t serialWrite(uint8_t data) const;
+    /**
+     * @brief Sends a response packet over the serial port.
+     * @param channel The channel number.
+     * @param packetIndex The index of the packet.
+     * @param success Indicates if the operation was successful.
+     */
+    void sendResponse(uint8_t channel, u_long packetIndex, bool success);
 
-	ssize_t serialRead() const;
+    /**
+     * @brief Sends a packet over the serial port.
+     * @param sp The packet to send.
+     */
+    virtual void sendPacket(const StreamPacket &sp) = 0;
 
-	virtual void sendPacket(const StreamPacket &sp) = 0;
-
-	virtual void receivePacket(StreamPacket &sp) = 0;
-
-	virtual bool checkResponse() = 0;
-
-	virtual void sendResponse(uint8_t channel, u_long packetIndex, bool success) = 0;
+    /**
+     * @brief Receives a packet from the serial port.
+     * @param sp The packet to receive.
+     */
+    virtual void receivePacket(StreamPacket &sp) = 0;
 
 public:
-	IoManager(uint8_t escapeSequence, CRC crc, uint8_t outboundChannel);
+    /**
+     * @brief Constructs an IoManager object.
+     * @param escapeSequence The escape sequence byte.
+     * @param crc The CRC object for checksum calculations.
+     * @param outboundChannel The outbound channel number.
+     */
+    IoManager(uint8_t escapeSequence, CRC crc, uint8_t outboundChannel);
 
-	/**
-	 * @brief Sets up the serial port with the specified settings.
-	 * @param serial_port The serial port file descriptor.
-	 */
-	void openSerialPort();
+    /**
+     * @brief Transfers data in a two-way communication.
+     * @param input A reference to the input data vector.
+     * @param output A reference to the output data vector.
+     */
+    void transfer2Way(std::vector<uint8_t> &input, std::vector<uint8_t> &output);
 
-	int closeSerialPort() const;
+    /**
+     * @brief Sends data. Deprecated, use transfer2Way instead.
+     */
+    [[deprecated("Use transfer2Way instead.")]]
+    void send();
 
-	void preparePackets(std::vector<uint8_t> &data);
+    /**
+     * @brief Receives data. Deprecated, use transfer2Way instead.
+     * @param data A reference to the data vector to store the received data.
+     */
+    [[deprecated("Use transfer2Way instead.")]]
+    void receive(std::vector<uint8_t> &data);
 
-	void send();
+    /**
+     * @brief Reads binary content from the standard input until EOF.
+     * @return A vector containing the binary data read from the input.
+     */
+    static std::vector<uint8_t> getBinaryPipeContent();
 
-	void receive(std::vector<uint8_t> &data);
-
-	bool hasTimeoutOccurred() const { return timeoutOccurred.load(); }
-
-	/**
-	 * @brief Reads binary content from the standard input until EOF.
-	 * @return A vector containing the binary data read from the input.
-	 */
-	static std::vector<uint8_t> getBinaryPipeContent();
-
-	/**
-	 * @brief Prints the contents of a vector to the standard output.
-	 * @param data A reference to the vector containing the data to be printed.
-	 */
-	static void printVector(const std::vector<uint8_t> &data);
+    /**
+     * @brief Prints the contents of a vector to the standard output.
+     * @param data A reference to the vector containing the data to be printed.
+     */
+    static void printVector(const std::vector<uint8_t> &data);
 };

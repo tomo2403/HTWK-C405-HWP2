@@ -5,6 +5,77 @@ IoManagerPc::IoManagerPc(uint8_t escapeSequence, CRC crc, uint8_t outboundChanne
 
 }
 
+void IoManagerPc::openSerialPort()
+{
+	const char *portName = "/dev/ttyUSB0";
+	serialPort = open(portName, O_RDWR | O_NOCTTY | O_NDELAY);
+
+	if (serialPort < 0)
+	{
+		std::cerr << "Error opening serial port!" << std::endl;
+		exit(1);
+	}
+
+	struct termios tty{};
+	memset(&tty, 0, sizeof(tty));
+
+	if (tcgetattr(serialPort, &tty) != 0)
+	{
+		std::cerr << "Error getting port settings!" << std::endl;
+		exit(1);
+	}
+
+	cfsetispeed(&tty, B57600);
+	cfsetospeed(&tty, B57600);
+	tty.c_cflag &= ~PARENB;
+	tty.c_cflag &= ~CSTOPB;
+	tty.c_cflag &= ~CSIZE;
+	tty.c_cflag |= CS8;
+	tty.c_cflag |= CREAD | CLOCAL;
+	tty.c_iflag &= ~(IXON | IXOFF | IXANY);
+	tty.c_oflag &= ~OPOST;
+	tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
+
+	tcsetattr(serialPort, TCSANOW, &tty);
+}
+
+int IoManagerPc::closeSerialPort() const
+{
+	return close(serialPort);
+}
+
+ssize_t IoManagerPc::serialWrite(uint8_t data) const
+{
+	ssize_t n = write(serialPort, &data, sizeof(data));
+	if (n < 0)
+	{
+		throw std::runtime_error("Error writing to serial port!");
+	}
+	std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	return n;
+}
+
+ssize_t IoManagerPc::serialRead() const
+{
+	uint8_t receivedData;
+	ssize_t m = read(serialPort, &receivedData, sizeof(receivedData));
+	if (m < 0)
+	{
+		throw std::runtime_error("Error reading from serial port!");
+	}
+	return receivedData;
+}
+
+bool IoManagerPc::isDataAvailable() const
+{
+	int bytesAvailable;
+	if (ioctl(serialPort, FIONREAD, &bytesAvailable) == -1)
+	{
+		throw std::runtime_error("Error checking available data on serial port!");
+	}
+	return bytesAvailable > 0;
+}
+
 void IoManagerPc::sendPacket(const StreamPacket &sp)
 {
 	serialWrite(sp.channel);
@@ -29,45 +100,10 @@ void IoManagerPc::receivePacket(StreamPacket &sp)
 	sp.data = data;
 }
 
-bool IoManagerPc::checkResponse()
+void IoManagerPc::processSerialInput()
 {
-	std::vector<uint8_t> data;
-	Decoder dec(escapeSequence, data);
-
-	std::atomic<bool> timeoutFlag{false};
-	std::thread timeoutThread(&IoManagerPc::checkTimeout, this, std::ref(timeoutFlag), 5000); // 5 seconds timeout
-
-	uint8_t receivedData;
-	ssize_t m = read(serialPort, &receivedData, sizeof(receivedData));
-	if (m < 0)
+	if (isDataAvailable())
 	{
-		throw std::runtime_error("Error reading from serial port!");
+
 	}
-	dec.nextNibble(receivedData);
-
-	timeoutThread.join();
-
-	if (timeoutFlag.load())
-	{
-		return false;
-	}
-
-	// TODO: check if response is valid
-	return true;
-}
-
-void IoManagerPc::sendResponse(uint8_t channel, u_long packetIndex, bool success)
-{
-	PrePacket p{};
-	p.index = packetIndex;
-	p.data.push_back(success ? 0x01 : 0x00);
-	crc.calculateCRC(p);
-
-	Encoder enc = Encoder(escapeSequence, Encoder::convertPacket(p));
-
-	StreamPacket sp{};
-	sp.channel = channel;
-	sp.data = enc.encodeAll();
-
-	sendPacket(sp);
 }

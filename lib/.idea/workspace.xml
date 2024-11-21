@@ -23,15 +23,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9787c96d-87ab-46fb-98f0-c53249cbc43b" name="Changes" comment="implemented packet conversation in encoder">
-      <change beforePath="$PROJECT_DIR$/../arduino/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../arduino/src/main.cpp" afterDir="false" />
+    <list default="true" id="9787c96d-87ab-46fb-98f0-c53249cbc43b" name="Changes" comment="optimized StreamPacket and send/receive">
+      <change beforePath="$PROJECT_DIR$/../b15f/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../b15f/main.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/header/IoManager.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/header/IoManager.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/header/IoManagerPc.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/header/IoManagerPc.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/header/Packets.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/header/Packets.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/implementation/CRC.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/implementation/CRC.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/implementation/IoManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/implementation/IoManager.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/implementation/IoManagerPc.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/implementation/IoManagerPc.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pc/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../pc/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -122,7 +121,8 @@
       <workItem from="1731582167112" duration="3690000" />
       <workItem from="1731940535991" duration="533000" />
       <workItem from="1732192395994" duration="6707000" />
-      <workItem from="1732199647716" duration="2000" />
+      <workItem from="1732199647716" duration="1283000" />
+      <workItem from="1732212308123" duration="2527000" />
     </task>
     <task id="LOCAL-00001" summary="implemented reading and writing from commandline">
       <option name="closed" value="true" />
@@ -164,7 +164,15 @@
       <option name="project" value="LOCAL" />
       <updated>1732196825486</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="optimized StreamPacket and send/receive">
+      <option name="closed" value="true" />
+      <created>1732199977629</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1732199977629</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -192,7 +200,8 @@
     <MESSAGE value="implemented single step encoding" />
     <MESSAGE value="added overload for calculating crc" />
     <MESSAGE value="implemented packet conversation in encoder" />
-    <option name="LAST_COMMIT_MESSAGE" value="implemented packet conversation in encoder" />
+    <MESSAGE value="optimized StreamPacket and send/receive" />
+    <option name="LAST_COMMIT_MESSAGE" value="optimized StreamPacket and send/receive" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
