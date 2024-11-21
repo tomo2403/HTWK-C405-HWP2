@@ -19,11 +19,15 @@ private:
 
 public:
 
-	Encoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector);
+	Encoder(uint8_t escapeSequence, std::vector<uint8_t> dataVector);
+
+	static std::vector<uint8_t> convertPacket(const PrePacket &p);
 
 	bool hasData();
 
 	uint8_t nextByte();
 
 	uint8_t nextNibble();
+
+	std::vector<uint8_t> encodeAll();
 };

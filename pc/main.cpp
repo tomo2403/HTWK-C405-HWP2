@@ -1,8 +1,3 @@
-#include <cstdint>
-#include <vector>
-#include <thread>
-#include <bitset>
-
 #include "../lib/header/IoManagerPc.hpp"
 
 typedef IoManagerPc ThisIoManager;
@@ -10,7 +5,7 @@ typedef IoManagerPc ThisIoManager;
 int main()
 {
 	CRC crc(65, 0x04C11DB7);
-	ThisIoManager ioManager = ThisIoManager(0x80, crc);
+	ThisIoManager ioManager = ThisIoManager(0x80, crc, 0x06);
 	ioManager.openSerialPort();
 
 	std::vector<uint8_t> inputData = ThisIoManager::getBinaryPipeContent();

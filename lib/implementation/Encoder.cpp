@@ -3,7 +3,7 @@
 
 #include "../header/Encoder.hpp"
 
-Encoder::Encoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : Codec::Codec(escapeSequence, dataVector)
+Encoder::Encoder(uint8_t escapeSequence, std::vector<uint8_t> dataVector) : Codec::Codec(escapeSequence, dataVector)
 {
 	if (dataVector.empty())
 	{
@@ -103,4 +103,22 @@ uint8_t Encoder::nextByte()
 	byte |= nextNibble();
 
 	return byte;
+}
+
+std::vector<uint8_t> Encoder::encodeAll()
+{
+	std::vector<uint8_t> encodedData{};
+	while (hasData())
+	{
+		encodedData.push_back(nextByte());
+	}
+	return encodedData;
+}
+
+std::vector<uint8_t> Encoder::convertPacket(const PrePacket &p)
+{
+	std::vector<uint8_t> packetData = {p.index};
+	packetData.insert(packetData.end(), p.data.begin(), p.data.end());
+	packetData.push_back(p.crc);
+	return packetData;
 }

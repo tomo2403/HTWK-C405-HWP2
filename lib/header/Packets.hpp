@@ -14,12 +14,6 @@ typedef Vector<uint8_t> vector8;
 typedef std::vector<uint8_t> vector8;
 #endif
 
-enum PacketType
-{
-	Data = 0,
-	Response = 1,
-};
-
 struct PrePacket
 {
 	uint8_t index;
@@ -30,7 +24,6 @@ struct PrePacket
 struct StreamPacket
 {
 	uint8_t channel;
-	PacketType type;
 	uint8_t dataLength;
 	vector8 data;
 };

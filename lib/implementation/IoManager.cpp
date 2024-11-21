@@ -13,7 +13,16 @@ void IoManager::send()
 	u_long index = 0;
 
 	for (int i = 0; i < packets.size(); i++) {
-		sendPacket(packets[i]);
+		Encoder enc = Encoder(escapeSequence, Encoder::convertPacket(packets[i]));
+
+		StreamPacket sp{};
+		sp.channel = outboundChannel;
+		sp.dataLength = packets[i].data.size();
+
+
+		sp.data = enc.encodeAll();
+
+		sendPacket(sp);
 
 		if (!checkResponse()) {
 			// resend packet
@@ -145,4 +154,26 @@ void IoManager::preparePackets(std::vector<uint8_t> &data)
 
 		packets.push_back(p);
 	}
+}
+
+ssize_t IoManager::serialWrite(uint8_t data) const
+{
+	ssize_t n = write(serialPort, &data, sizeof(data));
+	if (n < 0)
+	{
+		throw std::runtime_error("Error writing to serial port!");
+	}
+	std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	return n;
+}
+
+ssize_t IoManager::serialRead() const
+{
+	uint8_t receivedData;
+	ssize_t m = read(serialPort, &receivedData, sizeof(receivedData));
+	if (m < 0)
+	{
+		throw std::runtime_error("Error reading from serial port!");
+	}
+	return receivedData;
 }
