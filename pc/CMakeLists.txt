@@ -4,8 +4,8 @@ project(pc)
 set(CMAKE_CXX_STANDARD 20)
 
 add_executable(pc main.cpp
-        ../lib/Encoder.cpp
-        ../lib/Codec.cpp
-        ../lib/Decoder.cpp
-        ../lib/CRC.cpp
-        ../lib/IoManager.cpp)
+        ../lib/implementation/Encoder.cpp
+        ../lib/implementation/Codec.cpp
+        ../lib/implementation/Decoder.cpp
+        ../lib/implementation/CRC.cpp
+        ../lib/implementation/IoManager.cpp)

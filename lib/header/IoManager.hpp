@@ -18,7 +18,7 @@
  */
 class IoManager
 {
-private:
+protected:
 	bool connected = false;
 	uint8_t escapeSequence;
 	int serialPort{};
@@ -31,14 +31,14 @@ private:
 
 	void setTimeoutOccurred();
 
-	void sendPacket(const StreamPacket &sp);
+	virtual void sendPacket(const StreamPacket &sp) = 0;
 
-	bool checkResponse();
+	virtual bool checkResponse() = 0;
 
-	void sendResponse(uint8_t channel, u_long packetIndex, bool success);
+	virtual void sendResponse(uint8_t channel, u_long packetIndex, bool success) = 0;
 
 public:
-	explicit IoManager(uint8_t escapeSequence, CRC crc);
+	IoManager(uint8_t escapeSequence, CRC crc, uint8_t outboundChannel);
 
 	/**
 	 * @brief Sets up the serial port with the specified settings.
@@ -54,6 +54,8 @@ public:
 
 	void receive(std::vector<uint8_t> &data);
 
+	bool hasTimeoutOccurred() const { return timeoutOccurred.load(); }
+
 	/**
 	 * @brief Reads binary content from the standard input until EOF.
 	 * @return A vector containing the binary data read from the input.
@@ -65,8 +67,4 @@ public:
 	 * @param data A reference to the vector containing the data to be printed.
 	 */
 	static void printVector(const std::vector<uint8_t> &data);
-
-	bool hasTimeoutOccurred() const { return timeoutOccurred.load(); }
-
-
 };
