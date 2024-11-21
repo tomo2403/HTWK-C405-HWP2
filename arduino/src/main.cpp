@@ -6,6 +6,8 @@
 
 static struct pt thread1, thread2;
 
+bool writeLock = false;
+
 uint8_t lastChValueRec[CHANNEL2];
 
 uint8_t digitalReadAll(uint8_t channel) {
@@ -53,9 +55,15 @@ int processChannel(uint8_t channel, struct pt *pt) {
 	if (pinReceived != lastChValueRec[channel]) {
 		lastChValueRec[channel] = pinReceived;
 
+		PT_WAIT_UNTIL(pt, writeLock == 0);
+		writeLock = true;
+
 		Serial.write(channel);
 		Serial.write(pinReceived);
+
+		writeLock = false;
 	}
+
 
 	if (Serial.available() > 4){
 		StreamPacket sp = receiveStreamPacket();
