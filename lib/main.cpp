@@ -80,8 +80,8 @@ int main(int, char**){
     
     std::vector<uint8_t> RawBytes = {0x98, 0x0e, 0x26, 0xff};
     std::vector<uint8_t> decodedBytes = std::vector<uint8_t>();
-    Encoder enc = Encoder(0x80, RawBytes);
-    Decoder dec = Decoder(0x80, decodedBytes);
+    Encoder enc = Encoder(0x00, RawBytes);
+    Decoder dec = Decoder(0x00, decodedBytes);
 
 	std::cout << "Encoded:" << std::endl;
 	while (enc.hasData())

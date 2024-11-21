@@ -12,7 +12,7 @@ protected:
     
     const uint8_t escapeSequence = 0x00;
     std::vector<uint8_t> &dataVector;
-    uint8_t previousNibble = 0x10;
+    uint8_t previousNibble = 0x00;
 
     int8_t bufferEndBit = -1;
 

@@ -9,25 +9,22 @@ Encoder::Encoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : Cod
 	{
 		throw std::invalid_argument("Data-Vector cannot be empty.");
 	}
-
-	clock = 0;
 }
 
-void Encoder::insertIntoBuffer(const CodecCommand &command, const uint8_t &atBit)
+void Encoder::insertNibbleIntoBuffer(const uint8_t &nibble, const uint8_t &atBit)
 {
-	if (atBit > 20)
+	if (atBit > 27)
 	{
-		throw std::out_of_range("The buffer is 32bit in size and the sequence 12bit long.");
+		throw std::out_of_range("The buffer is 32bit in size and the sequence 4bit long.");
 	}
 
-	buffer &= ~(0xFFF << atBit);
-	buffer |= (static_cast<uint32_t>(escapeSequence) << (atBit + 4));
-	buffer |= (static_cast<uint32_t>(command) << atBit);
+	buffer &= ~(0xF << atBit);
+	buffer |= (static_cast<uint32_t>(nibble & 0x0F) << atBit);
 }
 
-void Encoder::insertIntoBuffer(const uint8_t &byte, const uint8_t &atBit)
+void Encoder::insertByteIntoBuffer(const uint8_t &byte, const uint8_t &atBit)
 {
-	if (atBit < 0 || atBit > 24)
+	if (atBit > 24)
 	{
 		throw std::out_of_range("The buffer is 32bit in size and the sequence 8bit long.");
 	}
@@ -51,14 +48,17 @@ uint8_t Encoder::nextNibble()
 
 	if (currentNibble() == previousNibble)
 	{
-		insertIntoBuffer(CodecCommand::insertPrevNibbleAgain, bufferEndBit-3);
+		insertNibbleIntoBuffer(escapeSequence, bufferEndBit-3); // replace current nibble
+		gracefullyInsertNibbleIntoBuffer(CodecCommand::insertPrevNibbleAgain, bufferEndBit-3); // insert cmf after current nibble
+		justEscaped = true;
 	}
 
-	if (currentNibble() == escapeSequence)
+	if (currentNibble() == escapeSequence && !justEscaped)
 	{
-		insertIntoBuffer(CodecCommand::insertEscSeqAsData, bufferEndBit-3);
+		gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsData, bufferEndBit-3);
 	}
 
+	justEscaped = false;
 	const uint8_t currentNib = currentNibble();
 	bufferEndBit -= 4;
 	previousNibble = currentNib;

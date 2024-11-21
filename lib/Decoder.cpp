@@ -16,14 +16,10 @@ void Decoder::processCommand(const uint8_t &command)
 			everythingReceived = true;
 			break;
 		case CodecCommand::insertEscSeqAsData:
-			leftShiftByteIntoBuffer(0x80);
-			bufferEndBit = bufferEndBit == 0 ? 7 : bufferEndBit+8;
-			timesToRun += 2;
-			escAllowed = false;
+			writeToDataVector(escapeSequence);
 			break;
-			dataVectorBuffer = (dataVectorBuffer & 0xF0) | (~dataVectorBuffer & 0x0F);
-			nibblesNotToDecode = 2;
-			break;
+		case CodecCommand::insertPrevNibbleAgain:
+			writeToDataVector(previousNibble);
 		default:
 			break;
 	}
@@ -31,7 +27,7 @@ void Decoder::processCommand(const uint8_t &command)
 
 void Decoder::writeToDataVector(const uint8_t &nibble)
 {
-	if (!partnerIsReady) return;
+	// if (!partnerIsReady) return;
 
 	if (dataVectorBufferShiftCount == 2)
 	{
@@ -42,6 +38,7 @@ void Decoder::writeToDataVector(const uint8_t &nibble)
 	dataVectorBuffer <<= 4;
 	dataVectorBuffer |= nibble & 0x0F;
 	dataVectorBufferShiftCount++;
+	previousNibble = nibble;
 }
 
 void Decoder::flushBufferIntoDataVector()
@@ -53,63 +50,26 @@ void Decoder::flushBufferIntoDataVector()
 	}
 
 	dataVector.push_back(dataVectorBuffer);
-	dataVectorBufferShiftCount = 0;
 
 	// TODO: Exception, wenn ein Nibble zu wenig!
 }
 
 void Decoder::nextNibble(const uint8_t &nibble)
 {
-	if (nibblesNotToDecode > 0)
-	{
-		writeToDataVector(nibble);
-		nibblesNotToDecode--;
-		flippedPevNibble = false;
-		previousNibble = nibble;
-		return;
-	}
-
-	if (EscapedModeIsActive)
+	if(EscapedModeIsActive)
 	{
 		processCommand(nibble);
 		EscapedModeIsActive = false;
 		return;
 	}
 
-	leftShiftNibbleIntoBuffer(nibble);
-	bufferEndBit = bufferEndBit == 0 ? 3 : bufferEndBit + 4;
-
-	// Es gibt nichts zu überprüfen
-	if (bufferEndBit < 7)
-	{
-		return;
-	}
-
-	const uint8_t currentByte = getByteSlice(bufferEndBit - 7);
-
-	if (getByteSlice(bufferEndBit - 7) == escapeSequence && escAllowed)
+	if (nibble == escapeSequence)
 	{
 		EscapedModeIsActive = true;
-		bufferEndBit = bufferEndBit == 7 ? 0 : bufferEndBit-8;
 		return;
 	}
 
-	if ((hasNegatedNibbles(currentByte)) && !flippedPevNibble && nibbleNotToFlip == 0)
-	{
-		negateNibbleInBuffer(bufferEndBit - 3);
-		flippedPevNibble = true;
-	}
-	else
-	{
-		flippedPevNibble = false;
-	}
-
-	escAllowed = true;
-	previousNibble = getNibbleSlice(bufferEndBit - 3);
-	writeToDataVector(getNibbleSlice(bufferEndBit - 3));
-	bufferEndBit -= 4;
-	timesToRun--;
-	nibbleNotToFlip = nibbleNotToFlip == 0 ? 0 : nibbleNotToFlip-1;
+	writeToDataVector(nibble);
 }
 
 bool Decoder::hasData() const
