@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <cstdint>
+#include "Packets.hpp"
 
 /**
  * @brief Klasse zum Generieren und Validieren eines CRC-Wertes.
@@ -31,6 +32,19 @@ public:
 	 * @return uint32_t; (Nur) 32bit CRC-Wert der Daten.
 	 */
 	[[nodiscard]] uint32_t calculateCRC(const std::vector<uint8_t> &data) const;
+
+
+	/**
+	 * @brief Berechnet 32-Bit CRC-Wert über ein PrePacket.
+	 *
+	 * @details
+	 * Diese Funktion berechnet den CRC-Wert für ein gegebenes PrePacket.
+	 * Die Berechnung erfolgt über die Nachahmung eines (Hardware-)Schieberegisters.
+	 *
+	 * @param p Das PrePacket, über welches der CRC-Wert berechnet werden soll.
+	 * @return uint32_t; 32-Bit CRC-Wert des PrePackets.
+	 */
+	uint32_t calculateCRC(PrePacket &p) const;
 
 	/**
 	 * @brief Validiert CRC-Wert.

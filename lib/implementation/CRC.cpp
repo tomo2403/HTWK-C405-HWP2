@@ -34,3 +34,10 @@ bool CRC::validateCRC(const std::vector<uint8_t> &data, uint32_t receivedCRC) co
 	uint32_t calculatedCRC = calculateCRC(data);
 	return (calculatedCRC == receivedCRC);
 }
+
+uint32_t CRC::calculateCRC(PrePacket &p) const
+{
+	std::vector<uint8_t> dataVector = {p.index};
+	dataVector.insert(dataVector.end(), p.data.begin(), p.data.end());
+	return p.crc = calculateCRC(dataVector);
+}
