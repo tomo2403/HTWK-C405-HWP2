@@ -20,7 +20,7 @@ private:
 	void writeToDataVector(const uint8_t &nibble);
 
 public:
-	Decoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector);
+	Decoder(std::vector<uint8_t> &dataVector);
 
 	void nextNibble(const uint8_t &nibble);
 

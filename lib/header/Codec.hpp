@@ -29,7 +29,7 @@ protected:
     uint8_t currentByte();
 
 public:
-    Codec(uint8_t escapeSequence);
+    Codec();
     
     // Sonderfall nachfolgendes Nibble ist gleich command
     void zeroBuffer();

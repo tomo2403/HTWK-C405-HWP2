@@ -1,7 +1,7 @@
 #include "../header/Decoder.hpp"
 
-Decoder::Decoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector) 
-    : Codec::Codec(escapeSequence), dataVector(dataVector)
+Decoder::Decoder(std::vector<uint8_t> &dataVector) 
+	: dataVector(dataVector)
 {
     this->bufferEndBit = 0;
 }
