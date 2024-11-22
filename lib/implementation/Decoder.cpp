@@ -13,7 +13,7 @@ void Decoder::processCommand(const uint8_t &command)
 		case CodecCommand::iAmReady:
 			partnerIsReady = true;
 			break;
-		case CodecCommand::STOP:
+		case CodecCommand::endBlock:
 			everythingReceived = true;
 			break;
 		case CodecCommand::insertEscSeqAsDataDefault:

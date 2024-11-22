@@ -36,14 +36,37 @@ public:
 };
 
 enum CodecCommand {
-    // Do NOT use: 0x00
-	insertPrevNibbleAgainDefault = 0x01,
+    // =========================================================================
+    // WARNING: Do not use 0x00, as it represents the escape sequence itself!
+    // NOTE: Every command is preceded by the escape sequence before being sent.
+    // =========================================================================
+
+    // If a nibble occurs back-to-back in the data stream, it is only sent once,
+    // followed by this command.
+    insertPrevNibbleAgainDefault = 0x01,
+
+    // If the upcoming nibble after the command is the same as the default command-nibble,
+    // this fallback command is used to avoid sending the same nibble twice in succession.
     insertPrevNibbleAgainFallback = 0x02,
-	/** The communication partner is ready to send/receive */
-	iAmReady = 0x03,
-	/** The communication partner has sent everything */
-	STOP = 0x04,
-    onlyReadOneBitOfNextNibble = 0x05,
+	
+    // The communication partner is ready to send/receive
+    iAmReady = 0x03,
+	
+    // This command marks the end of a data-block.
+	endBlock = 0x04,
+
+    // This command marks the begin of a data-block.
+    beginBlockDefault = 0x05,
+
+    // If the upcoming nibble after the command is the same as the default command-nibble,
+    // this fallback command is used to avoid sending the same nibble twice in succession.
+    beginBlockFallback = 0x08,
+    
+    // If the escape sequence occurs in the data stream, this command is placed after
+    // it to inform the decoder to place the escape sequence back in the original data stream.
     insertEscSeqAsDataDefault = 0x06,
+
+    // If the upcoming nibble after the command is the same as the default command-nibble,
+    // this fallback command is used to avoid sending the same nibble twice in succession.
     insertEscSeqAsDataFallback = 0x07,
 };
