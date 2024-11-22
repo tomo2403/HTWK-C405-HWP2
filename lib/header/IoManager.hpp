@@ -11,6 +11,7 @@
 #include "Encoder.hpp"
 #include "Decoder.hpp"
 #include "CRC.hpp"
+#include "ThreadSafeQueue.hpp"
 
 /**
  * @class IoManager
@@ -26,6 +27,9 @@ protected:
     int serialPort{}; /**< The file descriptor for the serial port. */
     CRC crc; /**< The CRC object for checksum calculations. */
     std::vector<PrePacket> packets{}; /**< A vector to store packets. */
+
+	ThreadSafeQueue<StreamPacket> incomingQueue;
+	ThreadSafeQueue<StreamPacket> outgoingQueue;
 
     /**
      * @brief Prepares packets from the given data.
