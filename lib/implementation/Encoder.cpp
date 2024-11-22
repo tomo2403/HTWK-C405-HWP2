@@ -3,8 +3,7 @@
 
 #include "../header/Encoder.hpp"
 
-Encoder::Encoder(std::vector<uint8_t> dataVector) 
-	: dataVector(dataVector)
+Encoder::Encoder(std::vector<uint8_t> dataVector) : dataVector(dataVector)
 {
 	if (dataVector.empty())
 	{
@@ -55,10 +54,30 @@ uint8_t Encoder::upcomingNibble()
 
 uint8_t Encoder::nextNibble()
 {
+
 	if (bufferEndBit < 3 && dataVectorOffset_Index < dataVector.size())
 	{
 		leftShiftByteIntoBuffer(dataVector.at(dataVectorOffset_Index++));
 		bufferEndBit += 8;
+	}
+
+	// TODO: Ende
+
+	if (!beginBlockWasSent)
+	{
+		insertNibbleIntoBuffer(escapeSequence, bufferEndBit+5);
+		if (currentNibble() == CodecCommand::beginBlockDefault)
+		{
+			insertNibbleIntoBuffer(CodecCommand::beginBlockFallback, bufferEndBit+1);
+		}
+		else
+		{
+			insertNibbleIntoBuffer(CodecCommand::beginBlockDefault, bufferEndBit+1);
+		}
+
+		beginBlockWasSent = true;
+		bufferEndBit += 8;
+		justEscaped = true;
 	}
 
 	if (currentNibble() == previousNibble && prevNibbleInitilized)

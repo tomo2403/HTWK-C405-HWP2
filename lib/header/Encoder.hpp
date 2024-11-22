@@ -8,9 +8,11 @@ class Encoder : public Codec
 {
 private:
 	uint32_t dataVectorOffset_Index = 0;
-	bool justEscaped = false;
+	bool justEscaped;
 	bool prevNibbleInitilized = false;
 	bool evenNumberOfNibblesSent = true;
+	bool beginBlockWasSent = false;
+	bool endBlockWasSent = false;
 	
 	void insertNibbleIntoBuffer(const uint8_t &nibble, const uint8_t &atBit);
 
