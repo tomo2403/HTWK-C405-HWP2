@@ -3,7 +3,7 @@
 
 #include "../header/Encoder.hpp"
 
-Encoder::Encoder(uint8_t escapeSequence, std::vector<uint8_t> dataVector) : Codec::Codec(escapeSequence, dataVector)
+Encoder::Encoder(uint8_t escapeSequence, std::vector<uint8_t> dataVector) : Codec::Codec(escapeSequence), dataVector(dataVector)
 {
 	if (dataVector.empty())
 	{
@@ -42,7 +42,7 @@ uint8_t Encoder::upcommingNibble()
 {
 	if (bufferEndBit == 3 && dataVectorOffset_Index < dataVector.size())
 	{
-		return dataVector.at(dataVectorOffset_Index+1) >> 4;
+		return dataVector.at(dataVectorOffset_Index) >> 4;
 	}
 	else if (bufferEndBit == 3 && dataVectorOffset_Index >= dataVector.size())
 	{
@@ -68,10 +68,12 @@ uint8_t Encoder::nextNibble()
 		if (upcommingNib == CodecCommand::insertPrevNibbleAgainDefault)
 		{
 			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertPrevNibbleAgainFallback, bufferEndBit-3);
+			evenNumberOfNibblesSent = !evenNumberOfNibblesSent;
 		}
 		else
 		{
 			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertPrevNibbleAgainDefault, bufferEndBit-3);
+			evenNumberOfNibblesSent = !evenNumberOfNibblesSent;
 		}
 		justEscaped = true;
 	}
@@ -81,10 +83,12 @@ uint8_t Encoder::nextNibble()
 		if (upcommingNibble() == CodecCommand::insertEscSeqAsDataDefault)
 		{
 			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataFallback, bufferEndBit-3);
+			evenNumberOfNibblesSent = !evenNumberOfNibblesSent;
 		}
 		else
 		{
 			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataDefault, bufferEndBit-3);
+			evenNumberOfNibblesSent = !evenNumberOfNibblesSent;
 		}
 	}
 

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Codec.hpp"
 
 class Decoder : public Codec
@@ -8,6 +10,8 @@ private:
 
 	uint8_t dataVectorBuffer = 0x00;
 	uint8_t dataVectorBufferShiftCount = 0;
+
+	std::vector<uint8_t> &dataVector;
 
 	bool partnerIsReady = false;
 

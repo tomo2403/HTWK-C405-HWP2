@@ -10,12 +10,14 @@ private:
 	uint32_t dataVectorOffset_Index = 0;
 	bool justEscaped = false;
 	bool prevNibbleInitilized = false;
+	bool evenNumberOfNibblesSent = true;
 	
 	void insertNibbleIntoBuffer(const uint8_t &nibble, const uint8_t &atBit);
 
 	void insertByteIntoBuffer(const uint8_t &byte, const uint8_t &atBit);
 
 	uint8_t upcommingNibble();
+	std::vector<uint8_t> dataVector;
 
 public:
 
