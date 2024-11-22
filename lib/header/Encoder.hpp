@@ -16,7 +16,7 @@ private:
 
 	void insertByteIntoBuffer(const uint8_t &byte, const uint8_t &atBit);
 
-	uint8_t upcommingNibble();
+	uint8_t upcomingNibble();
 	std::vector<uint8_t> dataVector;
 
 public:

@@ -39,7 +39,7 @@ bool Encoder::hasData()
 	return dataVectorOffset_Index < dataVector.size() || bufferEndBit != -1;
 }
 
-uint8_t Encoder::upcommingNibble()
+uint8_t Encoder::upcomingNibble()
 {
 	if (bufferEndBit == 3 && dataVectorOffset_Index < dataVector.size())
 	{
@@ -63,7 +63,7 @@ uint8_t Encoder::nextNibble()
 
 	if (currentNibble() == previousNibble && prevNibbleInitilized)
 	{
-		const uint8_t upcommingNib = upcommingNibble();
+		const uint8_t upcommingNib = upcomingNibble();
 		insertNibbleIntoBuffer(escapeSequence, bufferEndBit-3);
 
 		if (upcommingNib == CodecCommand::insertPrevNibbleAgainDefault)
@@ -81,7 +81,7 @@ uint8_t Encoder::nextNibble()
 
 	if (currentNibble() == escapeSequence && !justEscaped)
 	{
-		if (upcommingNibble() == CodecCommand::insertEscSeqAsDataDefault)
+		if (upcomingNibble() == CodecCommand::insertEscSeqAsDataDefault)
 		{
 			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataFallback, bufferEndBit-3);
 			evenNumberOfNibblesSent = !evenNumberOfNibblesSent;
