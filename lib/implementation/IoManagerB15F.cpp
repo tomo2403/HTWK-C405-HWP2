@@ -1,6 +1,7 @@
 #include "../header/IoManagerB15F.hpp"
 
-IoManagerB15F::IoManagerB15F(CRC crc, uint8_t outboundChannel, uint8_t inboundChannel) : IoManager(crc, outboundChannel, inboundChannel)
+IoManagerB15F::IoManagerB15F(CRC crc, uint8_t outboundChannel, uint8_t inboundChannel)
+    : IoManager(crc, outboundChannel, inboundChannel)
 {
     this->prevNibbleOnChannelZero = drv.getRegister(&PINA) & 0x0F;
     this->prevNibbleOnChannelFour = drv.getRegister(&PINA) & 0xF0;

@@ -2,7 +2,8 @@
 #include <algorithm>
 #include <utility>
 
-IoManager::IoManager(CRC crc, uint8_t outboundChannel, uint8_t inboundChannel) : crc(crc), outboundChannel(outboundChannel), inboundChannel(inboundChannel)
+IoManager::IoManager(CRC crc, uint8_t outboundChannel, uint8_t inboundChannel)
+	: crc(crc), outboundChannel(outboundChannel), inboundChannel(inboundChannel)
 {
 
 }

@@ -6,7 +6,7 @@
 #include "Decoder.hpp"
 #include "Encoder.hpp"
 
-class IoManagerB15F : IoManager
+class IoManagerB15F : public IoManager
 {
 private:
 	uint8_t prevNibbleOnChannelZero;
@@ -24,6 +24,4 @@ private:
 
 public:
 	IoManagerB15F(CRC crc, uint8_t outboundChannel, uint8_t inboundChannel);
-
-	void transfer2Way(std::vector<uint8_t>& inputData, std::vector<uint8_t>& outputData);
 };
