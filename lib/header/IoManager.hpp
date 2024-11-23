@@ -22,7 +22,6 @@ class IoManager
 protected:
     bool connected = false; /**< Indicates if the connection is established. */
     bool awaitingResponse = false; /**< Indicates if a response is awaited. */
-    uint8_t escapeSequence; /**< The escape sequence byte. */
     uint8_t outboundChannel; /**< The outbound channel number. */
     int serialPort{}; /**< The file descriptor for the serial port. */
     CRC crc; /**< The CRC object for checksum calculations. */
@@ -90,7 +89,7 @@ public:
      * @param crc The CRC object for checksum calculations.
      * @param outboundChannel The outbound channel number.
      */
-    IoManager(uint8_t escapeSequence, CRC crc, uint8_t outboundChannel);
+    IoManager(CRC crc, uint8_t outboundChannel);
 
     /**
      * @brief Transfers data in a two-way communication.
