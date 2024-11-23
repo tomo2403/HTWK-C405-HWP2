@@ -34,7 +34,7 @@ void Decoder::processCommand(const uint8_t &command)
 			dataVector.clear();
 			packetComplete = false;
 			zeroBuffer();
-			dataVectorBuffer == 0x00;
+			dataVectorBuffer = 0x00;
 			dataVectorBufferShiftCount = 0;
 			bufferEndBit = -1;
 			break;
