@@ -1,26 +1,20 @@
 #include "../lib/header/IoManagerPc.hpp"
 
-typedef IoManagerPc ThisIoManager;
-
 int main()
 {
-	CRC crc(65, 0x04C11DB7);
-	ThisIoManager ioManager = ThisIoManager(0x80, crc, 0x06);
-	ioManager.openSerialPort();
+    CRC crc(65, 0x04C11DB7);
+    IoManagerPc ioManager(crc, 0x06);
+    ioManager.openSerialPort();
 
-	std::vector<uint8_t> inputData = ThisIoManager::getBinaryPipeContent();
-	std::vector<uint8_t> outputData;
+    std::vector<uint8_t> inputData = IoManagerPc::getBinaryInput();
+    std::vector<uint8_t> outputData;
 
-	ioManager.preparePackets(inputData);
+    std::thread transfer(&IoManagerPc::transfer2Way, &ioManager, std::ref(inputData), std::ref(outputData));
 
-	std::thread writer(&ThisIoManager::send, &ioManager);
-	std::thread reader(&ThisIoManager::receive, &ioManager, std::ref(outputData));
+    transfer.join();
 
-	writer.join();
-	reader.join();
+    ioManager.closeSerialPort();
+    IoManagerPc::setBinaryOutput(outputData);
 
-	ioManager.closeSerialPort();
-	ThisIoManager::printVector(outputData);
-
-	return 0;
+    return 0;
 }
