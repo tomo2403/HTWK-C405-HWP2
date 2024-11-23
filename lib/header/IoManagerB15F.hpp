@@ -9,7 +9,7 @@ private:
 
 	void sendPacket(const StreamPacket &sp);
 
-	PrePacket receivePacket(StreamPacket &sp);
+	void receivePacket(StreamPacket &sp);
 
 public:
 	IoManagerB15F(CRC crc, uint8_t outboundChannel);

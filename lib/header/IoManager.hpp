@@ -80,7 +80,7 @@ protected:
      * @param sp The packet to receive.
      * @return The pre-packet received.
      */
-    virtual PrePacket receivePacket(StreamPacket &sp) = 0;
+    virtual void receivePacket(StreamPacket &sp) = 0;
 
 public:
     /**

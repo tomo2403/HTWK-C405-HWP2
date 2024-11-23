@@ -1,6 +1,6 @@
 #include "../header/IoManagerPc.hpp"
 
-IoManagerPc::IoManagerPc(uint8_t escapeSequence, CRC crc, uint8_t outboundChannel) : IoManager(escapeSequence, crc, outboundChannel)
+IoManagerPc::IoManagerPc(CRC crc, uint8_t outboundChannel) : IoManager(crc, outboundChannel)
 {
 
 }

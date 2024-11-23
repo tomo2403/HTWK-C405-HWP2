@@ -19,6 +19,8 @@ private:
      */
     ssize_t serialRead() const;
 
+	void getContinuesInput() override;
+
     /**
      * @brief Sends a packet over the serial port.
      * @param sp The packet to send.
@@ -29,7 +31,7 @@ private:
      * @brief Receives a packet from the serial port.
      * @param sp The packet to receive.
      */
-    void receivePacket(StreamPacket &sp) override;
+	void receivePacket(StreamPacket &sp) override;
 
     /**
      * @brief Processes the serial input.
@@ -50,7 +52,7 @@ public:
      * @param crc The CRC object for checksum calculations.
      * @param outboundChannel The outbound channel number.
      */
-    IoManagerPc(uint8_t escapeSequence, CRC crc, uint8_t outboundChannel);
+    IoManagerPc(CRC crc, uint8_t outboundChannel);
 
     /**
      * @brief Sets up the serial port with the specified settings.
