@@ -23,6 +23,7 @@ protected:
     bool connected = false; /**< Indicates if the connection is established. */
     bool awaitingResponse = false; /**< Indicates if a response is awaited. */
     uint8_t outboundChannel; /**< The outbound channel number. */
+    uint8_t inboundChannel; /**< The inbound channel number. */
     int serialPort{}; /**< The file descriptor for the serial port. */
     CRC crc; /**< The CRC object for checksum calculations. */
     std::vector<PrePacket> outgoingPackets{}; /**< A vector to store packets. */
