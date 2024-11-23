@@ -5,35 +5,7 @@ IoManager::IoManager(uint8_t escapeSequence, CRC crc, uint8_t outboundChannel) :
 
 }
 
-void IoManager::send()
-{
-	while (!connected)
-	{ }
-
-	u_long index = 0;
-
-	for (int i = 0; i < packets.size(); i++) {
-		Encoder enc = Encoder(escapeSequence, Encoder::convertPacket(packets[i]));
-
-		StreamPacket sp{};
-		sp.channel = outboundChannel;
-		sp.dataLength = packets[i].data.size();
-
-
-		sp.data = enc.encodeAll();
-
-		sendPacket(sp);
-
-		if (!checkResponse()) {
-			// resend packet
-			i--;
-		}
-	}
-
-	// TODO: send close connection command
-}
-
-std::vector<uint8_t> IoManager::getBinaryPipeContent()
+std::vector<uint8_t> IoManager::getBinaryInput()
 {
 	std::vector<uint8_t> data;
 	char ch;
@@ -48,7 +20,7 @@ std::vector<uint8_t> IoManager::getBinaryPipeContent()
 	return data;
 }
 
-void IoManager::printVector(const std::vector<uint8_t> &data)
+void IoManager::setBinaryOutput(const std::vector<uint8_t> &data)
 {
 	std::cout.write(reinterpret_cast<const char *>(data.data()), data.size());
 }
@@ -67,21 +39,20 @@ void IoManager::preparePackets(std::vector<uint8_t> &data)
 			p.data.push_back(data[dataIndex++]);
 		}
 		crc.calculateCRC(p);
-		packets.push_back(p);
+		outgoingPackets.push_back(p);
 	}
-}
-
-bool IoManager::checkResponse(StreamPacket &sp)
-{
-	// TODO: check if response is valid
-	return true;
 }
 
 void IoManager::sendResponse(uint8_t channel, u_long packetIndex, bool success)
 {
+	sendData(channel, packetIndex, std::vector<uint8_t> { success });
+}
+
+void IoManager::sendData(uint8_t channel, u_long packetIndex, std::vector<uint8_t> data)
+{
 	PrePacket p{};
 	p.index = packetIndex;
-	p.data.push_back(success ? 0x01 : 0x00);
+	p.data = data;
 	crc.calculateCRC(p);
 
 	Encoder enc = Encoder(escapeSequence, Encoder::convertPacket(p));
@@ -93,11 +64,64 @@ void IoManager::sendResponse(uint8_t channel, u_long packetIndex, bool success)
 	sendPacket(sp);
 }
 
+void IoManager::processIncomingPacket(StreamPacket &sp)
+{
+	Decoder dec = Decoder(escapeSequence, sp.data);
+	PrePacket p = dec.decodeAll(sp.data);
+
+	bool packetValid = crc.validateCRC(p);
+
+	if (!(awaitingResponse && p.data[0] == true && packetValid))
+		sendResponse(sp.channel, p.index, packetValid);
+
+	if (awaitingResponse) {
+		awaitingResponse = !awaitingResponse;
+
+		if (p.data[0] == false) {
+			StreamPacket response = createStreamPacket(outgoingPackets[p.index], sp.channel);
+			outgoingQueue.push(response);
+		}
+	}
+	else if (packetValid) {
+		receivedPackets.push_back(p);
+	}
+}
+
+StreamPacket IoManager::createStreamPacket(PrePacket p, uint8_t channel)
+{
+	Encoder enc = Encoder(escapeSequence, Encoder::convertPacket(p));
+	StreamPacket sp{};
+	sp.channel = channel;
+	sp.data = enc.encodeAll();
+	sp.dataLength = sp.data.size();
+	return sp;
+}
+
 void IoManager::transfer2Way(std::vector<uint8_t> &input, std::vector<uint8_t> &output)
 {
 	preparePackets(input);
 
-	// TODO: implement
+	std::thread handleInput(&IoManager::getContinuesInput, this);
 
+	while (!connected)
+	{ }
 
+	while (!incomingQueue.empty() && !outgoingQueue.empty())
+	{
+		// TODO: implement
+
+		if (!incomingQueue.empty())
+		{
+			StreamPacket sp;
+			incomingQueue.wait_and_pop(sp);
+			processIncomingPacket(sp);
+		}
+
+		if (!outgoingQueue.empty())
+		{
+			StreamPacket sp;
+			outgoingQueue.wait_and_pop(sp);
+			sendPacket(sp);
+		}
+	}
 }

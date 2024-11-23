@@ -26,7 +26,8 @@ protected:
     uint8_t outboundChannel; /**< The outbound channel number. */
     int serialPort{}; /**< The file descriptor for the serial port. */
     CRC crc; /**< The CRC object for checksum calculations. */
-    std::vector<PrePacket> packets{}; /**< A vector to store packets. */
+    std::vector<PrePacket> outgoingPackets{}; /**< A vector to store packets. */
+    std::vector<PrePacket> receivedPackets{};
 
 	ThreadSafeQueue<StreamPacket> incomingQueue;
 	ThreadSafeQueue<StreamPacket> outgoingQueue;
@@ -42,7 +43,7 @@ protected:
      * @return True if the response is valid, false otherwise.
      * @param sp The packet to check.
      */
-    bool checkResponse(StreamPacket &sp);
+    [[ nodiscard ]] bool checkResponse(StreamPacket &sp);
 
     /**
      * @brief Sends a response packet over the serial port.
@@ -51,6 +52,23 @@ protected:
      * @param success Indicates if the operation was successful.
      */
     void sendResponse(uint8_t channel, u_long packetIndex, bool success);
+
+	void sendData(uint8_t channel, u_long packetIndex, std::vector<uint8_t> data);
+
+	void processIncomingPacket(StreamPacket &sp);
+
+	/**
+	 * @brief Creates a stream packet from a pre-packet.
+	 * @param p The pre-packet to convert.
+	 * @param channel The channel number.
+	 * @return The stream packet.
+	 */
+	StreamPacket createStreamPacket(PrePacket p, uint8_t channel);
+
+	/**
+	 * @brief Gets continuous input from the incoming port.
+	 */
+	virtual void getContinuesInput() = 0;
 
     /**
      * @brief Sends a packet over the serial port.
@@ -61,8 +79,9 @@ protected:
     /**
      * @brief Receives a packet from the serial port.
      * @param sp The packet to receive.
+     * @return The pre-packet received.
      */
-    virtual void receivePacket(StreamPacket &sp) = 0;
+    virtual PrePacket receivePacket(StreamPacket &sp) = 0;
 
 public:
     /**
@@ -81,27 +100,14 @@ public:
     void transfer2Way(std::vector<uint8_t> &input, std::vector<uint8_t> &output);
 
     /**
-     * @brief Sends data. Deprecated, use transfer2Way instead.
-     */
-    [[deprecated("Use transfer2Way instead.")]]
-    void send();
-
-    /**
-     * @brief Receives data. Deprecated, use transfer2Way instead.
-     * @param data A reference to the data vector to store the received data.
-     */
-    [[deprecated("Use transfer2Way instead.")]]
-    void receive(std::vector<uint8_t> &data);
-
-    /**
      * @brief Reads binary content from the standard input until EOF.
      * @return A vector containing the binary data read from the input.
      */
-    static std::vector<uint8_t> getBinaryPipeContent();
+    static std::vector<uint8_t> getBinaryInput();
 
     /**
      * @brief Prints the contents of a vector to the standard output.
      * @param data A reference to the vector containing the data to be printed.
      */
-    static void printVector(const std::vector<uint8_t> &data);
+    static void setBinaryOutput(const std::vector<uint8_t> &data);
 };
