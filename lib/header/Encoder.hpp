@@ -9,7 +9,7 @@ class Encoder : public Codec
 private:
 	uint32_t dataVectorOffset_Index = 0;
 	bool justEscaped = false;
-	bool prevNibbleInitilized = false;
+	bool prevNibbleInitialized = false;
 	bool evenNumberOfNibblesSent = true;
 	bool beginBlockWasSent = false;
 	bool endBlockWasSent = false;
@@ -22,8 +22,7 @@ private:
 	std::vector<uint8_t> dataVector;
 
 public:
-
-	Encoder(std::vector<uint8_t> dataVector);
+	explicit Encoder(const std::vector<uint8_t>& dataVector);
 
 	static std::vector<uint8_t> convertPacket(const PrePacket &p);
 
@@ -35,5 +34,5 @@ public:
 
 	std::vector<uint8_t> encodeAll();
 
-	void newDataVector(const std::vector<uint8_t> data);
+	void newDataVector(std::vector<uint8_t> data);
 };

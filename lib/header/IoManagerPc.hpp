@@ -6,6 +6,8 @@
 class IoManagerPc : public IoManager
 {
 private:
+	int serialPort{}; /**< The file descriptor for the serial port. */
+
     /**
      * @brief Writes a byte of data to the serial port.
      * @param data The byte of data to write.
@@ -19,31 +21,17 @@ private:
      */
     ssize_t serialRead() const;
 
+	/**
+ 	 * @brief Checks if data is available in the serial buffer.
+	 * @return True if data is available, false otherwise.
+	 */
+	bool isDataAvailable() const;
+
 	void getContinuesInput() override;
 
-    /**
-     * @brief Sends a packet over the serial port.
-     * @param sp The packet to send.
-     */
     void sendPacket(const StreamPacket &sp) override;
 
-    /**
-     * @brief Receives a packet from the serial port.
-     * @param sp The packet to receive.
-     */
 	void receivePacket(StreamPacket &sp) override;
-
-    /**
-     * @brief Processes the serial input.
-     *
-     */
-    void processSerialInput(PrePacket &packet);
-
-    /**
-     * @brief Checks if data is available in the serial buffer.
-     * @return True if data is available, false otherwise.
-     */
-    bool isDataAvailable() const;
 
 public:
     /**

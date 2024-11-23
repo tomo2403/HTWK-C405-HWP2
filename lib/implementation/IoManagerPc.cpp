@@ -80,7 +80,7 @@ void IoManagerPc::sendPacket(const StreamPacket &sp)
 {
 	serialWrite(sp.channel);
 	serialWrite(sp.dataLength);
-	for (uint8_t byte : sp.data)
+	for (uint8_t byte: sp.data)
 	{
 		serialWrite(byte);
 	}
@@ -100,28 +100,22 @@ void IoManagerPc::receivePacket(StreamPacket &sp)
 	sp.data = data;
 }
 
-void IoManagerPc::processSerialInput(PrePacket &packet)
+void IoManagerPc::getContinuesInput()
 {
-	if (!isDataAvailable()) return;
-
-	if (awaitingResponse)
+	while (true)
 	{
+		if (!isDataAvailable()) return;
+
 		StreamPacket sp{};
 		receivePacket(sp);
-		if (sp.channel == outboundChannel){
-			awaitingResponse = false;
+
+		if (!connected && sp.channel != outboundChannel)
+		{
+			connected = true;
 		}
-
-		// TODO: place response in queue
-	}
-	else {
-		StreamPacket sp{};
-		receivePacket(sp);
-		std::vector<uint8_t> data;
-
-		Decoder dec = Decoder(escapeSequence, data);
-		packet = dec.decodeAll(sp.data);
-
-		// TODO: place packet in queue
+		else
+		{
+			incomingQueue.push(sp);
+		}
 	}
 }

@@ -42,7 +42,9 @@ bool CRC::validateCRC(const std::vector<uint8_t> &data, uint32_t receivedCRC) co
 	return (calculatedCRC == receivedCRC);
 }
 
-bool CRC::validateCRC(PrePacket &p) const
+bool CRC::validateCRC(PostPacket &p) const
 {
-	return validateCRC(p.data, p.crc);
+	std::vector<uint8_t> data = { p.index };
+	data.insert(data.end(), p.data.begin(), p.data.end());
+	return validateCRC(data, p.crc);
 }

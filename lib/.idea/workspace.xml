@@ -23,14 +23,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9787c96d-87ab-46fb-98f0-c53249cbc43b" name="Changes" comment="optimized StreamPacket and send/receive">
-      <change beforePath="$PROJECT_DIR$/../b15f/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../b15f/main.cpp" afterDir="false" />
+    <list default="true" id="9787c96d-87ab-46fb-98f0-c53249cbc43b" name="Changes" comment="implemented handling transfer without timeout">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/header/IoManager.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/header/IoManager.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/header/IoManagerPc.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/header/IoManagerPc.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/implementation/CRC.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/implementation/CRC.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/implementation/IoManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/implementation/IoManager.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/implementation/IoManagerPc.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/implementation/IoManagerPc.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,6 +37,7 @@
   </component>
   <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
   <component name="Git.Settings">
+    <option name="PREVIEW_PUSH_PROTECTED_ONLY" value="true" />
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
         <entry key="$PROJECT_DIR$/.." value="ac5d55766e8489bae8be62a8ee0900514f2bcf06" />
@@ -93,16 +89,22 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;fileTemplates&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/implementation" />
       <recent name="$PROJECT_DIR$/header" />
     </key>
   </component>
   <component name="RunManager">
+    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="lib" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="lib" TARGET_NAME="lib" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="lib" RUN_TARGET_NAME="lib">
       <method v="2">
         <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
@@ -122,7 +124,12 @@
       <workItem from="1731940535991" duration="533000" />
       <workItem from="1732192395994" duration="6707000" />
       <workItem from="1732199647716" duration="1283000" />
-      <workItem from="1732212308123" duration="2527000" />
+      <workItem from="1732212308123" duration="6693000" />
+      <workItem from="1732286374500" duration="44000" />
+      <workItem from="1732286480435" duration="803000" />
+      <workItem from="1732287289840" duration="61000" />
+      <workItem from="1732359509353" duration="4469000" />
+      <workItem from="1732363991152" duration="11827000" />
     </task>
     <task id="LOCAL-00001" summary="implemented reading and writing from commandline">
       <option name="closed" value="true" />
@@ -172,7 +179,87 @@
       <option name="project" value="LOCAL" />
       <updated>1732199977629</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="documented and reordered members of IoManager base and pc">
+      <option name="closed" value="true" />
+      <created>1732217684149</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1732217684149</updated>
+    </task>
+    <task id="LOCAL-00008" summary="worked on receiving serial data and fixed data wrong type in PerPacket">
+      <option name="closed" value="true" />
+      <created>1732220509543</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1732220509543</updated>
+    </task>
+    <task id="LOCAL-00009" summary="added ThreadSafeQueue.hpp">
+      <option name="closed" value="true" />
+      <created>1732287103401</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1732287103401</updated>
+    </task>
+    <task id="LOCAL-00010" summary="added overload for validation crc">
+      <option name="closed" value="true" />
+      <created>1732364597011</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1732364597011</updated>
+    </task>
+    <task id="LOCAL-00011" summary="split IoManager api">
+      <option name="closed" value="true" />
+      <created>1732364694292</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1732364694292</updated>
+    </task>
+    <task id="LOCAL-00012" summary="fixed new constructor of codec in ioManager">
+      <option name="closed" value="true" />
+      <created>1732365838034</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1732365838034</updated>
+    </task>
+    <task id="LOCAL-00013" summary="fixed new constructor of codec in ioManager">
+      <option name="closed" value="true" />
+      <created>1732365885869</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1732365885869</updated>
+    </task>
+    <task id="LOCAL-00014" summary="fixed missing methods in ioManager pc and b15f">
+      <option name="closed" value="true" />
+      <created>1732366274791</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1732366274791</updated>
+    </task>
+    <task id="LOCAL-00015" summary="added PostPacket">
+      <option name="closed" value="true" />
+      <created>1732376786627</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1732376786627</updated>
+    </task>
+    <task id="LOCAL-00016" summary="implemented handling transfer without timeout">
+      <option name="closed" value="true" />
+      <created>1732376834542</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1732376834542</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -201,7 +288,16 @@
     <MESSAGE value="added overload for calculating crc" />
     <MESSAGE value="implemented packet conversation in encoder" />
     <MESSAGE value="optimized StreamPacket and send/receive" />
-    <option name="LAST_COMMIT_MESSAGE" value="optimized StreamPacket and send/receive" />
+    <MESSAGE value="documented and reordered members of IoManager base and pc" />
+    <MESSAGE value="worked on receiving serial data and fixed data wrong type in PerPacket" />
+    <MESSAGE value="added ThreadSafeQueue.hpp" />
+    <MESSAGE value="added overload for validation crc" />
+    <MESSAGE value="split IoManager api" />
+    <MESSAGE value="fixed new constructor of codec in ioManager" />
+    <MESSAGE value="fixed missing methods in ioManager pc and b15f" />
+    <MESSAGE value="added PostPacket" />
+    <MESSAGE value="implemented handling transfer without timeout" />
+    <option name="LAST_COMMIT_MESSAGE" value="implemented handling transfer without timeout" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -213,5 +309,9 @@
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

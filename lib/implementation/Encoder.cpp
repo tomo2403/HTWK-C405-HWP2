@@ -3,7 +3,7 @@
 
 #include "../header/Encoder.hpp"
 
-Encoder::Encoder(std::vector<uint8_t> dataVector) : dataVector(dataVector)
+Encoder::Encoder(const std::vector<uint8_t>& dataVector) : dataVector(dataVector)
 {
 	if (dataVector.empty())
 	{
@@ -66,7 +66,7 @@ void Encoder::newDataVector(const std::vector<uint8_t> data)
 	this->dataVector = data;
 	dataVectorOffset_Index = 0;
 	justEscaped = false;
-	prevNibbleInitilized = false;
+	prevNibbleInitialized = false;
 	evenNumberOfNibblesSent = true;
 	beginBlockWasSent = false;
 	endBlockWasSent = false;
@@ -100,7 +100,7 @@ uint8_t Encoder::nextNibble()
 		justEscaped = true;
 	}
 
-	if (currentNibble() == previousNibble && prevNibbleInitilized)
+	if (currentNibble() == previousNibble && prevNibbleInitialized)
 	{
 		const uint8_t upcommingNib = upcomingNibble();
 		insertNibbleIntoBuffer(escapeSequence, bufferEndBit-3);
@@ -136,7 +136,7 @@ uint8_t Encoder::nextNibble()
 	const uint8_t currentNib = currentNibble();
 	bufferEndBit -= 4;
 	previousNibble = currentNib;
-	prevNibbleInitilized = true;
+	prevNibbleInitialized = true;
 	return currentNib;
 }
 
