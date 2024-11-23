@@ -23,6 +23,15 @@ void Decoder::processCommand(const uint8_t &command)
 		case CodecCommand::insertPrevNibbleAgainDefault:
 		case CodecCommand::insertPrevNibbleAgainFallback:
 			writeToDataVector(previousNibble);
+			break;
+		case CodecCommand::beginBlockDefault:
+		case CodecCommand::beginBlockFallback:
+			dataVector.clear();
+			everythingReceived = false;
+			zeroBuffer();
+			dataVectorBuffer == 0x00;
+			dataVectorBufferShiftCount = 0;
+			break;
 		default:
 			break;
 	}
