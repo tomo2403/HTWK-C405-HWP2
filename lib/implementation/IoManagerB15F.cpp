@@ -1,6 +1,6 @@
 #include "../header/IoManagerB15F.hpp"
 
-IoManagerB15F::IoManagerB15F(uint8_t escapeSequence, CRC crc, uint8_t outboundChannel) : IoManager(escapeSequence, crc, outboundChannel)
+IoManagerB15F::IoManagerB15F(CRC crc, uint8_t outboundChannel) : IoManager(crc, outboundChannel)
 {
 
 }

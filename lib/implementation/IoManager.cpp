@@ -1,6 +1,6 @@
 #include "../header/IoManager.hpp"
 
-IoManager::IoManager(uint8_t escapeSequence, CRC crc, uint8_t outboundChannel) : escapeSequence(escapeSequence), crc(crc), outboundChannel(outboundChannel)
+IoManager::IoManager(CRC crc, uint8_t outboundChannel) : crc(crc), outboundChannel(outboundChannel)
 {
 
 }
@@ -55,7 +55,7 @@ void IoManager::sendData(uint8_t channel, u_long packetIndex, std::vector<uint8_
 	p.data = data;
 	crc.calculateCRC(p);
 
-	Encoder enc = Encoder(escapeSequence, Encoder::convertPacket(p));
+	Encoder enc = Encoder(Encoder::convertPacket(p));
 
 	StreamPacket sp{};
 	sp.channel = channel;
@@ -66,7 +66,7 @@ void IoManager::sendData(uint8_t channel, u_long packetIndex, std::vector<uint8_
 
 void IoManager::processIncomingPacket(StreamPacket &sp)
 {
-	Decoder dec = Decoder(escapeSequence, sp.data);
+	Decoder dec = Decoder(sp.data);
 	PrePacket p = dec.decodeAll(sp.data);
 
 	bool packetValid = crc.validateCRC(p);
@@ -89,7 +89,7 @@ void IoManager::processIncomingPacket(StreamPacket &sp)
 
 StreamPacket IoManager::createStreamPacket(PrePacket p, uint8_t channel)
 {
-	Encoder enc = Encoder(escapeSequence, Encoder::convertPacket(p));
+	Encoder enc = Encoder(Encoder::convertPacket(p));
 	StreamPacket sp{};
 	sp.channel = channel;
 	sp.data = enc.encodeAll();

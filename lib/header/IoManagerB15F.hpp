@@ -5,12 +5,12 @@
 class IoManagerB15F : IoManager
 {
 private:
-	void sendPacket(const StreamPacket &sp) override;
+	void getContinuesInput();
 
-	bool checkResponse() override;
+	void sendPacket(const StreamPacket &sp);
 
-	void sendResponse(uint8_t channel, u_long packetIndex, bool success) override;
+	PrePacket receivePacket(StreamPacket &sp);
 
 public:
-	IoManagerB15F(uint8_t escapeSequence, CRC crc, uint8_t outboundChannel);
+	IoManagerB15F(CRC crc, uint8_t outboundChannel);
 };
