@@ -1,8 +1,18 @@
 #include "../lib/header/IoManagerB15F.hpp"
 
-int main(int, char**){
-	B15F& drv = B15F::getInstance();
+int main()
+{
+    CRC crc(65, 0x04C11DB7);
+    IoManagerB15F ioManager(crc, 0x0, 0x04);
 
-	drv.setRegister(&DDRA, 0xe5);
-	std::cout << std::bitset<8>(drv.getRegister(&DDRA)) << std::endl;
+    std::vector<uint8_t> inputData = IoManagerB15F::getBinaryInput();
+    std::vector<uint8_t> outputData;
+
+    std::thread transfer(&IoManagerB15F::transfer2Way, &ioManager, std::ref(inputData), std::ref(outputData));
+
+    transfer.join();
+
+    IoManagerB15F::setBinaryOutput(outputData);
+
+    return 0;
 }

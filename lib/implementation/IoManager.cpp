@@ -1,4 +1,5 @@
 #include "../header/IoManager.hpp"
+#include <algorithm>
 
 IoManager::IoManager(CRC crc, uint8_t outboundChannel) : crc(crc), outboundChannel(outboundChannel)
 {
