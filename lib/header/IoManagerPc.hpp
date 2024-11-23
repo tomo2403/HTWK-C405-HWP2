@@ -40,7 +40,7 @@ public:
      * @param crc The CRC object for checksum calculations.
      * @param outboundChannel The outbound channel number.
      */
-    IoManagerPc(CRC crc, uint8_t outboundChannel);
+    IoManagerPc(CRC crc, uint8_t outboundChannel, uint8_t inboundChannel);
 
     /**
      * @brief Sets up the serial port with the specified settings.

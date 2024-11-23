@@ -26,6 +26,8 @@
     <list default="true" id="9787c96d-87ab-46fb-98f0-c53249cbc43b" name="Changes" comment="implemented handling transfer without timeout">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/implementation/Decoder.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/implementation/Decoder.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../pc/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../pc/CMakeLists.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -129,7 +131,7 @@
       <workItem from="1732286480435" duration="803000" />
       <workItem from="1732287289840" duration="61000" />
       <workItem from="1732359509353" duration="4469000" />
-      <workItem from="1732363991152" duration="11827000" />
+      <workItem from="1732363991152" duration="12234000" />
     </task>
     <task id="LOCAL-00001" summary="implemented reading and writing from commandline">
       <option name="closed" value="true" />

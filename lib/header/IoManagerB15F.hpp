@@ -14,14 +14,16 @@ private:
 
 	B15F& drv = B15F::getInstance();
 
-	void getContinuesInput();
+	void getContinuesInput() override;
 
-	void sendPacket(const StreamPacket &sp);
+	void sendPacket(const StreamPacket &sp) override;
 
-	void receivePacket(StreamPacket &sp);
+	void receivePacket(StreamPacket &sp) override;
 
 	bool pinHasChanged(const uint8_t &channel);
 
 public:
 	IoManagerB15F(CRC crc, uint8_t outboundChannel, uint8_t inboundChannel);
+
+	void transfer2Way(std::vector<uint8_t>& inputData, std::vector<uint8_t>& outputData);
 };

@@ -3,7 +3,7 @@
 int main()
 {
     CRC crc(65, 0x04C11DB7);
-    IoManagerPc ioManager(crc, 0x06);
+    IoManagerPc ioManager(crc, 0x06, 0x02);
     ioManager.openSerialPort();
 
     std::vector<uint8_t> inputData = IoManagerPc::getBinaryInput();

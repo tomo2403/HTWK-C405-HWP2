@@ -1,12 +1,13 @@
 #include "../header/IoManager.hpp"
 #include <algorithm>
+#include <utility>
 
-IoManager::IoManager(CRC crc, uint8_t outboundChannel) : crc(crc), outboundChannel(outboundChannel)
+IoManager::IoManager(CRC crc, uint8_t outboundChannel, uint8_t inboundChannel) : crc(crc), outboundChannel(outboundChannel), inboundChannel(inboundChannel)
 {
 
 }
 
-StreamPacket IoManager::createStreamPacket(PrePacket p, uint8_t channel)
+StreamPacket IoManager::createStreamPacket(const PrePacket& p, uint8_t channel)
 {
 	Encoder enc = Encoder(Encoder::convertPacket(p));
 	StreamPacket sp{};
@@ -63,7 +64,7 @@ void IoManager::sendData(uint8_t channel, u_long packetIndex, std::vector<uint8_
 {
 	PrePacket p{};
 	p.index = packetIndex;
-	p.data = data;
+	p.data = std::move(data);
 	crc.calculateCRC(p);
 
 	sendData(channel, p);

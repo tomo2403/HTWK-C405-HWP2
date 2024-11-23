@@ -65,7 +65,7 @@ protected:
 	 * @param channel The channel number.
 	 * @return The stream packet.
 	 */
-	StreamPacket createStreamPacket(PrePacket p, uint8_t channel);
+	static StreamPacket createStreamPacket(const PrePacket& p, uint8_t channel);
 
 	/**
 	 * @brief Gets continuous input from the incoming port.
@@ -92,7 +92,7 @@ public:
      * @param crc The CRC object for checksum calculations.
      * @param outboundChannel The outbound channel number.
      */
-    IoManager(CRC crc, uint8_t outboundChannel);
+    IoManager(CRC crc, uint8_t outboundChannel, uint8_t inboundChannel);
 
     /**
      * @brief Transfers data in a two-way communication.

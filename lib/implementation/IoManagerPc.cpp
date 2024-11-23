@@ -1,13 +1,13 @@
 #include "../header/IoManagerPc.hpp"
 
-IoManagerPc::IoManagerPc(CRC crc, uint8_t outboundChannel) : IoManager(crc, outboundChannel)
+IoManagerPc::IoManagerPc(CRC crc, uint8_t outboundChannel, uint8_t inboundChannel) : IoManager(crc, outboundChannel, inboundChannel)
 {
 
 }
 
 void IoManagerPc::openSerialPort()
 {
-	const char *portName = "/dev/ttyUSB0";
+	const char *portName = "/dev/cu.usbserial-1140";
 	serialPort = open(portName, O_RDWR | O_NOCTTY | O_NDELAY);
 
 	if (serialPort < 0)
