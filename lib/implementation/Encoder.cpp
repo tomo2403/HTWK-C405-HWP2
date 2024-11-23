@@ -35,6 +35,15 @@ void Encoder::insertByteIntoBuffer(const uint8_t &byte, const uint8_t &atBit)
 
 bool Encoder::hasData()
 {
+	if (dataVectorOffset_Index >= dataVector.size() && bufferEndBit == -1 && !endBlockWasSent)
+	{
+		leftShiftNibbleIntoBuffer(escapeSequence);
+		leftShiftNibbleIntoBuffer(CodecCommand::endBlock);
+		bufferEndBit += 8;
+		endBlockWasSent = true;
+		justEscaped = true;
+	}
+
 	return dataVectorOffset_Index < dataVector.size() || bufferEndBit != -1;
 }
 
@@ -60,8 +69,6 @@ uint8_t Encoder::nextNibble()
 		leftShiftByteIntoBuffer(dataVector.at(dataVectorOffset_Index++));
 		bufferEndBit += 8;
 	}
-
-	// TODO: Ende
 
 	if (!beginBlockWasSent)
 	{
