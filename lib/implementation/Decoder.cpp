@@ -1,8 +1,9 @@
 #include "../header/Decoder.hpp"
 
-Decoder::Decoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : Codec::Codec(escapeSequence, dataVector)
+Decoder::Decoder(std::vector<uint8_t> &dataVector) 
+	: dataVector(dataVector)
 {
-	this->bufferEndBit = 0;
+    this->bufferEndBit = 0;
 }
 
 void Decoder::processCommand(const uint8_t &command)
@@ -12,7 +13,7 @@ void Decoder::processCommand(const uint8_t &command)
 		case CodecCommand::iAmReady:
 			partnerIsReady = true;
 			break;
-		case CodecCommand::STOP:
+		case CodecCommand::endBlock:
 			everythingReceived = true;
 			break;
 		case CodecCommand::insertEscSeqAsDataDefault:
@@ -22,6 +23,16 @@ void Decoder::processCommand(const uint8_t &command)
 		case CodecCommand::insertPrevNibbleAgainDefault:
 		case CodecCommand::insertPrevNibbleAgainFallback:
 			writeToDataVector(previousNibble);
+			break;
+		case CodecCommand::beginBlockDefault:
+		case CodecCommand::beginBlockFallback:
+			dataVector.clear();
+			everythingReceived = false;
+			zeroBuffer();
+			dataVectorBuffer == 0x00;
+			dataVectorBufferShiftCount = 0;
+			bufferEndBit = -1;
+			break;
 		default:
 			break;
 	}

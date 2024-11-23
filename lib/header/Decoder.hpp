@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Codec.hpp"
 
 class Decoder : public Codec
@@ -9,6 +11,8 @@ private:
 	uint8_t dataVectorBuffer = 0x00;
 	uint8_t dataVectorBufferShiftCount = 0;
 
+	std::vector<uint8_t> &dataVector;
+
 	bool partnerIsReady = false;
 
 	void processCommand(const uint8_t &command);
@@ -16,7 +20,7 @@ private:
 	void writeToDataVector(const uint8_t &nibble);
 
 public:
-	Decoder(uint8_t escapeSequence, std::vector<uint8_t> &dataVector);
+	Decoder(std::vector<uint8_t> &dataVector);
 
 	void nextNibble(const uint8_t &nibble);
 

@@ -2,7 +2,7 @@
 #include <iostream>
 #include <bitset>
 
-Codec::Codec(const uint8_t escapeSequence, std::vector<uint8_t> &dataVector) : escapeSequence(escapeSequence), dataVector(dataVector)
+Codec::Codec()
 { }
 
 bool Codec::hasNegatedNibbles(const uint8_t &byte)
