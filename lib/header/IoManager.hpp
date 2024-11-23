@@ -22,14 +22,14 @@ class IoManager
 protected:
     bool connected = false; /**< Indicates if the connection is established. */
     bool awaitingResponse = false; /**< Indicates if a response is awaited. */
+    bool everythingReceived = false; /**< Indicates if everything was received. */
     uint8_t outboundChannel; /**< The outbound channel number. */
-    int serialPort{}; /**< The file descriptor for the serial port. */
     CRC crc; /**< The CRC object for checksum calculations. */
     std::vector<PrePacket> outgoingPackets{}; /**< A vector to store packets. */
-    std::vector<PrePacket> receivedPackets{};
+    std::vector<PrePacket> receivedPackets{}; /**< A vector to store received packets. */
 
-	ThreadSafeQueue<StreamPacket> incomingQueue;
-	ThreadSafeQueue<StreamPacket> outgoingQueue;
+	ThreadSafeQueue<StreamPacket> incomingQueue; /**< A queue to store incoming packets. */
+	ThreadSafeQueue<StreamPacket> outgoingQueue; /**< A queue to store outgoing packets. */
 
     /**
      * @brief Prepares packets from the given data.
@@ -53,6 +53,8 @@ protected:
     void sendResponse(uint8_t channel, u_long packetIndex, bool success);
 
 	void sendData(uint8_t channel, u_long packetIndex, std::vector<uint8_t> data);
+
+	void sendData(uint8_t channel, PrePacket p);
 
 	void processIncomingPacket(StreamPacket &sp);
 
