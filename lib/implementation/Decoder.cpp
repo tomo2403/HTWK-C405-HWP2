@@ -1,5 +1,7 @@
 #include "../header/Decoder.hpp"
 
+bool Decoder::partnerIsReady = false;
+
 Decoder::Decoder(std::vector<uint8_t> &dataVector) : dataVector(dataVector)
 {
 	this->bufferEndBit = 0;
