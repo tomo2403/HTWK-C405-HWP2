@@ -31,6 +31,7 @@ void Decoder::processCommand(const uint8_t &command)
 			zeroBuffer();
 			dataVectorBuffer == 0x00;
 			dataVectorBufferShiftCount = 0;
+			bufferEndBit = -1;
 			break;
 		default:
 			break;

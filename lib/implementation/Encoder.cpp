@@ -61,6 +61,19 @@ uint8_t Encoder::upcomingNibble()
 	return getNibbleSlice(bufferEndBit - 7);
 }
 
+void Encoder::newDataVector(const std::vector<uint8_t> data)
+{
+	this->dataVector = data;
+	dataVectorOffset_Index = 0;
+	justEscaped = false;
+	prevNibbleInitilized = false;
+	evenNumberOfNibblesSent = true;
+	beginBlockWasSent = false;
+	endBlockWasSent = false;
+	bufferEndBit = -1;
+	zeroBuffer();
+}
+
 uint8_t Encoder::nextNibble()
 {
 

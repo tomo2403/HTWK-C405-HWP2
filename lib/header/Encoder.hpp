@@ -8,7 +8,7 @@ class Encoder : public Codec
 {
 private:
 	uint32_t dataVectorOffset_Index = 0;
-	bool justEscaped;
+	bool justEscaped = false;
 	bool prevNibbleInitilized = false;
 	bool evenNumberOfNibblesSent = true;
 	bool beginBlockWasSent = false;
@@ -34,4 +34,6 @@ public:
 	uint8_t nextNibble();
 
 	std::vector<uint8_t> encodeAll();
+
+	void newDataVector(const std::vector<uint8_t> data);
 };
