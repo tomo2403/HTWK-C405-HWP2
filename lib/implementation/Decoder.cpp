@@ -1,9 +1,8 @@
 #include "../header/Decoder.hpp"
 
-Decoder::Decoder(std::vector<uint8_t> &dataVector) 
-	: dataVector(dataVector)
+Decoder::Decoder(std::vector<uint8_t> &dataVector) : dataVector(dataVector)
 {
-    this->bufferEndBit = 0;
+	this->bufferEndBit = 0;
 }
 
 void Decoder::processCommand(const uint8_t &command)
@@ -13,8 +12,14 @@ void Decoder::processCommand(const uint8_t &command)
 		case CodecCommand::iAmReady:
 			partnerIsReady = true;
 			break;
-		case CodecCommand::endBlock:
+		case CodecCommand::closeConnection:
+			partnerIsReady = false;
+			break;
+		case CodecCommand::everythingSend:
 			everythingReceived = true;
+			break;
+		case CodecCommand::endBlock:
+			packetComplete = true;
 			break;
 		case CodecCommand::insertEscSeqAsDataDefault:
 		case CodecCommand::insertEscSeqAsDataFallback:
@@ -27,7 +32,7 @@ void Decoder::processCommand(const uint8_t &command)
 		case CodecCommand::beginBlockDefault:
 		case CodecCommand::beginBlockFallback:
 			dataVector.clear();
-			everythingReceived = false;
+			packetComplete = false;
 			zeroBuffer();
 			dataVectorBuffer == 0x00;
 			dataVectorBufferShiftCount = 0;
@@ -40,7 +45,7 @@ void Decoder::processCommand(const uint8_t &command)
 
 void Decoder::writeToDataVector(const uint8_t &nibble)
 {
-	// if (!partnerIsReady) return;
+	if (!partnerIsReady) return;
 
 	if (dataVectorBufferShiftCount == 2)
 	{
@@ -69,7 +74,7 @@ void Decoder::flushBufferIntoDataVector()
 
 void Decoder::nextNibble(const uint8_t &nibble)
 {
-	if(EscapedModeIsActive)
+	if (EscapedModeIsActive)
 	{
 		processCommand(nibble);
 		EscapedModeIsActive = false;
@@ -87,25 +92,28 @@ void Decoder::nextNibble(const uint8_t &nibble)
 
 bool Decoder::hasData() const
 {
-	return !everythingReceived;
+	return !packetComplete;
 }
 
-bool Decoder::connectionIsOnline() const
+bool Decoder::connectionIsOnline()
 {
 	return partnerIsReady;
 }
 
-PrePacket Decoder::decodeAll(std::vector<uint8_t> &data)
+PostPacket Decoder::decodeAll(std::vector<uint8_t> &data)
 {
-	for (uint8_t nibble : data)
+	for (uint8_t nibble: data)
 	{
 		nextNibble(nibble);
 	}
 	flushBufferIntoDataVector();
 
-	PrePacket packet;
+	PostPacket packet;
 	packet.index = dataVector[0];
 	packet.data = dataVector;
+
+	packet.transferFinished = everythingReceived;
+	packet.connectionClosed = !partnerIsReady;
 
 	// last 32 bytes are crc
 	uint32_t crc = 0;

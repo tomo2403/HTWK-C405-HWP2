@@ -69,4 +69,8 @@ enum CodecCommand {
     // If the upcoming nibble after the command is the same as the default command-nibble,
     // this fallback command is used to avoid sending the same nibble twice in succession.
     insertEscSeqAsDataFallback = 0x07,
+
+	closeConnection = 0x09,
+
+	everythingSend = 0x0A
 };

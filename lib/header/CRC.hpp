@@ -55,7 +55,7 @@ public:
 	 */
 	[[nodiscard]] bool validateCRC(const std::vector<uint8_t> &data, uint32_t receivedCRC) const;
 
-	[[nodiscard]] bool validateCRC(PrePacket &p) const;
+	[[nodiscard]] bool validateCRC(PostPacket &p) const;
 
 private:
 	uint32_t polynomial;

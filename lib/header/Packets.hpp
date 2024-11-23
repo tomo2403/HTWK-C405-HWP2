@@ -21,6 +21,15 @@ struct PrePacket
 	vector8 data;
 };
 
+struct PostPacket
+{
+	bool transferFinished;
+	bool connectionClosed;
+	uint8_t index;
+	uint32_t crc;
+	vector8 data;
+};
+
 struct StreamPacket
 {
 	uint8_t channel;
