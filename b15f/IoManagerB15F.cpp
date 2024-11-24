@@ -15,11 +15,11 @@ void IoManagerB15F::sendPacket(const StreamPacket &sp)
     {
     case 0:
         // bit 7-4 unchanged, bit 3-0 output
-        drv.setRegister(&DDRA,  (drv.getRegister(&DDRA) & 0xF0));
+        drv.setRegister(&DDRA,  (drv.getRegister(&DDRA) | 0x0F));
         break;
     case 4:
         // bit 7-4 output, bit 3-0 unchanged
-        drv.setRegister(&DDRA,  (drv.getRegister(&DDRA) & 0x0F));
+        drv.setRegister(&DDRA,  (drv.getRegister(&DDRA) | 0xF0));
         break;
     }
 
@@ -65,7 +65,6 @@ void IoManagerB15F::receivePacket(StreamPacket &sp)
 
 void IoManagerB15F::getContinuesInput()
 {
-    std::cerr << "Test text" << std::endl;
     drv.setRegister(&DDRA,  (drv.getRegister(&DDRA) & 0x0F));
 
     while (true)
