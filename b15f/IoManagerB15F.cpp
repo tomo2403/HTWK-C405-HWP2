@@ -10,8 +10,6 @@ void IoManagerB15F::sendPacket(const StreamPacket &sp)
 {
 	Encoder encoder = Encoder(sp.data);
 
-	std::cerr << "Test ich hasse mein Leben" << std::endl;
-
 	switch (sp.channel)
 	{
 		case 0:
@@ -22,6 +20,8 @@ void IoManagerB15F::sendPacket(const StreamPacket &sp)
 			// bit 7-4 output, bit 3-0 unchanged
 			b15.setDDRA((b15.getDDRA() | 0xF0));
 			break;
+        default:
+            throw std::invalid_argument(&"Channel not allowed: " [ sp.channel]);
 	}
 
 	while (encoder.hasData())
