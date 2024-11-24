@@ -34,5 +34,5 @@ public:
 
 	std::vector<uint8_t> encodeAll();
 
-	void newDataVector(std::vector<uint8_t> data);
+	void newDataVector(const std::vector<uint8_t>& data);
 };

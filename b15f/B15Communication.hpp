@@ -1,18 +1,21 @@
 #pragma once
+
 #include <b15f/b15f.h>
 
 class B15Communication
 {
-    private:
-    B15F& drv = B15F::getInstance();
+private:
+	B15F &drv = B15F::getInstance();
 
-    mutable std::mutex mtx;
+	mutable std::mutex mtx;
 	std::condition_variable cv;
 
-    public:
-    void setDDRA(const uint8_t vlaue);
-    uint8_t getDDRA();
+public:
+	void setDDRA(uint8_t value);
 
-    void setPORTA(const uint8_t vlaue);
-    uint8_t getPINA();
+	uint8_t getDDRA();
+
+	void setPORTA(uint8_t value);
+
+	uint8_t getPINA();
 };

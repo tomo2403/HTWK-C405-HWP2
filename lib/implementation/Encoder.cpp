@@ -61,7 +61,7 @@ uint8_t Encoder::upcomingNibble()
 	return getNibbleSlice(bufferEndBit - 7);
 }
 
-void Encoder::newDataVector(const std::vector<uint8_t> data)
+void Encoder::newDataVector(const std::vector<uint8_t>& data)
 {
 	this->dataVector = data;
 	dataVectorOffset_Index = 0;
@@ -102,10 +102,10 @@ uint8_t Encoder::nextNibble()
 
 	if (currentNibble() == previousNibble && prevNibbleInitialized)
 	{
-		const uint8_t upcommingNib = upcomingNibble();
+		const uint8_t upcomingNib = upcomingNibble();
 		insertNibbleIntoBuffer(escapeSequence, bufferEndBit-3);
 
-		if (upcommingNib == CodecCommand::insertPrevNibbleAgainDefault)
+		if (upcomingNib == CodecCommand::insertPrevNibbleAgainDefault)
 		{
 			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertPrevNibbleAgainFallback, bufferEndBit-3);
 			evenNumberOfNibblesSent = !evenNumberOfNibblesSent;
@@ -163,6 +163,10 @@ std::vector<uint8_t> Encoder::convertPacket(const PrePacket &p)
 {
 	std::vector<uint8_t> packetData = {p.index};
 	packetData.insert(packetData.end(), p.data.begin(), p.data.end());
+	// split crc into 4 bytes
+	packetData.push_back(p.crc >> 24);
+	packetData.push_back(p.crc >> 16);
+	packetData.push_back(p.crc >> 8);
 	packetData.push_back(p.crc);
 	return packetData;
 }

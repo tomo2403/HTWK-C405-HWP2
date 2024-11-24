@@ -2,13 +2,13 @@
 #include <algorithm>
 #include <utility>
 
-IoManager::IoManager(CRC crc, uint8_t outboundChannel, uint8_t inboundChannel)
-	: crc(crc), outboundChannel(outboundChannel), inboundChannel(inboundChannel)
+IoManager::IoManager(CRC crc, uint8_t outboundChannel, uint8_t inboundChannel) : crc(crc), outboundChannel(outboundChannel),
+																				 inboundChannel(inboundChannel)
 {
 
 }
 
-StreamPacket IoManager::createStreamPacket(const PrePacket& p, uint8_t channel)
+StreamPacket IoManager::createStreamPacket(const PrePacket &p, uint8_t channel)
 {
 	Encoder enc = Encoder(Encoder::convertPacket(p));
 	StreamPacket sp{};
@@ -79,7 +79,7 @@ void IoManager::sendData(uint8_t channel, u_long packetIndex, std::vector<uint8_
 
 void IoManager::sendData(uint8_t channel, PrePacket p)
 {
-	std::cerr << "[DEBUG] Sending data..." << std::endl;
+	//std::cerr << "[DEBUG] Sending data..." << std::endl;
 	Encoder enc = Encoder(Encoder::convertPacket(p));
 
 	StreamPacket sp{};
@@ -92,9 +92,9 @@ void IoManager::sendData(uint8_t channel, PrePacket p)
 
 void IoManager::processIncomingPacket(StreamPacket &sp)
 {
-	std::cerr << "[DEBUG] Processing input packet..." << std::endl;
+	//std::cerr << "[DEBUG] Processing input packet..." << std::endl;
 
-	Decoder dec = Decoder(sp.data);
+	Decoder dec(sp.data);
 	PostPacket p = dec.decodeAll(sp.data);
 
 	bool packetValid = crc.validateCRC(p);
@@ -117,7 +117,7 @@ void IoManager::processIncomingPacket(StreamPacket &sp)
 		}
 		else
 		{
-			receivedPackets.push_back(PrePacket { p.index, p.crc, p.data });
+			receivedPackets.push_back(PrePacket{p.index, p.crc, p.data});
 		}
 	}
 
@@ -131,7 +131,7 @@ void IoManager::processIncomingPacket(StreamPacket &sp)
 void IoManager::transfer2Way(std::vector<uint8_t> &input, std::vector<uint8_t> &output)
 {
 	std::cerr << "[INFO ] Preparing packets..." << std::endl;
-	preparePackets(input);
+	//preparePackets(input);
 
 	std::cerr << "[INFO ] Listening on serial port..." << std::endl;
 	std::thread handleInput(&IoManager::getContinuesInput, this);
@@ -145,8 +145,8 @@ void IoManager::transfer2Way(std::vector<uint8_t> &input, std::vector<uint8_t> &
 		auto now = steady_clock::now();
 		auto elapsed = duration_cast<seconds>(now - start).count();
 
-		std::cerr << "\r" << elapsed << "s" << std::flush;
-		std::this_thread::sleep_for(microseconds (500));
+		std::cerr << "\r[INFO ] " << elapsed << "s elapsed" << std::flush;
+		std::this_thread::sleep_for(microseconds(500));
 	}
 
 	std::cerr << std::endl << "[INFO ] Connected! Starting transfer..." << std::endl;
@@ -172,7 +172,8 @@ void IoManager::transfer2Way(std::vector<uint8_t> &input, std::vector<uint8_t> &
 			sendPacket(sp);
 		}
 
-		std::cerr << "\r[INFO ] Outgoing packets: " << outgoingPackets.size() << " / Incoming packets: " << receivedPackets.size() << std::flush;
+		std::cerr << "\r[INFO ] Outgoing packets: " << outgoingPackets.size() << " / Incoming packets: " << receivedPackets.size()
+				  << std::flush;
 	}
 	std::cerr << std::endl << "[WARN ] Connection closed!" << std::endl;
 

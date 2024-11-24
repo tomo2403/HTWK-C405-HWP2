@@ -21,6 +21,7 @@ uint8_t digitalReadAll(uint8_t channel) {
 }
 
 void digitalWriteAll(const uint8_t value) {
+	Serial.println(value);
 	for (int i = 0; i < 4; i++) {
 		digitalWrite(6 + i, (value >> i) & 0x01);
 	}
@@ -62,7 +63,6 @@ int processChannel(uint8_t channel, struct pt *pt) {
 
 		writeLock = false;
 	}
-
 
 	if (Serial.available() > 4){
 		StreamPacket sp = receiveStreamPacket();

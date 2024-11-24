@@ -8,7 +8,7 @@ IoManagerPc::IoManagerPc(CRC crc, uint8_t outboundChannel, uint8_t inboundChanne
 void IoManagerPc::openSerialPort()
 {
 	std::cerr << "[DEBUG] Opening serial port..." << std::endl;
-	const char *portName = "/dev/cu.usbserial-2140";
+	const char *portName = "/dev/cu.usbserial-140";
 	serialPort = open(portName, O_RDWR | O_NOCTTY | O_NDELAY);
 
 	if (serialPort < 0)
@@ -38,6 +38,16 @@ void IoManagerPc::openSerialPort()
 	tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
 
 	tcsetattr(serialPort, TCSANOW, &tty);
+
+	// Eingabe- und Ausgabe-Buffer leeren
+	if (tcflush(serialPort, TCIOFLUSH) == -1)
+	{
+		std::cerr << "Error: Failed to flush buffers." << std::endl;
+	}
+	else
+	{
+		std::cerr << "Serial buffers flushed successfully." << std::endl;
+	}
 
 	std::cerr << "[INFO ] Serial port open!" << std::endl;
 }

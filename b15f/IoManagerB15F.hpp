@@ -14,7 +14,7 @@ private:
 
 	B15Communication b15;
 
-	void getContinuesInput() override;
+	[[noreturn]] void getContinuesInput() override;
 
 	void sendPacket(const StreamPacket &sp) override;
 
