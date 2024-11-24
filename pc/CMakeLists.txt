@@ -9,4 +9,4 @@ add_executable(pc main.cpp
         ../lib/implementation/Decoder.cpp
         ../lib/implementation/CRC.cpp
         ../lib/implementation/IoManager.cpp
-        ../lib/implementation/IoManagerPc.cpp)
+        IoManagerPc.cpp)

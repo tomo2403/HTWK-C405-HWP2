@@ -1,4 +1,4 @@
-#include "../lib/header/IoManagerPc.hpp"
+#include "IoManagerPc.hpp"
 
 int main()
 {

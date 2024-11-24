@@ -1,4 +1,4 @@
-#include "../lib/header/IoManagerB15F.hpp"
+#include "IoManagerB15F.hpp"
 
 int main()
 {

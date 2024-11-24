@@ -2,9 +2,7 @@
 
 #include <b15f/b15f.h>
 
-#include "IoManager.hpp"
-#include "Decoder.hpp"
-#include "Encoder.hpp"
+#include "../lib/header/IoManager.hpp"
 
 class IoManagerB15F : public IoManager
 {

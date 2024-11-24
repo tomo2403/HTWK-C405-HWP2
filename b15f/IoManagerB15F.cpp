@@ -1,4 +1,4 @@
-#include "../header/IoManagerB15F.hpp"
+#include "IoManagerB15F.hpp"
 
 IoManagerB15F::IoManagerB15F(CRC crc, uint8_t outboundChannel, uint8_t inboundChannel)
     : IoManager(crc, outboundChannel, inboundChannel)

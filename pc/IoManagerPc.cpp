@@ -1,4 +1,4 @@
-#include "../header/IoManagerPc.hpp"
+#include "IoManagerPc.hpp"
 
 IoManagerPc::IoManagerPc(CRC crc, uint8_t outboundChannel, uint8_t inboundChannel) : IoManager(crc, outboundChannel, inboundChannel)
 {
