@@ -20,6 +20,7 @@ StreamPacket IoManager::createStreamPacket(const PrePacket& p, uint8_t channel)
 
 std::vector<uint8_t> IoManager::getBinaryInput()
 {
+	std::cerr << "[DEBUG] Getting input data..." << std::endl;
 	std::vector<uint8_t> data;
 	char ch;
 	while (std::cin.get(ch))
@@ -30,12 +31,15 @@ std::vector<uint8_t> IoManager::getBinaryInput()
 	{
 		std::cin.clear();
 	}
+	std::cerr << "[INFO ] Input data processed!" << std::endl;
 	return data;
 }
 
 void IoManager::setBinaryOutput(const std::vector<uint8_t> &data)
 {
+	std::cerr << "[DEBUG] Writing output..." << std::endl;
 	std::cout.write(reinterpret_cast<const char *>(data.data()), data.size());
+	std::cerr << "[INFO ] Output written!" << std::endl;
 }
 
 void IoManager::preparePackets(std::vector<uint8_t> &data)
@@ -53,7 +57,9 @@ void IoManager::preparePackets(std::vector<uint8_t> &data)
 		}
 		crc.calculateCRC(p);
 		outgoingPackets.push_back(p);
+		std::cerr << "\r[DEBUG] Processing " << dataIndex << "/" << data.size() << " bytes to " << packetIndex << " packets";
 	}
+	std::cerr << std::flush << std::endl;
 }
 
 void IoManager::sendResponse(uint8_t channel, u_long packetIndex, bool success)
@@ -73,6 +79,7 @@ void IoManager::sendData(uint8_t channel, u_long packetIndex, std::vector<uint8_
 
 void IoManager::sendData(uint8_t channel, PrePacket p)
 {
+	std::cerr << "[DEBUG] Sending data..." << std::endl;
 	Encoder enc = Encoder(Encoder::convertPacket(p));
 
 	StreamPacket sp{};
@@ -85,6 +92,8 @@ void IoManager::sendData(uint8_t channel, PrePacket p)
 
 void IoManager::processIncomingPacket(StreamPacket &sp)
 {
+	std::cerr << "[DEBUG] Processing input packet..." << std::endl;
+
 	Decoder dec = Decoder(sp.data);
 	PostPacket p = dec.decodeAll(sp.data);
 
@@ -121,12 +130,24 @@ void IoManager::processIncomingPacket(StreamPacket &sp)
 
 void IoManager::transfer2Way(std::vector<uint8_t> &input, std::vector<uint8_t> &output)
 {
+	std::cerr << "[INFO ] Preparing packets..." << std::endl;
 	preparePackets(input);
+
+	std::cerr << "[INFO ] Listening on serial port..." << std::endl;
 	std::thread handleInput(&IoManager::getContinuesInput, this);
 
+	auto start = steady_clock::now();
+	std::cerr << "[INFO ] Connecting..." << std::endl;
 	while (!connected)
-	{ }
+	{
+		auto now = steady_clock::now();
+		auto elapsed = duration_cast<seconds>(now - start).count();
 
+		std::cerr << "\r" << elapsed << "s" << std::flush;
+		std::this_thread::sleep_for(microseconds (500));
+	}
+
+	std::cerr << std::endl << "[INFO ] Connected! Starting transfer..." << std::endl;
 	while (connected)
 	{
 		if (!incomingQueue.empty())
@@ -148,14 +169,19 @@ void IoManager::transfer2Way(std::vector<uint8_t> &input, std::vector<uint8_t> &
 			outgoingQueue.wait_and_pop(sp);
 			sendPacket(sp);
 		}
-	}
 
-	// sortiere die empfangenen Pakete nach Index
+		std::cerr << "\r[INFO ] Outgoing packets: " << outgoingPackets.size() << " / Incoming packets: " << receivedPackets.size() << std::flush;
+	}
+	std::cerr << std::endl << "[WARN ] Connection closed!" << std::endl;
+
+	std::cerr << "[DEBUG] Sorting received packets..." << std::endl;
 	std::sort(receivedPackets.begin(), receivedPackets.end(), [](const PrePacket &a, const PrePacket &b)
 	{ return a.index < b.index; });
 
+	std::cerr << "[DEBUG] Flushing received packets..." << std::endl;
 	for (const PrePacket &p: receivedPackets)
 	{
 		output.insert(output.end(), p.data.begin(), p.data.end());
 	}
+	std::cerr << "[INFO ] Transfer finished!" << std::endl;
 }

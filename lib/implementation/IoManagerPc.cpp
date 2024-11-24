@@ -7,12 +7,13 @@ IoManagerPc::IoManagerPc(CRC crc, uint8_t outboundChannel, uint8_t inboundChanne
 
 void IoManagerPc::openSerialPort()
 {
-	const char *portName = "/dev/cu.usbserial-1140";
+	std::cerr << "[DEBUG] Opening serial port..." << std::endl;
+	const char *portName = "/dev/cu.usbserial-2140";
 	serialPort = open(portName, O_RDWR | O_NOCTTY | O_NDELAY);
 
 	if (serialPort < 0)
 	{
-		std::cerr << "Error opening serial port!" << std::endl;
+		std::cerr << "[ERROR] Error opening serial port!" << std::endl;
 		exit(1);
 	}
 
@@ -21,7 +22,7 @@ void IoManagerPc::openSerialPort()
 
 	if (tcgetattr(serialPort, &tty) != 0)
 	{
-		std::cerr << "Error getting port settings!" << std::endl;
+		std::cerr << "[ERROR] Error getting port settings!" << std::endl;
 		exit(1);
 	}
 
@@ -37,10 +38,13 @@ void IoManagerPc::openSerialPort()
 	tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);
 
 	tcsetattr(serialPort, TCSANOW, &tty);
+
+	std::cerr << "[INFO ] Serial port open!" << std::endl;
 }
 
 int IoManagerPc::closeSerialPort() const
 {
+	std::cerr << "[DEBUG] Closing serial port..." << std::endl;
 	return close(serialPort);
 }
 
@@ -49,7 +53,7 @@ ssize_t IoManagerPc::serialWrite(uint8_t data) const
 	ssize_t n = write(serialPort, &data, sizeof(data));
 	if (n < 0)
 	{
-		throw std::runtime_error("Error writing to serial port!");
+		throw std::runtime_error("[ERROR] Error writing to serial port!");
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	return n;
@@ -61,7 +65,7 @@ ssize_t IoManagerPc::serialRead() const
 	ssize_t m = read(serialPort, &receivedData, sizeof(receivedData));
 	if (m < 0)
 	{
-		throw std::runtime_error("Error reading from serial port!");
+		throw std::runtime_error("[ERROR] Error reading from serial port!");
 	}
 	return receivedData;
 }
@@ -71,7 +75,7 @@ bool IoManagerPc::isDataAvailable() const
 	int bytesAvailable;
 	if (ioctl(serialPort, FIONREAD, &bytesAvailable) == -1)
 	{
-		throw std::runtime_error("Error checking available data on serial port!");
+		throw std::runtime_error("[ERROR] Error checking available data on serial port!");
 	}
 	return bytesAvailable > 0;
 }

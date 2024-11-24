@@ -13,6 +13,8 @@
 #include "CRC.hpp"
 #include "ThreadSafeQueue.hpp"
 
+using namespace std::chrono;
+
 /**
  * @class IoManager
  * @brief A class to manage input/output operations.
