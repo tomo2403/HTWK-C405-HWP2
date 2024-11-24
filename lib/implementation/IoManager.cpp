@@ -140,7 +140,7 @@ void IoManager::transfer2Way(std::vector<uint8_t> &input, std::vector<uint8_t> &
 	std::cerr << "[INFO ] Connecting..." << std::endl;
 	while (!connected)
 	{
-		sendData(2, 0, {CodecCommand::iAmReady, 0, 0, 0, 0, 0});
+		sendData(outboundChannel, 0, {0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0});
 
 		auto now = steady_clock::now();
 		auto elapsed = duration_cast<seconds>(now - start).count();

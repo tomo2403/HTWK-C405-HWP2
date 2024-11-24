@@ -34,7 +34,7 @@ bool IoManagerB15F::pinHasChanged(const uint8_t &channel)
 {
 	uint8_t prevNibble = channel == 0 ? prevNibbleOnChannelZero : prevNibbleOnChannelFour;
 
-	uint8_t currentNibble = b15.getDDRA() & (0x0F << channel);
+	uint8_t currentNibble = b15.getPINA() & (0x0F << channel);
 	return prevNibble != currentNibble;
 }
 
