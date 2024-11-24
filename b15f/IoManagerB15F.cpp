@@ -65,6 +65,9 @@ void IoManagerB15F::receivePacket(StreamPacket &sp)
 
 void IoManagerB15F::getContinuesInput()
 {
+    std::cerr << "Test text" << std::endl;
+    drv.setRegister(&DDRA,  (drv.getRegister(&DDRA) & 0x0F));
+
     while (true)
     {
         StreamPacket sp{};
