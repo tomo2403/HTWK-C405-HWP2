@@ -10,7 +10,7 @@ bool writeLock = false;
 
 uint8_t lastChValueRec[CHANNEL2];
 
-uint8_t digitalReadAll(uint8_t channel) {
+uint8_t readCh(uint8_t channel) {
 	uint8_t value = 0;
 	for (int i = 0; i < 4; i++) {
 		if (digitalRead(channel + i) == HIGH) {
@@ -20,10 +20,10 @@ uint8_t digitalReadAll(uint8_t channel) {
 	return value;
 }
 
-void digitalWriteAll(const uint8_t value) {
+void writeCh(uint8_t channel, const uint8_t value) {
 	Serial.println(value);
 	for (int i = 0; i < 4; i++) {
-		digitalWrite(6 + i, (value >> i) & 0x01);
+		digitalWrite(channel + i, (value >> i) & 0x01);
 	}
 }
 
@@ -51,7 +51,7 @@ StreamPacket receiveStreamPacket() {
 int processChannel(uint8_t channel, struct pt *pt) {
 	PT_BEGIN(pt);
 
-	uint8_t pinReceived = digitalReadAll(channel);
+	uint8_t pinReceived = readCh(channel);
 	if (pinReceived != lastChValueRec[channel]) {
 		lastChValueRec[channel] = pinReceived;
 
@@ -68,7 +68,7 @@ int processChannel(uint8_t channel, struct pt *pt) {
 		StreamPacket sp = receiveStreamPacket();
 		changeChannelDirection(channel, OUTPUT);
 		for (uint8_t byte : sp.data) {
-			digitalWriteAll(byte);
+			writeCh(channel, byte);
 		}
 		changeChannelDirection(channel, INPUT);
 	}
@@ -77,14 +77,8 @@ int processChannel(uint8_t channel, struct pt *pt) {
 
 void setup() {
     Serial.begin(57600);
-    pinMode(2, INPUT);
-    pinMode(3, INPUT);
-    pinMode(4, INPUT);
-    pinMode(5, INPUT);
-    pinMode(6, OUTPUT);
-    pinMode(7, OUTPUT);
-    pinMode(8, OUTPUT);
-    pinMode(9, OUTPUT);
+	changeChannelDirection(CHANNEL1, INPUT);
+	changeChannelDirection(CHANNEL2, OUTPUT);
 
 	PT_INIT(&thread1);
 	PT_INIT(&thread2);

@@ -24,17 +24,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9787c96d-87ab-46fb-98f0-c53249cbc43b" name="Changes" comment="implemented handling transfer without timeout">
-      <change afterPath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_24_11_24__14_48__Changes_.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../arduino/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../arduino/src/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../b15f/B15Communication.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../b15f/B15Communication.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../b15f/B15Communication.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/../b15f/B15Communication.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../b15f/IoManagerB15F.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../b15f/IoManagerB15F.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../b15f/IoManagerB15F.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/../b15f/IoManagerB15F.hpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/header/Encoder.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/header/Encoder.hpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/implementation/Encoder.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/implementation/Encoder.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/implementation/IoManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/implementation/IoManager.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../pc/IoManagerPc.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../pc/IoManagerPc.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
