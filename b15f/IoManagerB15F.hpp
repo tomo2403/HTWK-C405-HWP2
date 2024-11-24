@@ -4,13 +4,15 @@
 
 #include "../lib/header/IoManager.hpp"
 
+#include "B15Communication.hpp"
+
 class IoManagerB15F : public IoManager
 {
 private:
 	uint8_t prevNibbleOnChannelZero;
 	uint8_t prevNibbleOnChannelFour;
 
-	B15F& drv = B15F::getInstance();
+	B15Communication b15;
 
 	void getContinuesInput() override;
 

@@ -9,6 +9,7 @@ add_executable(b15f main.cpp
         ../lib/implementation/Decoder.cpp
         ../lib/implementation/CRC.cpp
         ../lib/implementation/IoManager.cpp
-        IoManagerB15F.cpp)
+        IoManagerB15F.cpp
+        B15Communication.cpp)
 
 target_link_libraries(b15f PRIVATE b15fdrv)

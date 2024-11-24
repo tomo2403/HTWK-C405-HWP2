@@ -1,7 +1,6 @@
 #include "IoManagerB15F.hpp"
 #include <b15f/b15f.h>
 
-/*
 int main()
 {
     CRC crc(65, 0x04C11DB7);
@@ -18,12 +17,12 @@ int main()
 
     return 0;
 }
-*/
 
+/*
 int main()
 {
     B15F& drv = B15F::getInstance();
-    drv.setRegister(&DDRA, 0x00);
+    drv.setRegister(&DDRA, 0xff);
     
     while (true)
     {
@@ -33,3 +32,4 @@ int main()
         std::this_thread::sleep_for(std::chrono::seconds(1));
     }
 }
+*/

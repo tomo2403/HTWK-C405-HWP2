@@ -3,29 +3,31 @@
 IoManagerB15F::IoManagerB15F(CRC crc, uint8_t outboundChannel, uint8_t inboundChannel)
     : IoManager(crc, outboundChannel, inboundChannel)
 {
-    this->prevNibbleOnChannelZero = drv.getRegister(&PINA) & 0x0F;
-    this->prevNibbleOnChannelFour = drv.getRegister(&PINA) & 0xF0;
+    this->prevNibbleOnChannelZero = b15.getPINA() & 0x0F;
+    this->prevNibbleOnChannelFour = b15.getPINA() & 0xF0;
 }
 
 void IoManagerB15F::sendPacket(const StreamPacket &sp)
 {
     Encoder encoder = Encoder(sp.data);
 
+    std::cerr << "Test ich hasse mein Leben" << std::endl;
+
     switch (sp.channel)
     {
     case 0:
         // bit 7-4 unchanged, bit 3-0 output
-        drv.setRegister(&DDRA,  (drv.getRegister(&DDRA) | 0x0F));
+        b15.setDDRA((b15.getDDRA() | 0x0F));
         break;
     case 4:
         // bit 7-4 output, bit 3-0 unchanged
-        drv.setRegister(&DDRA,  (drv.getRegister(&DDRA) | 0xF0));
+        b15.setDDRA((b15.getDDRA() | 0xF0));
         break;
     }
 
     while (encoder.hasData())
     {
-        drv.setRegister(&PORTA, encoder.nextNibble() << sp.channel);
+        b15.setPORTA(encoder.nextNibble() << sp.channel);
     }
 }
 
@@ -33,7 +35,7 @@ bool IoManagerB15F::pinHasChanged(const uint8_t &channel)
 {
     uint8_t prevNibble = channel == 0 ? prevNibbleOnChannelZero : prevNibbleOnChannelFour;
 
-    const uint8_t currentNibble = drv.getRegister(&DDRA) & (0x0F << channel);
+    const uint8_t currentNibble = b15.getDDRA() & (0x0F << channel);
     if (prevNibble == currentNibble)
     {
         return false;
@@ -54,7 +56,7 @@ void IoManagerB15F::receivePacket(StreamPacket &sp)
     {
         if (pinHasChanged(channelToReadFrom))
         {
-            decoder.nextNibble(drv.getRegister(&PINA) & (0x0F << channelToReadFrom));
+            decoder.nextNibble(b15.getPINA() & (0x0F << channelToReadFrom));
         }
     }
 
@@ -65,8 +67,6 @@ void IoManagerB15F::receivePacket(StreamPacket &sp)
 
 void IoManagerB15F::getContinuesInput()
 {
-    drv.setRegister(&DDRA,  (drv.getRegister(&DDRA) & 0x0F));
-
     while (true)
     {
         StreamPacket sp{};
