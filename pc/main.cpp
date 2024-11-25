@@ -1,4 +1,4 @@
-#include "../lib/library.cpp"
+#include "../lib/lib.cpp"
 #include "Serial.hpp"
 
 using namespace ioManager;
