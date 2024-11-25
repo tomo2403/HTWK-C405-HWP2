@@ -1,4 +1,5 @@
 #include "Serial.hpp"
+#include <cstring>
 
 void Serial::openSerialPort()
 {
