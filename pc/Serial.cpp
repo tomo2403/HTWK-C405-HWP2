@@ -1,10 +1,9 @@
 #include "Serial.hpp"
-#include <cstring>
 
 void Serial::openSerialPort()
 {
 	Logger(DEBUG) << "Opening serial port...";
-	const char *portName = "/dev/cu.usbserial-140";
+	const char *portName = SERIAL_PORT;
 	serialPort = open(portName, O_RDWR | O_NOCTTY | O_NDELAY);
 
 	if (serialPort < 0)
