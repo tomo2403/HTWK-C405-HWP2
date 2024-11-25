@@ -8,6 +8,9 @@ using namespace ioManager;
 Serial serial;
 DecoderObserver decObserver;
 
+ThreadSafeQueue<std::vector<uint8_t>> incomingQueue; /**< A queue to store incoming packets. */
+ThreadSafeQueue<std::vector<uint8_t>> outgoingQueue; /**< A queue to store outgoing packets. */
+
 void receiveData(std::vector<uint8_t> &data)
 {
 	while (serial.isDataAvailable())
@@ -18,6 +21,10 @@ void receiveData(std::vector<uint8_t> &data)
 		// TODO: Decode and stop receiving data.
 		//data.push_back(byte);
 	}
+}
+
+void processIncomingQueue(){
+
 }
 
 int main()
