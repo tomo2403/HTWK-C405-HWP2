@@ -45,17 +45,14 @@ StreamPacket receiveStreamPacket()
 	StreamPacket packet;
 
 	// Header lesen
-	while (Serial.available() < 2); // Warten, bis genügend Bytes verfügbar sind
 	packet.channel = Serial.read();
 	packet.dataLength = Serial.read();
 
 	// Daten lesen
-	while (Serial.available() < packet.dataLength); // Warten, bis alle Daten verfügbar sind
-	Serial.readBytes(packet.data.data(), packet.dataLength);
-
-	while (Serial.available())
+	for (int i = 0; i < packet.dataLength; i++)
 	{
-		Serial.read();
+		while (Serial.available() < 1);
+		packet.data.push_back(Serial.read());
 	}
 
 	return packet;
@@ -74,13 +71,13 @@ int processChannel(uint8_t channel, struct pt *pt)
 		//PT_WAIT_UNTIL(pt, writeLock == false);
 		writeLock = true;
 
-		Serial.println(channel);
-		Serial.println(pinReceived);
+		Serial.write(channel);
+		Serial.write(pinReceived);
 
 		writeLock = false;
 	}
 
-	if (Serial.available() > 4)
+	if (Serial.available() > 2)
 	{
 		//digitalWrite(10, HIGH);
 		StreamPacket sp = receiveStreamPacket();
@@ -88,6 +85,7 @@ int processChannel(uint8_t channel, struct pt *pt)
 		for (uint8_t byte: sp.data)
 		{
 			writeCh(channel, byte);
+			delayMicroseconds(10);
 		}
 		//digitalWrite(10, LOW);
 	}
