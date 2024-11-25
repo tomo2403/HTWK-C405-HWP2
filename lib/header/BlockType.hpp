@@ -1,0 +1,5 @@
+enum BlockType
+{
+    dataBlock,
+    controlBlock
+};
