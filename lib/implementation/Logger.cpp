@@ -1,6 +1,6 @@
 #include "../header/Logger.hpp"
 
-Logger::Logger(LogLevel level, bool rewriteLine = false) : level_(level), rewriteLine_(rewriteLine)
+Logger::Logger(LogLevel level, bool rewriteLine) : level_(level), rewriteLine_(rewriteLine)
 { }
 
 Logger::~Logger()
