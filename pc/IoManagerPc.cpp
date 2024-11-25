@@ -42,11 +42,11 @@ void IoManagerPc::openSerialPort()
 	// Eingabe- und Ausgabe-Buffer leeren
 	if (tcflush(serialPort, TCIOFLUSH) == -1)
 	{
-		std::cerr << "Error: Failed to flush buffers." << std::endl;
+		std::cerr << "[ERROR] Failed to flush buffers." << std::endl;
 	}
 	else
 	{
-		std::cerr << "Serial buffers flushed successfully." << std::endl;
+		std::cerr << "[DEBUG] Serial buffers flushed successfully." << std::endl;
 	}
 
 	std::cerr << "[INFO ] Serial port open!" << std::endl;
@@ -102,9 +102,10 @@ void IoManagerPc::sendPacket(const StreamPacket &sp)
 
 void IoManagerPc::receivePacket(StreamPacket &sp)
 {
-	uint8_t channel = serialRead();
+	uint8_t channel = 6;//serialRead();
 	uint8_t dataLength = serialRead();
 	std::vector<uint8_t> data;
+	data.reserve(dataLength);
 	for (int i = 0; i < dataLength; i++)
 	{
 		data.push_back(serialRead());

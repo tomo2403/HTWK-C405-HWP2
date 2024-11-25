@@ -140,13 +140,14 @@ void IoManager::transfer2Way(std::vector<uint8_t> &input, std::vector<uint8_t> &
 	std::cerr << "[INFO ] Connecting..." << std::endl;
 	while (!connected)
 	{
-		sendData(outboundChannel, 0, {0xf0, 0xf0, 0xf0, 0xf0, 0xf0, 0xf0});
+		sendData(outboundChannel, 0, {0xf0, 0x0f, 0xf0, 0x0f, 0xf0, 0x0f});
 
 		auto now = steady_clock::now();
 		auto elapsed = duration_cast<seconds>(now - start).count();
 
 		std::cerr << "\r[INFO ] " << elapsed << "s elapsed" << std::flush;
-		std::this_thread::sleep_for(microseconds(500));
+		//std::this_thread::sleep_for(microseconds(500));
+		std::this_thread::sleep_for(seconds (1));
 	}
 
 	std::cerr << std::endl << "[INFO ] Connected! Starting transfer..." << std::endl;
