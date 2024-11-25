@@ -24,13 +24,13 @@ public:
 	 * @param data The byte of data to write.
 	 * @return The number of bytes written, or -1 on error.
 	 */
-	ssize_t serialWrite(uint8_t data) const;
+	ssize_t writeByte(uint8_t &data) const;
 
 	/**
 	 * @brief Reads a byte of data from the serial port.
 	 * @return The byte of data read, or -1 on error.
 	 */
-	ssize_t serialRead() const;
+	ssize_t readByte(uint8_t &data) const;
 
 	/**
  	 * @brief Checks if data is available in the serial buffer.
@@ -41,11 +41,11 @@ public:
 	/**
 	 * @brief Sets up the serial port with the specified settings.
 	 */
-	void openSerialPort();
+	void openPort();
 
 	/**
 	 * @brief Closes the serial port.
 	 * @return 0 if the serial port was closed successfully, -1 otherwise.
 	 */
-	int closeSerialPort() const;
+	int closePort() const;
 };

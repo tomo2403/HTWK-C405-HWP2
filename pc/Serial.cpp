@@ -1,6 +1,6 @@
 #include "Serial.hpp"
 
-void Serial::openSerialPort()
+void Serial::openPort()
 {
 	Logger(DEBUG) << "Opening serial port...";
 	const char *portName = SERIAL_PORT;
@@ -47,13 +47,13 @@ void Serial::openSerialPort()
 	Logger(INFO) << "Serial port open!";
 }
 
-int Serial::closeSerialPort() const
+int Serial::closePort() const
 {
 	Logger(DEBUG) << "Closing serial port...";
 	return close(serialPort);
 }
 
-ssize_t Serial::serialWrite(uint8_t data) const
+ssize_t Serial::writeByte(uint8_t &data) const
 {
 	ssize_t n = write(serialPort, &data, sizeof(data));
 	if (n < 0)
@@ -64,15 +64,14 @@ ssize_t Serial::serialWrite(uint8_t data) const
 	return n;
 }
 
-ssize_t Serial::serialRead() const
+ssize_t Serial::readByte(uint8_t &data) const
 {
-	uint8_t receivedData;
-	ssize_t m = read(serialPort, &receivedData, sizeof(receivedData));
+	ssize_t m = read(serialPort, &data, sizeof(data));
 	if (m < 0)
 	{
 		throw std::runtime_error("Error reading from serial port!");
 	}
-	return receivedData;
+	return m;
 }
 
 bool Serial::isDataAvailable() const
