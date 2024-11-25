@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cstdio>
 #include <cstdint>
+#include <cstring>
 #include <sys/fcntl.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -10,6 +11,8 @@
 #include <thread>
 
 #include "../lib/header/Logger.hpp"
+
+#define SERIAL_PORT "/dev/cu.usbserial-140"
 
 class Serial
 {
