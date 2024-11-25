@@ -1,6 +1,4 @@
-cmake_minimum_required(VERSION 3.30)
-project(pc)
+add_executable(pc main.cpp
+        Serial.cpp)
 
-set(CMAKE_CXX_STANDARD 20)
-
-add_executable(pc main.cpp)
+target_link_libraries(pc PRIVATE lib)
