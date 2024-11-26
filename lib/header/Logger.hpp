@@ -11,7 +11,7 @@ enum LogLevel
 class Logger
 {
 public:
-	Logger(LogLevel level, bool rewriteLine = false);
+	explicit Logger(LogLevel level, bool rewriteLine = false);
 
 	~Logger();
 

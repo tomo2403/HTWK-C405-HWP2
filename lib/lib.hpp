@@ -9,10 +9,11 @@
 #include "header/IDecoderObserver.hpp"
 #include "header/Logger.hpp"
 #include "header/ThreadSafeQueue.hpp"
+#include "header/ControlPanel.hpp"
 
 namespace ioManager
 {
-	std::vector <uint8_t> getBinaryInput();
+	std::vector<uint8_t> getBinaryInput();
 
-	void setBinaryOutput(const std::vector <uint8_t> &data);
+	void setBinaryOutput(const std::vector<uint8_t> &data);
 }
