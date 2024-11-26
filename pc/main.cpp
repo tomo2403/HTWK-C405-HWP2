@@ -7,6 +7,7 @@ using namespace ioManager;
 
 Serial serial;
 DecoderObserver decObserver;
+ControlPanel cp;
 
 ThreadSafeQueue<std::vector<uint8_t>> incomingQueue; /**< A queue to store incoming packets. */
 ThreadSafeQueue<std::vector<uint8_t>> outgoingQueue; /**< A queue to store outgoing packets. */
@@ -23,8 +24,26 @@ void receiveData(std::vector<uint8_t> &data)
 	}
 }
 
-void processIncomingQueue(){
+void processIncomingQueue()
+{
+	while (cp.isConnected())
+	{
+		if (!incomingQueue.empty())
+		{
 
+		}
+	}
+}
+
+void processOutgoingQueue()
+{
+	while (cp.isConnected())
+	{
+		if (!outgoingQueue.empty())
+		{
+
+		}
+	}
 }
 
 int main()
@@ -34,7 +53,13 @@ int main()
 	std::vector<uint8_t> inputData = getBinaryInput();
 	std::vector<uint8_t> outputData;
 
-	// TODO: Implement the main loop here.
+	// TODO: handshake
+
+	std::thread receiveThread(processIncomingQueue);
+	std::thread sendThread(processOutgoingQueue);
+
+	receiveThread.join();
+	sendThread.join();
 
 	serial.closePort();
 	setBinaryOutput(outputData);
