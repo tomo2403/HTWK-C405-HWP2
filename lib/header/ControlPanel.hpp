@@ -26,11 +26,16 @@ private:
 	bool closeCmdReceived = false;
 
 public:
-	ThreadSafeQueue<uint32_t> resendRequests;
-	ThreadSafeQueue<uint32_t> confirmedPackets;
+	ThreadSafeQueue<uint32_t> resendRequests; /**< Packets that need to be resent. */
+	ThreadSafeQueue<uint32_t> confirmedPackets; /**< Packets that were confirmed by the receiver. */
 
 	ControlPanel() = default;
 
+	/**
+	 * @brief Processes a control block.
+	 * @param flags The flags to process.
+	 * @param packetId The packet id to process.
+	 */
 	void processControlBlock(uint8_t &flags, uint32_t &packetId);
 
 	/**
