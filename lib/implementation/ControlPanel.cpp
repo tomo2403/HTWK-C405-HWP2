@@ -20,7 +20,7 @@ bool ControlPanel::isCloseCmdReceived() const
 	return closeCmdReceived;
 }
 
-void ControlPanel::processControlBlock(uint8_t &flags, uint8_t &packetId)
+void ControlPanel::processControlBlock(uint8_t &flags, uint32_t &packetId)
 {
     if (flags & Flags::CLOSE_CONNECTION)
         closeCmdReceived = true;
@@ -34,14 +34,19 @@ void ControlPanel::processControlBlock(uint8_t &flags, uint8_t &packetId)
         confirmedPackets.push(packetId);
 }
 
-std::array<uint8_t, 2> ControlPanel::createControlBlock(uint8_t flags, uint8_t packetId)
+std::vector<uint8_t> ControlPanel::createControlBlock(uint8_t flags, uint32_t packetId)
 {
-    std::array<uint8_t, 2> controlBlock{flags, packetId};
+	std::vector<uint8_t> data;
+	data.push_back(flags);
+	data.push_back(packetId >> 24);
+	data.push_back(packetId >> 16);
+	data.push_back(packetId >> 8);
+	data.push_back(packetId);
 
     if (flags & Flags::TRANSFER_FINISHED)
         everythingSent = true;
     else if (flags & Flags::CLOSE_CONNECTION)
         connected = false;
 
-    return controlBlock;
+    return data;
 }

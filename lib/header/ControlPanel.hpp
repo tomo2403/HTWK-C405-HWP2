@@ -26,14 +26,20 @@ private:
 	bool closeCmdReceived = false;
 
 public:
-	ThreadSafeQueue<uint8_t> resendRequests;
-	ThreadSafeQueue<uint8_t> confirmedPackets;
+	ThreadSafeQueue<uint32_t> resendRequests;
+	ThreadSafeQueue<uint32_t> confirmedPackets;
 
 	ControlPanel() = default;
 
-	void processControlBlock(uint8_t &flags, uint8_t &packetId);
+	void processControlBlock(uint8_t &flags, uint32_t &packetId);
 
-	[[nodiscard]] std::array<uint8_t, 2> createControlBlock(uint8_t packetId, uint8_t flags);
+	/**
+	 * @brief Creates a control block.
+	 * @param flags The flags to set.
+	 * @param packetId The packet id to set.
+	 * @return The created control block.
+	 */
+	[[nodiscard]] std::vector<uint8_t> createControlBlock(uint8_t flags, uint32_t packetId);
 
 	/**
 	 * @brief Checks if the connection is established.
