@@ -12,15 +12,26 @@ ControlPanel cp;
 ThreadSafeQueue<std::vector<uint8_t>> incomingQueue; /**< A queue to store incoming packets. */
 ThreadSafeQueue<std::vector<uint8_t>> outgoingQueue; /**< A queue to store outgoing packets. */
 
-void receiveData(std::vector<uint8_t> &data)
+void receiveData()
 {
-	while (serial.isDataAvailable())
+	while(cp.isConnected())
 	{
+		if (!serial.isDataAvailable())
+			continue;
+
 		uint8_t byte;
 		serial.readByte(byte);
 
-		// TODO: Decode and stop receiving data.
-		//data.push_back(byte);
+		// TODO: hand over to Decoder
+	}
+}
+
+void sendData(std::vector<uint8_t> &data)
+{
+	for (uint8_t byte : data)
+	{
+		serial.writeByte(byte);
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 }
 
@@ -30,7 +41,10 @@ void processIncomingQueue()
 	{
 		if (!incomingQueue.empty())
 		{
+			std::vector<uint8_t> packet;
+			incomingQueue.wait_and_pop(packet);
 
+			// TODO: Process packet
 		}
 	}
 }
@@ -41,7 +55,9 @@ void processOutgoingQueue()
 	{
 		if (!outgoingQueue.empty())
 		{
-
+			std::vector<uint8_t> packet;
+			incomingQueue.wait_and_pop(packet);
+			sendData(packet);
 		}
 	}
 }
@@ -50,16 +66,18 @@ void watchControlPanel()
 {
 	while (true)
 	{
-		if (!cp.isConnected()  && cp.isCloseCmdReceived())
+		if (!cp.isConnected() && cp.isCloseCmdReceived())
 			return;
 
-		if (!cp.isConnected())
-		{
-			// TODO: create handshake packet
-			cp.createControlBlock(Flags::CONNECT, 0);
-		}
-
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+}
+
+void connect() {
+	std::vector<uint8_t> data = cp.createControlBlock(Flags::CONNECT, 0);
+	while (!cp.isConnected())
+	{
+		sendData(data);
 	}
 }
 
@@ -70,12 +88,16 @@ int main()
 	std::vector<uint8_t> inputData = getBinaryInput();
 	std::vector<uint8_t> outputData;
 
+	connect();
+
 	std::thread controlPanelThread(watchControlPanel);
-	std::thread receiveThread(processIncomingQueue);
-	std::thread sendThread(processOutgoingQueue);
+	std::thread receiveThread(receiveData);
+	std::thread incomingThread(processIncomingQueue);
+	std::thread outgoingThread(processOutgoingQueue);
 
 	receiveThread.join();
-	sendThread.join();
+	incomingThread.join();
+	outgoingThread.join();
 	controlPanelThread.join();
 
 	serial.closePort();
