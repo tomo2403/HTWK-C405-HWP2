@@ -7,20 +7,11 @@ class Encoder : public Codec
 {
 private:
 
-	// state Pattern?
-	enum State
-	{
-		UNINITIALIZED,
-		START,
-		DATA,
-		END,
-	};
-
 	std::vector<uint8_t> dataVector;
 	uint32_t dataVectorOffset_Index;
 	bool justEscaped;
 	BlockType blockType;
-	State state;
+	bool endBlockWasSent;
 
 	void initialize();
 	
@@ -29,6 +20,8 @@ private:
 	void insertByteIntoBuffer(const uint8_t &byte, const uint8_t &atBit);
 
 	uint8_t upcomingNibble();
+
+	void insertStartBlockIntoBuffer();
 
 public:
 	Encoder();

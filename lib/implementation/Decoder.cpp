@@ -1,49 +1,77 @@
-#include "../header/Decoder.hpp"
+#include <algorithm>
 
-bool Decoder::partnerIsReady = false;
+#include "../header/Decoder.hpp"
+#include "../header/CodecCommand.hpp"
+
+Decoder::Decoder()
+{
+	initialize();
+}
+
+void Decoder::initialize()
+{
+	Codec::initialize();
+	this->EscapedModeIsActive = false;
+	this->dataVectorBuffer = 0x00;
+	this->dataVectorBufferShiftCount = 0;
+	this->dataVector = std::vector<uint8_t>();
+}
+
+void Decoder::addObserver(IDecoderObserver *observer)
+{
+	observers.push_back(observer);
+}
+
+void Decoder::removeObserver(IDecoderObserver *observer)
+{
+	observers.erase(std::remove(observers.begin(), observers.end(), observer), observers.end());
+}
 
 void Decoder::processCommand(const uint8_t &command)
 {
 	switch (command & 0x0F)
 	{
-		case CodecCommand::iAmReady:
-			partnerIsReady = true;
-			break;
-		case CodecCommand::closeConnection:
-			partnerIsReady = false;
-			break;
-		case CodecCommand::everythingSend:
-			everythingReceived = true;
-			break;
-		case CodecCommand::endBlock:
-			packetComplete = true;
-			break;
-		case CodecCommand::insertEscSeqAsDataDefault:
-		case CodecCommand::insertEscSeqAsDataFallback:
-			writeToDataVector(escapeSequence);
-			break;
-		case CodecCommand::insertPrevNibbleAgainDefault:
-		case CodecCommand::insertPrevNibbleAgainFallback:
-			writeToDataVector(previousNibble);
-			break;
-		case CodecCommand::beginBlockDefault:
-		case CodecCommand::beginBlockFallback:
-			dataVector.clear();
-			packetComplete = false;
-			zeroBuffer();
-			dataVectorBuffer = 0x00;
-			dataVectorBufferShiftCount = 0;
-			bufferEndBit = -1;
-			break;
-		default:
-			break;
+	case beginDataBlockDefault:
+	case beginDataBlockFallback:
+		initialize();
+		dataVectorIsLocked = false;
+		for (IDecoderObserver *observer : observers)
+		{
+			observer->beginBlockReceived(BlockType::dataBlock);
+		}
+		break;
+	case beginControlBlockDefault:
+	case beginControlBlockFallback:
+		dataVectorIsLocked = false;
+		for (IDecoderObserver *observer : observers)
+		{
+			observer->beginBlockReceived(BlockType::controlBlock);
+		}
+		break;
+	case insertEscSeqAsDataDefault:
+	case insertEscSeqAsDataFallback:
+		writeToDataVector(escapeSequence);
+		break;
+	case insertPrevNibbleAgainDefault:
+	case insertPrevNibbleAgainFallback:
+		writeToDataVector(previousNibble);
+		break;
+	case endBlock:
+		flushBufferIntoDataVector();
+		dataVectorIsLocked = true;
+		for (IDecoderObserver *observer : observers)
+		{
+			observer->endBlockReceived(BlockType::dataBlock);
+		}
+	default:
+		break;
 	}
 }
 
 void Decoder::writeToDataVector(const uint8_t &nibble)
 {
-	if (!partnerIsReady) return;
-
+	if (dataVectorIsLocked) return;
+	
 	if (dataVectorBufferShiftCount == 2)
 	{
 		dataVector.push_back(dataVectorBuffer);
@@ -87,38 +115,7 @@ void Decoder::nextNibble(const uint8_t &nibble)
 	writeToDataVector(nibble);
 }
 
-bool Decoder::hasData() const
+std::vector<uint8_t> Decoder::getDataVector()
 {
-	return !packetComplete;
-}
-
-bool Decoder::connectionIsOnline()
-{
-	return partnerIsReady;
-}
-
-PostPacket Decoder::decodeAll(std::vector<uint8_t> &data)
-{
-	for (uint8_t nibble: data)
-	{
-		nextNibble(nibble);
-	}
-	flushBufferIntoDataVector();
-
-	PostPacket packet;
-	packet.index = dataVector[0];
-	packet.data = dataVector;
-
-	packet.transferFinished = everythingReceived;
-	packet.connectionClosed = !partnerIsReady;
-
-	// last 32 bytes are crc
-	uint32_t crc = 0;
-	for (int i = 0; i < 4; i++)
-	{
-		crc <<= 8;
-		crc |= dataVector[dataVector.size() - 4 + i];
-	}
-	packet.crc = crc;
-	return packet;
+	return this->dataVector;
 }

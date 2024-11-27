@@ -14,8 +14,33 @@ void Encoder::initialize()
 	Codec::initialize();
 	this->dataVectorOffset_Index = 0;
 	this->justEscaped = false;
-	this->state = unini
+	this->endBlockWasSent = false;
 	
+}
+
+void Encoder::insertStartBlockIntoBuffer()
+{
+	leftShiftNibbleIntoBuffer(CodecCommand::escapeSequence);
+
+	if (blockType == controlBlock && upcomingNibble() != CodecCommand::beginControlBlockDefault)
+	{
+		leftShiftNibbleIntoBuffer(CodecCommand::beginControlBlockDefault);
+	}
+	else if (blockType == controlBlock && upcomingNibble() == CodecCommand::beginControlBlockDefault)
+	{
+		leftShiftNibbleIntoBuffer(CodecCommand::beginControlBlockFallback);
+	}
+	else if (blockType == dataBlock && upcomingNibble() != CodecCommand::beginDataBlockDefault)
+	{
+		leftShiftNibbleIntoBuffer(CodecCommand::beginDataBlockDefault);
+	}
+	else if (blockType == dataBlock && upcomingNibble() == CodecCommand::beginDataBlockDefault)
+	{
+		leftShiftNibbleIntoBuffer(CodecCommand::beginDataBlockFallback);
+	}
+
+	bufferEndBit += 8;
+	justEscaped = true;
 }
 
 void Encoder::inputData(const BlockType &blockType, const std::vector<uint8_t> &dataVector)
@@ -23,6 +48,7 @@ void Encoder::inputData(const BlockType &blockType, const std::vector<uint8_t> &
 	initialize();
 	this->blockType = blockType;
 	this->dataVector = dataVector;
+	insertStartBlockIntoBuffer();
 }
 
 void Encoder::insertNibbleIntoBuffer(const uint8_t &nibble, const uint8_t &atBit)
@@ -49,13 +75,13 @@ void Encoder::insertByteIntoBuffer(const uint8_t &byte, const uint8_t &atBit)
 
 bool Encoder::hasData()
 {
-	if (dataVectorOffset_Index >= dataVector.size() && bufferEndBit == -1)
+	if (dataVectorOffset_Index >= dataVector.size() && bufferEndBit == -1 && !endBlockWasSent)
 	{
 		leftShiftNibbleIntoBuffer(escapeSequence);
 		leftShiftNibbleIntoBuffer(CodecCommand::endBlock);
 		bufferEndBit += 8;
-		endBlockWasSent = true;
 		justEscaped = true;
+		endBlockWasSent = true;
 	}
 
 	return dataVectorOffset_Index < dataVector.size() || bufferEndBit != -1;
@@ -63,7 +89,7 @@ bool Encoder::hasData()
 
 uint8_t Encoder::upcomingNibble()
 {
-	if (bufferEndBit == 3 && dataVectorOffset_Index < dataVector.size())
+	if (bufferEndBit < 7 && dataVectorOffset_Index < dataVector.size())
 	{
 		return dataVector.at(dataVectorOffset_Index) >> 4;
 	}
@@ -84,24 +110,7 @@ uint8_t Encoder::nextNibble()
 		bufferEndBit += 8;
 	}
 
-	if (!beginBlockWasSent)
-	{
-		insertNibbleIntoBuffer(escapeSequence, bufferEndBit+5);
-		if (currentNibble() == CodecCommand::beginBlockDefault)
-		{
-			insertNibbleIntoBuffer(CodecCommand::beginBlockFallback, bufferEndBit+1);
-		}
-		else
-		{
-			insertNibbleIntoBuffer(CodecCommand::beginBlockDefault, bufferEndBit+1);
-		}
-
-		beginBlockWasSent = true;
-		bufferEndBit += 8;
-		justEscaped = true;
-	}
-
-	if (currentNibble() == previousNibble && prevNibbleInitialized)
+	if (currentNibble() == previousNibble && previousNibbleExists)
 	{
 		const uint8_t upcomingNib = upcomingNibble();
 		insertNibbleIntoBuffer(escapeSequence, bufferEndBit-3);
@@ -109,12 +118,10 @@ uint8_t Encoder::nextNibble()
 		if (upcomingNib == CodecCommand::insertPrevNibbleAgainDefault)
 		{
 			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertPrevNibbleAgainFallback, bufferEndBit-3);
-			evenNumberOfNibblesSent = !evenNumberOfNibblesSent;
 		}
 		else
 		{
 			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertPrevNibbleAgainDefault, bufferEndBit-3);
-			evenNumberOfNibblesSent = !evenNumberOfNibblesSent;
 		}
 		justEscaped = true;
 	}
@@ -124,12 +131,10 @@ uint8_t Encoder::nextNibble()
 		if (upcomingNibble() == CodecCommand::insertEscSeqAsDataDefault)
 		{
 			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataFallback, bufferEndBit-3);
-			evenNumberOfNibblesSent = !evenNumberOfNibblesSent;
 		}
 		else
 		{
 			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataDefault, bufferEndBit-3);
-			evenNumberOfNibblesSent = !evenNumberOfNibblesSent;
 		}
 	}
 
@@ -137,7 +142,7 @@ uint8_t Encoder::nextNibble()
 	const uint8_t currentNib = currentNibble();
 	bufferEndBit -= 4;
 	previousNibble = currentNib;
-	prevNibbleInitialized = true;
+	previousNibbleExists = true;
 	return currentNib;
 }
 
@@ -158,16 +163,4 @@ std::vector<uint8_t> Encoder::encodeAll()
 		encodedData.push_back(nextByte());
 	}
 	return encodedData;
-}
-
-std::vector<uint8_t> Encoder::convertPacket(const PrePacket &p)
-{
-	std::vector<uint8_t> packetData = {p.index};
-	packetData.insert(packetData.end(), p.data.begin(), p.data.end());
-	// split crc into 4 bytes
-	packetData.push_back(p.crc >> 24);
-	packetData.push_back(p.crc >> 16);
-	packetData.push_back(p.crc >> 8);
-	packetData.push_back(p.crc);
-	return packetData;
 }

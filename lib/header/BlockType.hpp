@@ -1,3 +1,5 @@
+#pragma once
+
 enum BlockType
 {
     // Data-Block
