@@ -46,6 +46,23 @@ void processOutgoingQueue()
 	}
 }
 
+void watchControlPanel()
+{
+	while (true)
+	{
+		if (!cp.isConnected()  && cp.isCloseCmdReceived())
+			return;
+
+		if (!cp.isConnected())
+		{
+			// TODO: create handshake packet
+			cp.createControlBlock(Flags::CONNECT, 0);
+		}
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	}
+}
+
 int main()
 {
 	serial.openPort();
@@ -53,13 +70,13 @@ int main()
 	std::vector<uint8_t> inputData = getBinaryInput();
 	std::vector<uint8_t> outputData;
 
-	// TODO: handshake
-
+	std::thread controlPanelThread(watchControlPanel);
 	std::thread receiveThread(processIncomingQueue);
 	std::thread sendThread(processOutgoingQueue);
 
 	receiveThread.join();
 	sendThread.join();
+	controlPanelThread.join();
 
 	serial.closePort();
 	setBinaryOutput(outputData);
