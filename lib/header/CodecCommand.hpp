@@ -97,29 +97,4 @@ enum CodecCommand
      * it to inform the decoder to place the escape sequence back in the original data stream.
      */
     insertEscSeqAsDataFallback = 0x09,
-
-    /**
-     * @brief Indicates that the communication partner is ready.
-     *
-     * @details
-     * This command signals that the communication partner is ready to send or receive data.
-     */
-    iAmReady = 0x0A,
-
-    /**
-     * @brief Closes the connection.
-     *
-     * @details
-     * This command is used to indicate that the party that sends it will close its connection.
-     */
-    closeConnection = 0x0B,
-
-    /**
-     * @brief Indicates that the entire file has been sent.
-     *
-     * @details
-     * This command signals that the entire file has been sent. It does NOT
-     * guarantee that the transfer was successful, only that it SHOULD be complete.
-     */
-    everythingSend = 0x0C,
 };
