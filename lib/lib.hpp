@@ -16,4 +16,6 @@ namespace ioManager
 	std::vector<uint8_t> getBinaryInput();
 
 	void setBinaryOutput(const std::vector<uint8_t> &data);
+
+	std::vector<uint8_t> extractSubvector(const std::vector<uint8_t>& vec, size_t start, size_t length);
 }

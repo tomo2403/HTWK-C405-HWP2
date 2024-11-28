@@ -6,8 +6,12 @@ class B15Receiver : IDecoderObserver
 {
 private:
     B15F& drv;
-    uint32_t packetCounter;
+    uint16_t packetCounter;
     Decoder decoder;
+    uint8_t previouslyReceivedNibble;
+    std::vector<uint8_t> receivedData;
+
+    bool isDifferentFromPrevious(const uint8_t &nibble);
 
 public:
 
