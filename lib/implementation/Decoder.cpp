@@ -35,17 +35,19 @@ void Decoder::processCommand(const uint8_t &command)
 	case beginDataBlockFallback:
 		initialize();
 		dataVectorIsLocked = false;
+		currentBlockType = dataBlock;
 		for (IDecoderObserver *observer : observers)
 		{
-			observer->beginBlockReceived(BlockType::dataBlock);
+			observer->beginBlockReceived(dataBlock);
 		}
 		break;
 	case beginControlBlockDefault:
 	case beginControlBlockFallback:
 		dataVectorIsLocked = false;
+		currentBlockType = controlBlock;
 		for (IDecoderObserver *observer : observers)
 		{
-			observer->beginBlockReceived(BlockType::controlBlock);
+			observer->beginBlockReceived(controlBlock);
 		}
 		break;
 	case insertEscSeqAsDataDefault:
@@ -61,7 +63,7 @@ void Decoder::processCommand(const uint8_t &command)
 		dataVectorIsLocked = true;
 		for (IDecoderObserver *observer : observers)
 		{
-			observer->endBlockReceived(BlockType::dataBlock);
+			observer->endBlockReceived(currentBlockType);
 		}
 	default:
 		break;
