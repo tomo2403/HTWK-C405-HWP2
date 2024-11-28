@@ -53,7 +53,7 @@ int Serial::closePort() const
 	return close(serialPort);
 }
 
-ssize_t Serial::writeByte(uint8_t &data) const
+ssize_t Serial::writeByte(uint8_t data) const
 {
 	ssize_t n = write(serialPort, &data, sizeof(data));
 	if (n < 0)

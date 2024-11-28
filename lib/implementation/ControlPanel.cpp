@@ -20,7 +20,7 @@ bool ControlPanel::isCloseCmdReceived() const
 	return closeCmdReceived;
 }
 
-void ControlPanel::processControlBlock(uint8_t &flags, uint32_t &packetId)
+void ControlPanel::processControlBlock(uint8_t &flags, uint32_t packetId)
 {
     if (flags & Flags::CLOSE_CONNECTION)
         closeCmdReceived = true;

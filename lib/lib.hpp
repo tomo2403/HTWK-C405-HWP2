@@ -10,6 +10,8 @@
 #include "header/Logger.hpp"
 #include "header/ThreadSafeQueue.hpp"
 #include "header/ControlPanel.hpp"
+#include "header/Encoder.hpp"
+#include "header/Decoder.hpp"
 
 namespace ioManager
 {
