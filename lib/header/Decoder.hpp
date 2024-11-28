@@ -16,6 +16,8 @@ private:
 
 	std::vector<IDecoderObserver*> observers;
 
+	BlockType currentBlockType;
+
 	void processCommand(const uint8_t &command);
 
 	void writeToDataVector(const uint8_t &nibble);
