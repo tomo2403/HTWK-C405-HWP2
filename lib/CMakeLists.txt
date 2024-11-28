@@ -8,4 +8,9 @@ add_library(lib STATIC lib.cpp lib.hpp
         implementation/CRC.cpp
         header/CRC.hpp
         implementation/ControlPanel.cpp
-        header/ControlPanel.hpp)
+        header/ControlPanel.hpp
+        implementation/Logger.cpp
+        implementation/CRC.cpp
+        implementation/Encoder.cpp
+        implementation/Decoder.cpp
+        implementation/Codec.cpp)

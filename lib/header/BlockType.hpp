@@ -2,6 +2,9 @@
 
 enum BlockType
 {
+    // Data-Block
     dataBlock,
-    controlBlock
+
+    // Control-Block
+    controlBlock,
 };
