@@ -6,6 +6,19 @@
 class Decoder : public Codec
 {
 private:
+	struct Storage
+	{
+		uint32_t buffer;
+		bool previousNibbleExists;
+		uint8_t previousNibble;
+		int8_t bufferEndBit;
+		bool EscapedModeIsActive;
+		uint8_t dataVectorBuffer;
+		uint8_t dataVectorBufferShiftCount;
+		std::vector<uint8_t> dataVector;
+		BlockType currentBlockType;
+	};
+
 	bool EscapedModeIsActive;
 	bool dataVectorIsLocked = true;
 
@@ -14,9 +27,12 @@ private:
 
 	std::vector<uint8_t> dataVector;
 
-	std::vector<IDecoderObserver*> observers;
+	std::vector<IDecoderObserver *> observers;
 
 	BlockType currentBlockType;
+
+	bool storageHoldsData = false;
+	Storage storage = Storage();
 
 	void processCommand(const uint8_t &command);
 
@@ -26,14 +42,16 @@ private:
 
 	void initialize();
 
+	void saveCurrentAttributes();
+
+	void restoreSavedAttributes();
+
 public:
 	Decoder();
 
-	void addObserver(IDecoderObserver* observer);
+	void addObserver(IDecoderObserver *observer);
 
-	void removeObserver(IDecoderObserver* observer);
+	void removeObserver(IDecoderObserver *observer);
 
 	void nextNibble(const uint8_t &nibble);
-
-	std::vector<uint8_t> getDataVector();
 };

@@ -79,6 +79,7 @@ bool Encoder::hasData()
 	if (dataVectorOffset_Index >= dataVector.size() && bufferEndBit == -1 && !endBlockWasSent)
 	{
 		leftShiftNibbleIntoBuffer(escapeSequence);
+		// TODO: Implement Fallback sequence
 		leftShiftNibbleIntoBuffer(CodecCommand::endBlockDefault);
 		bufferEndBit += 8;
 		justEscaped = true;

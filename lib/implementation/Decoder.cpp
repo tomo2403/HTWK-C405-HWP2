@@ -43,8 +43,14 @@ void Decoder::processCommand(const uint8_t &command)
 		break;
 	case beginControlBlockDefault:
 	case beginControlBlockFallback:
+		if (!dataVectorIsLocked && !storageHoldsData)
+		{
+			saveCurrentAttributes();
+			initialize();
+		}
 		dataVectorIsLocked = false;
 		currentBlockType = controlBlock;
+		storageHoldsData = true;
 		for (IDecoderObserver *observer : observers)
 		{
 			observer->beginBlockReceived(controlBlock);
@@ -59,12 +65,20 @@ void Decoder::processCommand(const uint8_t &command)
 		writeToDataVector(previousNibble);
 		break;
 	case endBlockDefault:
+	case endBlockFallback:
 		flushBufferIntoDataVector();
-		dataVectorIsLocked = true;
 		for (IDecoderObserver *observer : observers)
 		{
-			observer->endBlockReceived(currentBlockType);
+			observer->endBlockReceived(currentBlockType, dataVector);
 		}
+
+		if (!storageHoldsData)
+		{
+			dataVectorIsLocked = true;
+		}
+
+		restoreSavedAttributes();
+		storageHoldsData = false;
 	default:
 		break;
 	}
@@ -117,7 +131,28 @@ void Decoder::nextNibble(const uint8_t &nibble)
 	writeToDataVector(nibble);
 }
 
-std::vector<uint8_t> Decoder::getDataVector()
+void Decoder::saveCurrentAttributes()
 {
-	return this->dataVector;
+	this->storage.buffer = this->buffer;
+	this->storage.previousNibbleExists = this->previousNibbleExists;
+	this->storage.previousNibble = this->previousNibble;
+	this->storage.bufferEndBit = this->bufferEndBit;
+	this->storage.dataVector = this->dataVector;
+	this->storage.EscapedModeIsActive = this->EscapedModeIsActive;
+	this->storage.dataVectorBuffer = this->dataVectorBuffer;
+	this->storage.dataVectorBufferShiftCount = this->dataVectorBufferShiftCount;
+	this->storage.currentBlockType = this->currentBlockType;
+}
+
+void Decoder::restoreSavedAttributes()
+{
+    this->buffer = this->storage.buffer;
+    this->previousNibbleExists = this->storage.previousNibbleExists;
+    this->previousNibble = this->storage.previousNibble;
+    this->bufferEndBit = this->storage.bufferEndBit;
+    this->dataVector = this->storage.dataVector;
+    this->EscapedModeIsActive = this->storage.EscapedModeIsActive;
+    this->dataVectorBuffer = this->storage.dataVectorBuffer;
+    this->dataVectorBufferShiftCount = this->storage.dataVectorBufferShiftCount;
+    this->currentBlockType = this->storage.currentBlockType;
 }
