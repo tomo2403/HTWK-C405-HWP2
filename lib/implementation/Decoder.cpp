@@ -58,7 +58,7 @@ void Decoder::processCommand(const uint8_t &command)
 	case insertPrevNibbleAgainFallback:
 		writeToDataVector(previousNibble);
 		break;
-	case endBlock:
+	case endBlockDefault:
 		flushBufferIntoDataVector();
 		dataVectorIsLocked = true;
 		for (IDecoderObserver *observer : observers)

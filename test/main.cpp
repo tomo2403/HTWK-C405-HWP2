@@ -24,29 +24,17 @@ int main()
     Encoder encoder = Encoder();
     Decoder decoder = Decoder();
 
-    encoder.inputData(BlockType::dataBlock, inputData_1);
+    encoder.inputDataBlock(inputData_1);
     decoder.addObserver(new Reciever());
 
+    uint8_t i = 0;
     while(encoder.hasData())
     {
+        if (i == 4) encoder.interruptWithControlBlock(inputData_2);
         uint8_t nN = encoder.nextNibble();
         std::cout << std::hex << static_cast<int>(nN) << std::endl;
         decoder.nextNibble(nN);
-    }
-
-    for (auto i : decoder.getDataVector())
-    {
-        std::cout << std::hex << static_cast<int>(i) << std::endl;
-    }
-
-    std::cout << "Neuer Vektor" << std::endl;
-    encoder.inputData(BlockType::dataBlock, inputData_2);
-
-    while(encoder.hasData())
-    {
-        uint8_t nN = encoder.nextNibble();
-        std::cout << std::hex << static_cast<int>(nN) << std::endl;
-        decoder.nextNibble(nN);
+        i++;
     }
 
     for (auto i : decoder.getDataVector())

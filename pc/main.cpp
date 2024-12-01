@@ -16,7 +16,7 @@ ThreadSafeQueue<std::vector<uint8_t>> outgoingQueue; /**< A queue to store outgo
 
 void sendData(BlockType type, std::vector<uint8_t> &data)
 {
-	encoder.inputData(type, data);
+	encoder.inputDataBlock(type, data);
 	while (encoder.hasData())
 	{
 		serial.writeByte(encoder.nextNibble());

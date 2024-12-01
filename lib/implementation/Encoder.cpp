@@ -7,6 +7,8 @@
 Encoder::Encoder()
 {
 	initialize();
+	this->storageHoldsData = false;
+	this->storage = Storage();
 }
 
 void Encoder::initialize()
@@ -15,7 +17,6 @@ void Encoder::initialize()
 	this->dataVectorOffset_Index = 0;
 	this->justEscaped = false;
 	this->endBlockWasSent = false;
-	
 }
 
 void Encoder::insertStartBlockIntoBuffer()
@@ -43,10 +44,10 @@ void Encoder::insertStartBlockIntoBuffer()
 	justEscaped = true;
 }
 
-void Encoder::inputData(const BlockType &blockType, const std::vector<uint8_t> &dataVector)
+void Encoder::inputDataBlock(const std::vector<uint8_t> &dataVector)
 {
 	initialize();
-	this->blockType = blockType;
+	this->blockType = dataBlock;
 	this->dataVector = dataVector;
 	insertStartBlockIntoBuffer();
 }
@@ -78,10 +79,14 @@ bool Encoder::hasData()
 	if (dataVectorOffset_Index >= dataVector.size() && bufferEndBit == -1 && !endBlockWasSent)
 	{
 		leftShiftNibbleIntoBuffer(escapeSequence);
-		leftShiftNibbleIntoBuffer(CodecCommand::endBlock);
+		leftShiftNibbleIntoBuffer(CodecCommand::endBlockDefault);
 		bufferEndBit += 8;
 		justEscaped = true;
 		endBlockWasSent = true;
+	} else if (dataVectorOffset_Index >= dataVector.size() && bufferEndBit == -1 && endBlockWasSent && storageHoldsData)
+	{
+		restoreSavedAttributes();
+		storageHoldsData = false;
 	}
 
 	return dataVectorOffset_Index < dataVector.size() || bufferEndBit != -1;
@@ -163,4 +168,40 @@ std::vector<uint8_t> Encoder::encodeAll()
 		encodedData.push_back(nextByte());
 	}
 	return encodedData;
+}
+
+void Encoder::interruptWithControlBlock(const std::vector<uint8_t> &controlVector)
+{
+	saveCurrentAttributes();
+	initialize();
+	this->blockType = controlBlock;
+	this->dataVector = controlVector;
+	this->storageHoldsData = true;
+	insertStartBlockIntoBuffer();
+}
+
+void Encoder::saveCurrentAttributes()
+{
+	this->storage.buffer = this->buffer;
+	this->storage.previousNibbleExists = this->previousNibbleExists;
+	this->storage.previousNibble = this->previousNibble;
+	this->storage.bufferEndBit = this->bufferEndBit;
+	this->storage.dataVector = this->dataVector;
+	this->storage.dataVectorOffset_Index = this->dataVectorOffset_Index;
+	this->storage.justEscaped = this->justEscaped;
+	this->storage.blockType = this->blockType;
+	this->storage.endBlockWasSent = this->endBlockWasSent;
+}
+
+void Encoder::restoreSavedAttributes()
+{
+    this->buffer = this->storage.buffer;
+    this->previousNibbleExists = this->storage.previousNibbleExists;
+    this->previousNibble = this->storage.previousNibble;
+    this->bufferEndBit = this->storage.bufferEndBit;
+    this->dataVector = this->storage.dataVector;
+    this->dataVectorOffset_Index = this->storage.dataVectorOffset_Index;
+    this->justEscaped = this->storage.justEscaped;
+    this->blockType = this->storage.blockType;
+    this->endBlockWasSent = this->storage.endBlockWasSent;
 }
