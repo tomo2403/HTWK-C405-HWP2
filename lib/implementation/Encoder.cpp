@@ -80,7 +80,15 @@ bool Encoder::hasData()
 	{
 		leftShiftNibbleIntoBuffer(escapeSequence);
 		// TODO: Implement Fallback sequence
-		leftShiftNibbleIntoBuffer(CodecCommand::endBlockDefault);
+		if (storageHoldsData && upcomingNibbleFromStorage() == CodecCommand::endBlockDefault)
+		{
+			leftShiftNibbleIntoBuffer(CodecCommand::endBlockFallback);
+		} 
+		else
+		{
+			leftShiftNibbleIntoBuffer(CodecCommand::endBlockDefault);
+		}
+
 		bufferEndBit += 8;
 		justEscaped = true;
 		endBlockWasSent = true;
@@ -109,6 +117,12 @@ uint8_t Encoder::upcomingNibble()
 
 uint8_t Encoder::nextNibble()
 {
+	if (controlBlockIsQueued && previousNibble != 0)
+	{
+		std::vector<uint8_t> tmp = storage.dataVector;
+		interruptWithControlBlock(tmp);
+		controlBlockIsQueued = false;
+	}
 
 	if (bufferEndBit < 3 && dataVectorOffset_Index < dataVector.size())
 	{
@@ -173,12 +187,20 @@ std::vector<uint8_t> Encoder::encodeAll()
 
 void Encoder::interruptWithControlBlock(const std::vector<uint8_t> &controlVector)
 {
-	saveCurrentAttributes();
-	initialize();
-	this->blockType = controlBlock;
-	this->dataVector = controlVector;
-	this->storageHoldsData = true;
-	insertStartBlockIntoBuffer();
+	if (previousNibble == 0x00)
+	{
+		this->storage.dataVector = controlVector;
+		controlBlockIsQueued = true;
+	}
+	else
+	{
+		saveCurrentAttributes();
+		initialize();
+		this->blockType = controlBlock;
+		this->dataVector = controlVector;
+		this->storageHoldsData = true;
+		insertStartBlockIntoBuffer();
+	}
 }
 
 void Encoder::saveCurrentAttributes()
@@ -205,4 +227,18 @@ void Encoder::restoreSavedAttributes()
     this->justEscaped = this->storage.justEscaped;
     this->blockType = this->storage.blockType;
     this->endBlockWasSent = this->storage.endBlockWasSent;
+}
+
+uint8_t Encoder::upcomingNibbleFromStorage()
+{
+	if (storage.bufferEndBit >= 3)
+	{
+		return (storage.buffer >> storage.bufferEndBit-3) & 0x0F;
+	}
+	else if (storage.dataVectorOffset_Index <= storage.dataVector.size())
+	{
+		return storage.dataVector.at(storage.dataVectorOffset_Index) >> 4;
+	}
+
+	return 0x00; // fishy
 }

@@ -25,6 +25,7 @@ private:
 	BlockType blockType;
 	bool endBlockWasSent;
 
+	bool controlBlockIsQueued = false;
 	bool storageHoldsData;
 	Storage storage;
 
@@ -41,6 +42,8 @@ private:
 	void saveCurrentAttributes();
 
 	void restoreSavedAttributes();
+
+	uint8_t upcomingNibbleFromStorage();
 
 public:
 	Encoder();
