@@ -187,7 +187,7 @@ std::vector<uint8_t> Encoder::encodeAll()
 
 void Encoder::interruptWithControlBlock(const std::vector<uint8_t> &controlVector)
 {
-	if (previousNibble == 0x00)
+	if (previousNibble == 0x00 && previousNibbleExists)
 	{
 		this->storage.dataVector = controlVector;
 		controlBlockIsQueued = true;
@@ -235,7 +235,7 @@ uint8_t Encoder::upcomingNibbleFromStorage()
 	{
 		return (storage.buffer >> storage.bufferEndBit-3) & 0x0F;
 	}
-	else if (storage.dataVectorOffset_Index <= storage.dataVector.size())
+	else if (storage.dataVector.size() > storage.dataVectorOffset_Index)
 	{
 		return storage.dataVector.at(storage.dataVectorOffset_Index) >> 4;
 	}

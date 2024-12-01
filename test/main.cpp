@@ -40,21 +40,27 @@ public:
 
 int main()
 {
-    std::vector<uint8_t> inputData_1 = {0x05, 0x00, 0x00};
-    std::vector<uint8_t> inputData_2 = {0x12, 0x34};
+    std::vector<uint8_t> inputData_1 = {0x12, 0x34};
+    std::vector<uint8_t> inputData_2 = {0x56, 0x78};
     Encoder encoder = Encoder();
     Receiver receiver = Receiver();
 
-    encoder.inputDataBlock(inputData_1);
+    encoder.interruptWithControlBlock(inputData_1);
 
-    uint8_t i = 0;
     while(encoder.hasData())
     {
-        if (i == 3) encoder.interruptWithControlBlock(inputData_2);
+        uint8_t nN = encoder.nextNibble();
+        // std::cout << std::hex << static_cast<int>(nN) << std::endl;
+        receiver.receive(nN);
+    }
+
+    encoder.inputDataBlock(inputData_2);
+
+    while(encoder.hasData())
+    {
         uint8_t nN = encoder.nextNibble();
         std::cout << std::hex << static_cast<int>(nN) << std::endl;
         receiver.receive(nN);
-        i++;
     }
 
 }
