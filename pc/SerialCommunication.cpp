@@ -5,14 +5,16 @@ void SerialCommunication::beginBlockReceived(const BlockType &blockType)
 
 }
 
-void SerialCommunication::endBlockReceived(const BlockType &blockType)
+void SerialCommunication::endBlockReceived(const BlockType &blockType, const std::vector<uint8_t> &dataVector)
 {
-	incomingQueue.push(std::make_pair(blockType, decoder.getDataVector()));
+	if (dataVector.size() < 7)
+		return;
+	incomingQueue.push(std::make_pair(blockType, dataVector));
 }
 
 void SerialCommunication::receiveData()
 {
-	while(cp.isConnected())
+	while(cp.isConnected() || !cp.isCloseCmdReceived())
 	{
 		if (!serial.isDataAvailable())
 			continue;

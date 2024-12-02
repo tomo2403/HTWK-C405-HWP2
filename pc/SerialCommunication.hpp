@@ -5,7 +5,7 @@
 #include "../lib/header/ControlPanel.hpp"
 #include "Serial.hpp"
 
-class SerialCommunication : IDecoderObserver
+class SerialCommunication : public IDecoderObserver
 {
 private:
 	ControlPanel &cp;
@@ -19,7 +19,7 @@ public:
 
 	void beginBlockReceived(const BlockType &blockType) override;
 
-	void endBlockReceived(const BlockType &blockType) override;
+	void endBlockReceived(const BlockType &blockType, const std::vector<uint8_t> &dataVector) override;
 
 	void receiveData();
 };
