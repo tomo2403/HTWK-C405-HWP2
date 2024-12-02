@@ -24,7 +24,7 @@ public:
 	 * @param data The byte of data to write.
 	 * @return The number of bytes written, or -1 on error.
 	 */
-	ssize_t writeByte(uint8_t &data) const;
+	ssize_t writeByte(uint8_t data) const;
 
 	/**
 	 * @brief Reads a byte of data from the serial port.

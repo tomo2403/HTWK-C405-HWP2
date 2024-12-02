@@ -36,7 +36,7 @@ public:
 	 * @param flags The flags to process.
 	 * @param packetId The packet id to process.
 	 */
-	void processControlBlock(uint8_t &flags, uint32_t &packetId);
+	void processControlBlock(uint8_t &flags, uint32_t packetId);
 
 	/**
 	 * @brief Creates a control block.

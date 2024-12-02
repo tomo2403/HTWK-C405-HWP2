@@ -60,7 +60,15 @@ enum CodecCommand
      * @details
      * This command is used to indicate the end of a data block.
      */
-    endBlock = 0x05,
+    endBlockDefault = 0x05,
+
+    /**
+     * @brief The current data block ends.
+     *
+     * @details
+     * This command is used to indicate the end of a data block.
+     */
+    endBlockFallback = 0x0A,
 
     /**
      * @brief Inserts the previous nibble again.

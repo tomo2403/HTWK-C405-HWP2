@@ -6,12 +6,28 @@
 class Encoder : public Codec
 {
 private:
+	struct Storage
+	{
+		uint32_t buffer;
+		bool previousNibbleExists;
+		uint8_t previousNibble;
+		int8_t bufferEndBit;
+		std::vector<uint8_t> dataVector;
+		uint32_t dataVectorOffset_Index;
+		bool justEscaped;
+		BlockType blockType;
+		bool endBlockWasSent;
+	};
 
 	std::vector<uint8_t> dataVector;
 	uint32_t dataVectorOffset_Index;
 	bool justEscaped;
 	BlockType blockType;
 	bool endBlockWasSent;
+
+	bool controlBlockIsQueued = false;
+	bool storageHoldsData;
+	Storage storage;
 
 	void initialize();
 	
@@ -23,10 +39,18 @@ private:
 
 	void insertStartBlockIntoBuffer();
 
+	void saveCurrentAttributes();
+
+	void restoreSavedAttributes();
+
+	uint8_t upcomingNibbleFromStorage();
+
 public:
 	Encoder();
 
-	void inputData(const BlockType &blockType, const std::vector<uint8_t> &dataVector);
+	void inputDataBlock(const std::vector<uint8_t> &dataVector);
+
+	void interruptWithControlBlock(const std::vector<uint8_t> &controlVector);
 
 	bool hasData();
 
