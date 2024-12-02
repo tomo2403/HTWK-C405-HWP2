@@ -26,41 +26,46 @@ void sendData(BlockType type, std::vector<uint8_t> &data)
 
 void processIncomingQueue(std::vector<uint8_t> &outputData)
 {
-	while (cp.isConnected())
+	while (true)
 	{
-		if (!com.incomingQueue.empty())
+		if (!cp.isConnected() && cp.isCloseCmdReceived())
+			return;
+
+		if (com.incomingQueue.empty())
+			continue;
+
+
+		std::pair<BlockType, std::vector<uint8_t>> packet;
+		com.incomingQueue.wait_and_pop(packet);
+
+		uint32_t id = (packet.second[0] << 8) | packet.second[1];
+		std::vector<uint8_t> data(packet.second.begin() + 2, packet.second.end() - 4);
+		uint32_t receivedCrc = (packet.second[packet.second.size() - 4] << 24) | (packet.second[packet.second.size() - 3] << 16) |
+							   (packet.second[packet.second.size() - 2] << 8) | packet.second[packet.second.size() - 1];
+		bool valid = crc.validateCRC({packet.second.begin(), packet.second.end() - 4}, receivedCrc);
+
+		if (packet.first == BlockType::controlBlock)
 		{
-			std::pair<BlockType, std::vector<uint8_t>> packet;
-			com.incomingQueue.wait_and_pop(packet);
-
-			if (packet.first == BlockType::controlBlock)
+			if (valid)
+				cp.processControlBlock(packet.second[2], id);
+		}
+		else if (packet.first == BlockType::dataBlock)
+		{
+			std::vector<uint8_t> controlBlock;
+			if (valid)
 			{
-				cp.processControlBlock(packet.second[0],
-									   packet.second[1] << 24 | packet.second[2] << 16 | packet.second[3] << 8 | packet.second[4]);
-			}
-			else if (packet.first == BlockType::dataBlock)
-			{
-				std::vector<uint8_t> data(packet.second.begin(), packet.second.end() - 4);
-				uint32_t receivedCrc = packet.second[packet.second.size() - 4] << 24 | packet.second[packet.second.size() - 3] << 16 |
-									   packet.second[packet.second.size() - 2] << 8 | packet.second[packet.second.size() - 1];
-				uint32_t id = data[0] << 24 | data[1] << 16 | data[2] << 8 | data[3];
-
-				if (crc.validateCRC(data, receivedCrc))
-				{
-					outputData.insert(outputData.end(), data.begin() + 4, data.end());
-					std::vector<uint8_t> controlBlock = cp.createControlBlock(Flags::RECEIVED, id);
-					outgoingQueue.push(controlBlock);
-				}
-				else
-				{
-					std::vector<uint8_t> controlBlock = cp.createControlBlock(Flags::RESEND, id);
-					outgoingQueue.push(controlBlock);
-				}
+				outputData.insert(outputData.end(), data.begin(), data.end());
+				controlBlock = cp.createControlBlock(Flags::RECEIVED, id);
 			}
 			else
 			{
-				throw std::invalid_argument("Invalid block type.");
+				controlBlock = cp.createControlBlock(Flags::RESEND, id);
 			}
+			outgoingQueue.push(controlBlock);
+		}
+		else
+		{
+			throw std::invalid_argument("Invalid block type.");
 		}
 	}
 }
