@@ -37,11 +37,9 @@ void ControlPanel::processControlBlock(uint8_t &flags, uint32_t packetId)
 std::vector<uint8_t> ControlPanel::createControlBlock(uint8_t flags, uint32_t packetId)
 {
 	std::vector<uint8_t> data;
-	data.push_back(flags);
-	data.push_back(packetId >> 24);
-	data.push_back(packetId >> 16);
 	data.push_back(packetId >> 8);
 	data.push_back(packetId);
+	data.push_back(flags);
 
     if (flags & Flags::TRANSFER_FINISHED)
         everythingSent = true;
