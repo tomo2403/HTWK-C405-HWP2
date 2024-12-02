@@ -1,31 +1,56 @@
 #include <Arduino.h>
 
-uint8_t lastReceived = 0;
+uint8_t lastReceived = -1;
 
-uint8_t readNibble() {
-	// D2 to D5
-    return (PIND & 0b00111100) >> 2;
+uint8_t reverseNibble(uint8_t nibble)
+{
+	nibble = ((nibble & 0b0001) << 3) | // Bit 0 -> Bit 3
+			 ((nibble & 0b0010) << 1) | // Bit 1 -> Bit 2
+			 ((nibble & 0b0100) >> 1) | // Bit 2 -> Bit 1
+			 ((nibble & 0b1000) >> 3);  // Bit 3 -> Bit 0
+	return nibble;
 }
 
-void writeNibble(uint8_t nibble){
-	// D6 to D9
+uint8_t readNibble()
+{
+	uint8_t portD = (PIND & 0b11000000) >> 6; // Lese D6 und D7
+	uint8_t portB = (PINB & 0b00000011);      // Lese D8 und D9
+	uint8_t nibble = (portB << 2) | portD;
+	return reverseNibble(nibble);
+}
+
+void writeNibble(uint8_t nibble) {
 	PORTD = (PORTD & 0b11000011) | ((nibble & 0b00001111) << 2);
 }
 
 void setup()
 {
-	Serial.begin(57600);
+    Serial.begin(57600);
+	pinMode(2, OUTPUT);
+	pinMode(3, OUTPUT);
+	pinMode(4, OUTPUT);
+	pinMode(5, OUTPUT);
+	pinMode(6, INPUT);
+	pinMode(7, INPUT);
+	pinMode(8, INPUT);
+	pinMode(9, INPUT);
+
+	//DDRD &= ~(0b11000000); // Set D6 und D7 als Input
+	//DDRB &= ~(0b00000011); // Set D8 und D9 als Input
 }
 
 void loop()
 {
 	uint8_t received = readNibble();
-	if(received != lastReceived){
-		Serial.write(received);
+	if (received != lastReceived)
+	{
 		lastReceived = received;
+		Serial.write(received);
+		//Serial.println(received);
 	}
 
-	if (Serial.available()){
+	if (Serial.available())
+	{
 		writeNibble(Serial.read());
 	}
 }
