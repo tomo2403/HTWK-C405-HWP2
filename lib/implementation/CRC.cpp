@@ -29,6 +29,14 @@ uint32_t CRC::calculateCRC(const std::vector<uint8_t> &data) const
 	return crc;
 }
 
+void CRC::attachCRC(std::vector<uint8_t> &data) const {
+	uint32_t crcValue = calculateCRC(data);
+	data.push_back(crcValue >> 24);
+	data.push_back((crcValue >> 16) & 0xFF);
+	data.push_back((crcValue >> 8) & 0xFF);
+	data.push_back(crcValue & 0xFF);
+}
+
 bool CRC::validateCRC(const std::vector<uint8_t> &data, uint32_t receivedCRC) const
 {
 	uint32_t calculatedCRC = calculateCRC(data);

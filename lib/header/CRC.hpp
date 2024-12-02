@@ -32,6 +32,8 @@ public:
 	 */
 	[[nodiscard]] uint32_t calculateCRC(const std::vector<uint8_t> &data) const;
 
+	void attachCRC(std::vector<uint8_t> &data) const;
+
 	/**
 	 * @brief Validiert CRC-Wert.
 	 * @param data Daten, zu welchen ein CRC-Wert validiert werden soll.
