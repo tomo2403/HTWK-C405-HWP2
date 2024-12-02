@@ -24,6 +24,24 @@ void sendData(BlockType type, std::vector<uint8_t> &data)
 	}
 }
 
+void connect()
+{
+	auto start = std::chrono::steady_clock::now();
+	Logger(INFO) << "Connecting...";
+	std::vector<uint8_t> data = cp.createControlBlock(Flags::CONNECT, 0);
+	crc.attachCRC(data);
+	while (!cp.isConnected())
+	{
+		sendData(BlockType::controlBlock, data);
+
+		auto now = std::chrono::steady_clock::now();
+		auto elapsed = duration_cast<std::chrono::seconds>(now - start).count();
+		Logger(INFO, true) << "Connecting... " << elapsed << "s elapsed";
+		std::this_thread::sleep_for(std::chrono::milliseconds(480));
+	}
+	Logger(INFO) << "Connected!";
+}
+
 void processIncomingQueue(std::vector<uint8_t> &outputData)
 {
 	while (true)
@@ -115,12 +133,18 @@ void processOutgoingQueue(std::vector<uint8_t> &inputData)
 	}
 }
 
-void connect()
+void watchControlPanel()
 {
-	std::vector<uint8_t> data = cp.createControlBlock(Flags::CONNECT, 0);
-	while (!cp.isConnected())
+	while (true)
 	{
-		sendData(BlockType::controlBlock, data);
+		if (!cp.isConnected() && cp.isCloseCmdReceived())
+		{
+			Logger(DEBUG) << "Connection closed!";
+			return;
+		}
+
+		Logger(INFO, true) << "Current packet id: " << nextPacketId;
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 }
 
@@ -133,14 +157,15 @@ int main()
 
 	std::thread receiveThread(&SerialCommunication::receiveData, &com);
 
-	connect();
-
+	Logger(DEBUG) << "Staring queue threads...";
 	std::thread incomingThread(processIncomingQueue, std::ref(outputData));
 	std::thread outgoingThread(processOutgoingQueue, std::ref(inputData));
 
 	receiveThread.join();
 	incomingThread.join();
 	outgoingThread.join();
+
+	Logger(DEBUG) << "Queues stopped.";
 
 	serial.closePort();
 	setBinaryOutput(outputData);
