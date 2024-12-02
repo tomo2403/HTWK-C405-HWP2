@@ -1,15 +1,14 @@
 #include <b15f/b15f.h>
-#include "../lib/header/IDecoderObserver.hpp"
-#include "../lib/header/Decoder.hpp"
-#include "../lib/header/Encoder.hpp"
+#include "../lib/lib.hpp"
 
-class B15Sender : IDecoderObserver
+class B15Sender : public IDecoderObserver
 {
 private:
     B15F& drv;
     uint32_t packetCounter;
     Decoder& decoder;
     Encoder& encoder;
+    CRC crcGenerator = CRC(0x00, 0x00);
 
 
 public:
@@ -17,7 +16,7 @@ public:
     ~B15Sender();
 
     void beginBlockReceived(const BlockType &blockType) override;
-    void endBlockReceived(const BlockType &blockType, std::vector<uint8_t> dataVector) override;
+    void endBlockReceived(const BlockType &blockType, const std::vector<uint8_t> &dataVector) override;
 
     void send();
 };

@@ -13,7 +13,7 @@ B15Receiver::B15Receiver(B15F& drv, Decoder& decoder, Encoder& encoder) : drv(dr
 void B15Receiver::beginBlockReceived(const BlockType &blockType)
 {}
 
-void B15Receiver::endBlockReceived(const BlockType &blockType, std::vector<uint8_t> dataVector)
+void B15Receiver::endBlockReceived(const BlockType &blockType, const std::vector<uint8_t> &dataVector)
 {
     if (blockType != BlockType::dataBlock)
     {
