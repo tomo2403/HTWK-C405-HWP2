@@ -31,7 +31,7 @@ int main()
 	drv.setRegister(&DDRA, 0x0F);
 	ControlPanel controlPanel;
 	Encoder encoder = Encoder();
-	CRC crcPanel = CRC(0x00, 0x00);
+	CRC crcPanel = CRC(0x04c11db7, 0xfffffffff);
 	std::vector<uint8_t> connectPacket = controlPanel.createControlBlock(Flags::CONNECT, 0);
 
 	crcPanel.attachCRC(connectPacket);
@@ -42,6 +42,7 @@ int main()
 		while(encoder.hasData())
 		{
 			uint8_t nN = encoder.nextNibble();
+			// drv.delay_ms(5000);
 			drv.setRegister(&PORTA, nN);
 		}
 	}
