@@ -1,9 +1,9 @@
 #include "B15Receiver.hpp"
+#include "../lib/lib.hpp"
 
-B15Receiver::B15Receiver(B15F& drv) : drv(drv)
+B15Receiver::B15Receiver(B15F& drv, Decoder& decoder, Encoder& encoder) : drv(drv), decoder(decoder), encoder(encoder)
 {
     this->packetCounter = 0;
-    this->decoder = Decoder();
     this->previouslyReceivedNibble = 0xff;
     this->receivedData = std::vector<uint8_t>();
 
@@ -13,19 +13,43 @@ B15Receiver::B15Receiver(B15F& drv) : drv(drv)
 void B15Receiver::beginBlockReceived(const BlockType &blockType)
 {}
 
-void B15Receiver::endBlockReceived(const BlockType &blockType)
+void B15Receiver::endBlockReceived(const BlockType &blockType, std::vector<uint8_t> dataVector)
 {
-    const std::vector<uint8_t> block = decoder.getDataVector();
+    if (blockType != BlockType::dataBlock)
+    {
+        return; // Non of this methods business.
+    }
+
+    if (dataVector.size() < 7)
+    {
+        // error control package
+        throw std::invalid_argument("Received Vector is to short. This should be specially treated but it is currently not. BRUH");
+    }
 
     // TODO: Potential bug, if msb is not received first.
-    const uint16_t packetID = 0 | block.at(0) << 8 | block.at(1);
+    uint16_t packetID = 0;
+    packetID |= (static_cast<uint16_t>(dataVector.at(0)) << 8);
+    packetID |= (static_cast<uint16_t>(dataVector.at(1)));
 
-    const uint32_t crc = 0 | block.at(block.size() - 4) << 24 | block.at(block.size() - 4) << 24 | block.at(block.size() - 4) << 24 | block.at(block.size() - 4) << 24;
+    uint32_t crc = 0;
+    crc |= (static_cast<uint32_t>(dataVector.at(dataVector.size() - 4)) << 24);
+    crc |= (static_cast<uint32_t>(dataVector.at(dataVector.size() - 3)) << 16);
+    crc |= (static_cast<uint32_t>(dataVector.at(dataVector.size() - 2)) << 8);
+    crc |= (static_cast<uint32_t>(dataVector.at(dataVector.size() - 1)) << 0);
 
-    if (blockType == BlockType::dataBlock)
+    if (packetID != packetCounter+1)
     {
-
+        encoder.interruptWithControlBlock(controlPanel.createControlBlock(Flags::RESEND, packetCounter+1));
     }
+    
+    if (!crcGenerator.validateCRC(ioManager::extractSubvector(dataVector, 0, dataVector.size()-4), crc))
+    {
+        encoder.interruptWithControlBlock(controlPanel.createControlBlock(Flags::RESEND, packetCounter+1));
+    }
+
+    packetCounter++;
+    receivedData.reserve(dataVector.size() - 6);
+    receivedData.insert(receivedData.end(), dataVector.begin()+2, dataVector.end()-4);
 }
 
 bool B15Receiver::isDifferentFromPrevious(const uint8_t &nibble)
