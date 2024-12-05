@@ -27,11 +27,11 @@ void ControlPanel::processControlBlock(uint8_t &flags, uint32_t packetId)
     else if (flags & Flags::TRANSFER_FINISHED)
         everythingReceived = true;
     else if (flags & Flags::RESEND)
-        resendRequests.push(packetId);
+        responses.push(std::make_pair(packetId, Flags::RESEND));
     else if (flags & Flags::CONNECT)
         connected = true;
     else if (flags & Flags::RECEIVED)
-        confirmedPackets.push(packetId);
+		responses.push(std::make_pair(packetId, Flags::RECEIVED));
 }
 
 std::vector<uint8_t> ControlPanel::createControlBlock(uint8_t flags, uint32_t packetId)

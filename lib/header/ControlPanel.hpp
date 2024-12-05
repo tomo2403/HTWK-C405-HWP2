@@ -26,8 +26,7 @@ private:
 	bool closeCmdReceived = false;
 
 public:
-	ThreadSafeQueue<uint32_t> resendRequests; /**< Packets that need to be resent. */
-	ThreadSafeQueue<uint32_t> confirmedPackets; /**< Packets that were confirmed by the receiver. */
+	ThreadSafeQueue<std::pair<uint16_t, Flags>> responses;
 
 	ControlPanel() = default;
 
