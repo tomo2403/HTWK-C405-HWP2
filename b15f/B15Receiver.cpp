@@ -3,7 +3,6 @@
 
 B15Receiver::B15Receiver(B15F& drv, Decoder& decoder, Encoder& encoder) : drv(drv), decoder(decoder), encoder(encoder)
 {
-    this->packetCounter = 0;
     this->previouslyReceivedNibble = 0xff;
     this->receivedData = std::vector<uint8_t>();
 
@@ -22,8 +21,7 @@ void B15Receiver::endBlockReceived(const BlockType &blockType, const std::vector
 
     if (dataVector.size() < 7)
     {
-        // error control package
-        throw std::invalid_argument("Received Vector is to short. This should be specially treated but it is currently not. BRUH");
+        encoder.interruptWithControlBlock(controlPanel.createControlBlock(Flags::RESEND, prevPacketID+1));
     }
 
     // TODO: Potential bug, if msb is not received first.
@@ -37,17 +35,17 @@ void B15Receiver::endBlockReceived(const BlockType &blockType, const std::vector
     crc |= (static_cast<uint32_t>(dataVector.at(dataVector.size() - 2)) << 8);
     crc |= (static_cast<uint32_t>(dataVector.at(dataVector.size() - 1)) << 0);
 
-    if (packetID != packetCounter+1)
+    if (packetID != prevPacketID+1)
     {
-        encoder.interruptWithControlBlock(controlPanel.createControlBlock(Flags::RESEND, packetCounter+1));
+        encoder.interruptWithControlBlock(controlPanel.createControlBlock(Flags::RESEND, prevPacketID+1));
     }
     
     if (!crcGenerator.validateCRC(ioManager::extractSubvector(dataVector, 0, dataVector.size()-4), crc))
     {
-        encoder.interruptWithControlBlock(controlPanel.createControlBlock(Flags::RESEND, packetCounter+1));
+        encoder.interruptWithControlBlock(controlPanel.createControlBlock(Flags::RESEND, prevPacketID+1));
     }
 
-    packetCounter++;
+    prevPacketID = packetID;
     receivedData.reserve(dataVector.size() - 6);
     receivedData.insert(receivedData.end(), dataVector.begin()+2, dataVector.end()-4);
 }

@@ -5,7 +5,7 @@ class B15Receiver : IDecoderObserver
 {
 private:
     B15F& drv;
-    uint16_t packetCounter;
+    uint16_t prevPacketID  = -1;
     Decoder& decoder;
     Encoder& encoder;
     ControlPanel controlPanel;
@@ -23,5 +23,5 @@ public:
     void receive();
 
     B15Receiver(B15F& drv, Decoder& decoder, Encoder &encoder);
-    ~B15Receiver();
+    // ~B15Receiver();
 };
