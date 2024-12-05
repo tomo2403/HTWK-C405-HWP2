@@ -1,23 +1,29 @@
 #include <b15f/b15f.h>
-#include "../lib/header/IDecoderObserver.hpp"
-#include "../lib/header/Decoder.hpp"
-#include "../lib/header/Encoder.hpp"
+#include "../lib/lib.hpp"
+#include "Timer.hpp"
 
-class B15Sender : IDecoderObserver
+class B15Sender : public IDecoderObserver
 {
 private:
     B15F& drv;
-    uint32_t packetCounter;
+    uint16_t prevPacketID  = -1;
     Decoder& decoder;
     Encoder& encoder;
+    CRC crcGenerator = CRC(0x00, 0x00);
+    Timer timer = Timer();
+    std::vector<uint8_t> rawDataToSend;
+    bool connectionEstablished = false;
+    const uint8_t packetSize = 64;
 
+    std::vector<uint8_t> getRawDataById(const uint16_t &id);
+    std::vector<uint8_t> getPackageById(const uint16_t &id);
 
 public:
-    B15Sender(B15F& drv, Decoder& decoder, Encoder& encoder);
-    ~B15Sender();
+    B15Sender(B15F& drv, Decoder& decoder, Encoder& encoder, const std::vector<uint8_t> &rawDataToSend);
+    // ~B15Sender();
 
     void beginBlockReceived(const BlockType &blockType) override;
-    void endBlockReceived(const BlockType &blockType, std::vector<uint8_t> dataVector) override;
+    void endBlockReceived(const BlockType &blockType, const std::vector<uint8_t> &dataVector) override;
 
     void send();
 };

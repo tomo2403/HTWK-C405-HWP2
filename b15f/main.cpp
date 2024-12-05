@@ -1,10 +1,8 @@
 #include <b15f/b15f.h>
-// #include "B15Receiver.hpp"
-#include "../lib/header/Encoder.hpp"
-#include "../lib/header/ControlPanel.hpp"
 #include "../lib/lib.hpp"
+#include "B15Receiver.hpp"
+#include "B15Sender.hpp"
 
-/*
 int main()
 {
 	B15F& drv = B15F::getInstance();
@@ -15,16 +13,18 @@ int main()
 	drv.setRegister(&DDRA, 0x0F);
 	
 	B15Receiver receiver = B15Receiver(drv, decoder, encoder);
+	B15Sender sender = B15Sender(drv, decoder, encoder, ioManager::getBinaryInput());
 
 	while(true)
 	{
 		receiver.receive();
+		sender.send();
 	}
 
 	return 0;
 }
-*/
 
+/*
 int main()
 {
 	B15F& drv = B15F::getInstance();
@@ -48,3 +48,4 @@ int main()
 	}
 	
 }
+*/

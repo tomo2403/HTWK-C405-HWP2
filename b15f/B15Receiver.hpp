@@ -1,14 +1,11 @@
 #include <b15f/b15f.h>
-#include "../lib/header/IDecoderObserver.hpp"
-#include "../lib/header/Decoder.hpp"
-#include "../lib/header/CRC.hpp"
-#include "../lib/header/ControlPanel.hpp"
+#include "../lib/lib.hpp"
 
 class B15Receiver : IDecoderObserver
 {
 private:
     B15F& drv;
-    uint16_t packetCounter;
+    uint16_t prevPacketID  = -1;
     Decoder& decoder;
     Encoder& encoder;
     ControlPanel controlPanel;
@@ -21,10 +18,10 @@ private:
 public:
 
     void beginBlockReceived(const BlockType &blockType) override;
-    void endBlockReceived(const BlockType &blockType, std::vector<uint8_t> dataVector) override;
+    void endBlockReceived(const BlockType &blockType, const std::vector<uint8_t> &dataVector) override;
 
     void receive();
 
     B15Receiver(B15F& drv, Decoder& decoder, Encoder &encoder);
-    ~B15Receiver();
+    // ~B15Receiver();
 };
