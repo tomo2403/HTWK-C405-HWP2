@@ -88,25 +88,6 @@ void processIncomingQueue(std::vector<uint8_t> &outputData)
 		if (!cp.isConnected() && cp.isCloseCmdReceived())
 			return;
 
-		if (!cp.responses.empty())
-		{
-			std::pair<uint16_t, Flags> response;
-			cp.responses.wait_and_pop(response);
-
-			switch (response.second)
-			{
-				case RESEND:
-					errors++;
-					nextPacketId = response.first;
-					break;
-				case RECEIVED:
-					// cancel outgoing timeout
-					break;
-				default:
-					throw std::invalid_argument("Invalid response.");
-			}
-		}
-
 		if (com.incomingQueue.empty())
 			continue;
 
@@ -149,12 +130,11 @@ void processOutgoingQueue()
 {
 	while (true)
 	{
-		if (!cp.isConnected() && cp.isCloseCmdReceived())
+		if (!cp.isConnected())
 		{
-			return;
-		}
-		else if (!cp.isConnected() && !cp.isCloseCmdReceived())
-		{
+			if (cp.isCloseCmdReceived())
+				return;
+
 			connect();
 		}
 
@@ -166,8 +146,6 @@ void processOutgoingQueue()
 			sendResponseThread = std::thread(sendResponse, std::ref(response));
 		}
 
-		//check timeout and resend
-
 		if (!sendDataThread.joinable())
 			continue;
 
@@ -176,6 +154,31 @@ void processOutgoingQueue()
 			std::vector<uint8_t> packet = outgoingData[nextPacketId++];
 			sendDataThread.join();
 			sendDataThread = std::thread(sendData, std::ref(packet));
+
+			std::unique_lock<std::mutex> lock(mtx);
+			if (cv.wait_for(lock, std::chrono::seconds(5), []
+			{ return !cp.responses.empty(); }))
+			{
+				// Received a response within the timeout
+				std::pair<uint16_t, Flags> response;
+				cp.responses.wait_and_pop(response);
+
+				if (response.second == Flags::RECEIVED)
+				{
+					// Continue with the next packet
+					continue;
+				}
+				else if (response.second == Flags::RESEND)
+				{
+					errors++;
+					nextPacketId = response.first;
+				}
+			}
+			else
+			{
+				// Timeout occurred, resend the last packet
+				nextPacketId--;
+			}
 		}
 		else
 		{
@@ -189,6 +192,8 @@ void processOutgoingQueue()
 
 void watchControlPanel()
 {
+	while(!cp.isConnected()) {}
+
 	Logger(DEBUG) << "Watching control panel...";
 	while (true)
 	{
@@ -210,8 +215,7 @@ void prepareOutgoingQueue(std::vector<uint8_t> &inputData)
 	Logger(INFO) << "";
 	while (!inputData.empty())
 	{
-		std::vector<uint8_t> data = {static_cast<uint8_t>(nextPacketId >> 8), static_cast<uint8_t>(nextPacketId)};
-		nextPacketId++;
+		std::vector<uint8_t> data = {static_cast<uint8_t>(nextPacketId >> 8), static_cast<uint8_t>(nextPacketId++)};
 
 		size_t bytesToSend = std::min(static_cast<size_t>(64), inputData.size());
 		data.insert(data.end(), inputData.begin(), inputData.begin() + bytesToSend);
@@ -241,11 +245,15 @@ int main()
 	std::thread incomingThread(processIncomingQueue, std::ref(outputData));
 	std::thread outgoingThread(processOutgoingQueue);
 
+	std::thread watchThread(watchControlPanel);
+
 	receiveThread.join();
 	incomingThread.join();
 	outgoingThread.join();
 
 	Logger(DEBUG) << "Queues stopped.";
+
+	watchThread.join();
 
 	serial.closePort();
 	setBinaryOutput(outputData);
