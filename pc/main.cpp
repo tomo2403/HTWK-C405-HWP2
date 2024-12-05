@@ -148,12 +148,37 @@ void watchControlPanel()
 	}
 }
 
+void prepareOutgoingQueue(std::vector<uint8_t> &inputData)
+{
+	Logger(DEBUG) << "Preparing outgoing queue with " << inputData.size() << " bytes...";
+
+	Logger(INFO) << "";
+	while (!inputData.empty())
+	{
+		std::vector<uint8_t> data = {static_cast<uint8_t>(nextPacketId >> 8), static_cast<uint8_t>(nextPacketId)};
+		nextPacketId++;
+
+		size_t bytesToSend = std::min(static_cast<size_t>(64), inputData.size());
+		data.insert(data.end(), inputData.begin(), inputData.begin() + bytesToSend);
+
+		uint32_t crcValue = crc.calculateCRC(data);
+		data.push_back(crcValue >> 8);
+		data.push_back(crcValue);
+
+		outgoingDataQueue.push(data);
+		inputData.erase(inputData.begin(), inputData.begin() + bytesToSend);
+		Logger(INFO, true) << "Data left to process: " << inputData.size() << " bytes";
+	}
+}
+
 int main()
 {
 	serial.openPort();
 
 	std::vector<uint8_t> inputData = getBinaryInput();
 	std::vector<uint8_t> outputData;
+
+	prepareOutgoingQueue(inputData);
 
 	std::thread receiveThread(&SerialCommunication::receiveData, &com);
 
