@@ -241,16 +241,19 @@ void prepareOutgoingQueue(std::vector<uint8_t> &inputData)
 	Logger(DEBUG) << "Preparing outgoing queue with " << inputData.size() << " bytes...";
 
 	Logger(INFO) << "";
+	uint16_t i = 0;
 	while (!inputData.empty())
 	{
-		std::vector<uint8_t> data = {static_cast<uint8_t>(nextPacketId >> 8), static_cast<uint8_t>(nextPacketId++)};
+		std::vector<uint8_t> data = {static_cast<uint8_t>(i >> 8), static_cast<uint8_t>(i++)};
 
 		size_t bytesToSend = std::min(static_cast<size_t>(64), inputData.size());
 		data.insert(data.end(), inputData.begin(), inputData.begin() + bytesToSend);
 
 		uint32_t crcValue = crc.calculateCRC(data);
-		data.push_back(crcValue >> 8);
-		data.push_back(crcValue);
+		data.push_back(crcValue >> 24);
+		data.push_back((crcValue >> 16) & 0xFF);
+		data.push_back((crcValue >> 8) & 0xFF);
+		data.push_back(crcValue & 0xFF);
 
 		outgoingData.push_back(data);
 		inputData.erase(inputData.begin(), inputData.begin() + bytesToSend);
