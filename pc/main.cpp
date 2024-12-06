@@ -1,7 +1,7 @@
-#include "../lib/lib.cpp"
+#include "../lib/lib.hpp"
 #include <condition_variable>
 #include <mutex>
-
+#include <future>
 #include "Serial.hpp"
 #include "SerialCommunication.hpp"
 
@@ -25,7 +25,7 @@ bool responsePending = false;
 std::thread sendDataThread;
 std::thread sendResponseThread;
 
-void sendData(std::vector<uint8_t> &data)
+void sendData(const std::vector<uint8_t> &data)
 {
 	encoder.inputDataBlock(data);
 	while (encoder.hasData())
@@ -74,7 +74,7 @@ void connect()
 		sendThread.join();
 
 		auto now = std::chrono::steady_clock::now();
-		auto elapsed = duration_cast<std::chrono::seconds>(now - start).count();
+		auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
 		Logger(INFO, true) << "Connecting... " << elapsed << "s elapsed";
 		std::this_thread::sleep_for(std::chrono::milliseconds(485));
 	}
@@ -128,32 +128,46 @@ void processIncomingQueue(std::vector<uint8_t> &outputData)
 
 void processOutgoingQueue()
 {
+	Logger(DEBUG) << "Watching control panel...";
+	std::promise<void> sendDataPromise;
+	std::future<void> sendDataFuture = sendDataPromise.get_future();
+
 	while (true)
 	{
-		if (!cp.isConnected())
-		{
-			if (cp.isCloseCmdReceived())
-				return;
+		if (!cp.isConnected() && cp.isCloseCmdReceived())
+			return;
 
-			connect();
-		}
+		if (!cp.isConnected())
+			continue;
 
 		if (!outgoingResponseQueue.empty())
 		{
-			std::vector<uint8_t> response;
-			outgoingResponseQueue.wait_and_pop(response);
-			sendResponseThread.join();
-			sendResponseThread = std::thread(sendResponse, std::ref(response));
+			if (sendResponseThread.joinable())
+			{
+				sendResponseThread.join();
+				std::vector<uint8_t> response;
+				outgoingResponseQueue.wait_and_pop(response);
+				sendResponseThread = std::thread(sendResponse, std::ref(response));
+			}
 		}
 
-		if (!sendDataThread.joinable())
+		if (sendDataFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
 			continue;
 
 		if (nextPacketId < outgoingData.size())
 		{
 			std::vector<uint8_t> packet = outgoingData[nextPacketId++];
-			sendDataThread.join();
-			sendDataThread = std::thread(sendData, std::ref(packet));
+			if (sendDataThread.joinable())
+			{
+				sendDataThread.join();
+			}
+			sendDataPromise = std::promise<void>();
+			sendDataFuture = sendDataPromise.get_future();
+			sendDataThread = std::thread([&sendDataPromise](std::vector<uint8_t> &data)
+										 {
+											 sendData(data);
+											 sendDataPromise.set_value();
+										 }, std::ref(packet));
 
 			std::unique_lock<std::mutex> lock(mtx);
 			if (cv.wait_for(lock, std::chrono::seconds(5), []
@@ -184,15 +198,29 @@ void processOutgoingQueue()
 		{
 			std::vector<uint8_t> data = cp.createControlBlock(Flags::TRANSFER_FINISHED, 0);
 			crc.attachCRC(data);
-			sendDataThread.join();
-			sendDataThread = std::thread(sendData, std::ref(data));
+			if (sendDataThread.joinable())
+			{
+				sendDataThread.join();
+			}
+			sendDataPromise = std::promise<void>();
+			sendDataFuture = sendDataPromise.get_future();
+			sendDataThread = std::thread([&sendDataPromise](std::vector<uint8_t> &data)
+										 {
+											 sendData(data);
+											 sendDataPromise.set_value();
+										 }, std::ref(data));
 		}
+
+		Logger(INFO, true) << "Sending packet " << nextPacketId << " of " << outgoingData.size() << " packets. Errors: " << errors;
 	}
 }
 
 void watchControlPanel()
 {
-	while(!cp.isConnected()) {}
+	while (!cp.isConnected())
+	{
+		connect();
+	}
 
 	Logger(DEBUG) << "Watching control panel...";
 	while (true)
@@ -204,7 +232,7 @@ void watchControlPanel()
 		}
 
 		Logger(INFO, true) << "Sending packet " << nextPacketId << " of " << outgoingData.size() << " packets. Errors: " << errors;
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 	}
 }
 
