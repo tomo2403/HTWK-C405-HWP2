@@ -15,7 +15,7 @@ private:
         B15F& drv;
     #endif
 
-    uint16_t prevPacketID  = -1;
+    int32_t prevPacketID  = -1;
     Decoder& decoder;
     Encoder& encoder;
     CRC crcGenerator = CRC(0x00, 0x00);
@@ -23,6 +23,7 @@ private:
     std::vector<uint8_t> rawDataToSend;
     bool connectionEstablished = false;
     const uint8_t packetSize = 64;
+    ControlPanel controlPanel;
 
     std::vector<uint8_t> getRawDataById(const uint16_t &id);
     std::vector<uint8_t> getPackageById(const uint16_t &id);
@@ -38,6 +39,7 @@ public:
 
     void beginBlockReceived(const BlockType &blockType) override;
     void endBlockReceived(const BlockType &blockType, const std::vector<uint8_t> &dataVector) override;
+    bool hasSentEverything();
 
     void send();
 };

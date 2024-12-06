@@ -6,7 +6,9 @@
     B15Sender::B15Sender(B15F& drv, Decoder& decoder, Encoder& encoder,const std::vector<uint8_t> &rawDataToSend)
 #endif
     : drv(drv), encoder(encoder), decoder(decoder), rawDataToSend(rawDataToSend)
-{ }
+{ 
+    decoder.addObserver(this);
+}
 
 void B15Sender::beginBlockReceived(const BlockType &blockType)
 {
@@ -73,18 +75,18 @@ void B15Sender::endBlockReceived(const BlockType &blockType, const std::vector<u
         encoder.inputDataBlock(getPackageById(prevPacketID));
     }
 
-    if (!connectionEstablished && dataVector.at(3) == Flags::CONNECT)
+    if (!connectionEstablished && dataVector.at(2) == Flags::CONNECT)
     {
         connectionEstablished = true;
         encoder.inputDataBlock(getPackageById(++prevPacketID));
     }
 
-    if (dataVector.at(3) == Flags::RESEND)
+    if (dataVector.at(2) == Flags::RESEND)
     {
         encoder.inputDataBlock(getPackageById(prevPacketID));
     }
 
-    if (dataVector.at(3) == Flags::RECEIVED)
+    if (dataVector.at(2) == Flags::RECEIVED)
     {
         encoder.inputDataBlock(getPackageById(++prevPacketID));
     }
@@ -92,6 +94,11 @@ void B15Sender::endBlockReceived(const BlockType &blockType, const std::vector<u
 
 void B15Sender::send()
 {
+    if (hasSentEverything())
+    {
+        return;
+    }
+
     if (encoder.hasData())
     {
         drv.setRegister(&PORTA, encoder.nextNibble());
@@ -101,4 +108,18 @@ void B15Sender::send()
     {
         encoder.inputDataBlock(getPackageById(prevPacketID));
     }
+    else if (!connectionEstablished)
+    {
+        std::vector<uint8_t> connectPacket = controlPanel.createControlBlock(Flags::CONNECT, 0);
+        crcGenerator.attachCRC(connectPacket);
+        encoder.interruptWithControlBlock(connectPacket);
+    }
+}
+
+bool B15Sender::hasSentEverything()
+{
+    // This const int must remain here. If rawDataToSend.size() is put directly into the equation,
+    // it always evaluates to TRUE, no matter what. Why?!
+    const int vectorSize = rawDataToSend.size();
+    return prevPacketID * packetSize >= vectorSize && !encoder.hasData();
 }

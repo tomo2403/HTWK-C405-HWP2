@@ -17,7 +17,7 @@ public:
     uint8_t getRegister(volatile uint8_t *adr)
     {
         uint8_t value = readData.at(readDataOffset++);
-        std::cout << "getReg: " << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(value) << std::endl;
+        // std::cout << "getReg: " << std::hex << std::setfill('0') << std::setw(2) << static_cast<int>(value) << std::endl;
         return value;
     };
 
