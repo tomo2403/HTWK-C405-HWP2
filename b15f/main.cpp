@@ -1,12 +1,14 @@
-#include <b15f/b15f.h>
+#include "b15global.hpp"
+#ifndef DEBUG_MODE
+    #include <b15f/b15f.h>
+#endif
 #include "../lib/lib.hpp"
 #include "B15Receiver.hpp"
 #include "B15Sender.hpp"
-#include "b15global.hpp"
 
 int main()
 {
-	#ifdef DEBUG
+	#ifdef DEBUG_MODE
 		B15Fake drv = B15Fake();
 	#else
 		B15F& drv = B15F::getInstance();

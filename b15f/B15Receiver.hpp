@@ -1,12 +1,14 @@
-#include <b15f/b15f.h>
-#include "../lib/lib.hpp"
 #include "b15global.hpp"
+#ifndef DEBUG_MODE
+    #include <b15f/b15f.h>
+#endif
+#include "../lib/lib.hpp"
 
 class B15Receiver : IDecoderObserver
 {
 private:
 
-    #ifdef DEBUG
+    #ifdef DEBUG_MODE
         B15Fake& drv;
     #else
         B15F& drv;
@@ -29,7 +31,7 @@ public:
 
     void receive();
 
-    #ifdef DEBUG
+    #ifdef DEBUG_MODE
         B15Receiver(B15Fake& drv, Decoder& decoder, Encoder &encoder);
     #else
         B15Receiver(B15F& drv, Decoder& decoder, Encoder &encoder);

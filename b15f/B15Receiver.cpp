@@ -1,7 +1,7 @@
 #include "B15Receiver.hpp"
 #include "../lib/lib.hpp"
 
-#ifdef DEBUG
+#ifdef DEBUG_MODE
     B15Receiver::B15Receiver(B15Fake& drv, Decoder& decoder, Encoder& encoder)
 #else
     B15Receiver::B15Receiver(B15F& drv, Decoder& decoder, Encoder& encoder)

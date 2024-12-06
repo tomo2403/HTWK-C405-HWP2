@@ -1,13 +1,15 @@
-#include <b15f/b15f.h>
+#include "b15global.hpp"
+#ifndef DEBUG_MODE
+    #include <b15f/b15f.h>
+#endif
 #include "../lib/lib.hpp"
 #include "Timer.hpp"
-#include "b15global.hpp"
 
 class B15Sender : public IDecoderObserver
 {
 private:
     
-    #ifdef DEBUG
+    #ifdef DEBUG_MODE
         B15Fake& drv;
     #else
         B15F& drv;
@@ -27,7 +29,7 @@ private:
 
 public:
 
-    #ifdef DEBUG
+    #ifdef DEBUG_MODE
         B15Sender(B15Fake& drv, Decoder& decoder, Encoder& encoder, const std::vector<uint8_t> &rawDataToSend);
     #else
         B15Sender(B15F& drv, Decoder& decoder, Encoder& encoder, const std::vector<uint8_t> &rawDataToSend);

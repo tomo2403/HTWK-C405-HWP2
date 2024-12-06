@@ -1,6 +1,6 @@
 #include "B15Sender.hpp"
 
-#ifdef DEBUG
+#ifdef DEBUG_MODE
     B15Sender::B15Sender(B15Fake& drv, Decoder& decoder, Encoder& encoder,const std::vector<uint8_t> &rawDataToSend)
 #else
     B15Sender::B15Sender(B15F& drv, Decoder& decoder, Encoder& encoder,const std::vector<uint8_t> &rawDataToSend)
