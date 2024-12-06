@@ -2,10 +2,16 @@
 #include "../lib/lib.hpp"
 #include "B15Receiver.hpp"
 #include "B15Sender.hpp"
+#include "b15global.hpp"
 
 int main()
 {
-	B15F& drv = B15F::getInstance();
+	#ifdef DEBUG
+		B15Fake drv = B15Fake();
+	#else
+		B15F& drv = B15F::getInstance();
+	#endif
+
 	Decoder decoder = Decoder();
 	Encoder encoder = Encoder();
 

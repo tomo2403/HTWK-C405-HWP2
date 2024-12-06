@@ -1,11 +1,18 @@
 #include <b15f/b15f.h>
 #include "../lib/lib.hpp"
 #include "Timer.hpp"
+#include "b15global.hpp"
 
 class B15Sender : public IDecoderObserver
 {
 private:
-    B15F& drv;
+    
+    #ifdef DEBUG
+        B15Fake& drv;
+    #else
+        B15F& drv;
+    #endif
+
     uint16_t prevPacketID  = -1;
     Decoder& decoder;
     Encoder& encoder;
@@ -19,7 +26,12 @@ private:
     std::vector<uint8_t> getPackageById(const uint16_t &id);
 
 public:
-    B15Sender(B15F& drv, Decoder& decoder, Encoder& encoder, const std::vector<uint8_t> &rawDataToSend);
+
+    #ifdef DEBUG
+        B15Sender(B15Fake& drv, Decoder& decoder, Encoder& encoder, const std::vector<uint8_t> &rawDataToSend);
+    #else
+        B15Sender(B15F& drv, Decoder& decoder, Encoder& encoder, const std::vector<uint8_t> &rawDataToSend);
+    #endif
     // ~B15Sender();
 
     void beginBlockReceived(const BlockType &blockType) override;

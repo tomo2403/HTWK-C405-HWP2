@@ -1,10 +1,17 @@
 #include <b15f/b15f.h>
 #include "../lib/lib.hpp"
+#include "b15global.hpp"
 
 class B15Receiver : IDecoderObserver
 {
 private:
-    B15F& drv;
+
+    #ifdef DEBUG
+        B15Fake& drv;
+    #else
+        B15F& drv;
+    #endif
+    
     uint16_t prevPacketID  = -1;
     Decoder& decoder;
     Encoder& encoder;
@@ -22,6 +29,10 @@ public:
 
     void receive();
 
-    B15Receiver(B15F& drv, Decoder& decoder, Encoder &encoder);
+    #ifdef DEBUG
+        B15Receiver(B15Fake& drv, Decoder& decoder, Encoder &encoder);
+    #else
+        B15Receiver(B15F& drv, Decoder& decoder, Encoder &encoder);
+    #endif
     // ~B15Receiver();
 };

@@ -1,7 +1,12 @@
 #include "B15Receiver.hpp"
 #include "../lib/lib.hpp"
 
-B15Receiver::B15Receiver(B15F& drv, Decoder& decoder, Encoder& encoder) : drv(drv), decoder(decoder), encoder(encoder)
+#ifdef DEBUG
+    B15Receiver::B15Receiver(B15Fake& drv, Decoder& decoder, Encoder& encoder)
+#else
+    B15Receiver::B15Receiver(B15F& drv, Decoder& decoder, Encoder& encoder)
+#endif
+    : drv(drv), decoder(decoder), encoder(encoder)
 {
     this->previouslyReceivedNibble = 0xff;
     this->receivedData = std::vector<uint8_t>();
