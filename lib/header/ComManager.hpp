@@ -25,7 +25,7 @@ private:
 	Encoder encoder;
 	Decoder decoder;
 	CRC crc;
-	ICommunicationInterface com = ICommunicationInterface();
+	ICommunicationInterface* com;
 	DecoderObserver observer = DecoderObserver(&cp);
 
 	std::vector<uint8_t> outputData{};
@@ -41,7 +41,7 @@ private:
 
 public:
 
-	explicit ComManager(const ICommunicationInterface &com);
+	explicit ComManager(ICommunicationInterface* com);
 
 	void prepareOutgoingQueue(std::vector<uint8_t> inputData);
 

@@ -5,7 +5,7 @@
 using namespace ioManager;
 
 ComInterface serial = ComInterface();
-ComManager comManager = ComManager(serial);
+ComManager comManager = ComManager(&serial);
 
 int main()
 {

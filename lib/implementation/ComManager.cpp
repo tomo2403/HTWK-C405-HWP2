@@ -16,8 +16,7 @@ void ComManager::sendData(const std::vector<uint8_t> &data)
 			cv.wait(lock);
 		}
 
-		com.writeByte(encoder.nextNibble());
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		com->writeByte(encoder.nextNibble());
 	}
 }
 
@@ -31,8 +30,7 @@ void ComManager::sendResponse(const std::vector<uint8_t> &data)
 	encoder.interruptWithControlBlock(data);
 	while (encoder.hasData())
 	{
-		com.writeByte(encoder.nextNibble());
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		com->writeByte(encoder.nextNibble());
 	}
 
 	{
@@ -82,22 +80,22 @@ void ComManager::connect()
 		auto now = std::chrono::steady_clock::now();
 		auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
 		Logger(INFO, true) << "Connecting... " << elapsed << "s elapsed";
-		std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+		std::this_thread::sleep_for(std::chrono::milliseconds(480));
 	}
 	Logger(INFO) << "Connected!";
 }
 
 void ComManager::receiveData()
 {
-	decoder.addObserver(&com);
+	decoder.addObserver(&observer);
 
 	while (cp.isConnected() || !cp.isCloseCmdReceived())
 	{
-		if (!com.isDataAvailable())
+		if (!com->isDataAvailable())
 			continue;
 
 		uint8_t byte;
-		com.readByte(byte);
+		com->readByte(byte);
 		decoder.nextNibble(byte);
 	}
 }
@@ -109,11 +107,11 @@ void ComManager::processIncomingQueue()
 		if (!cp.isConnected() && cp.isCloseCmdReceived())
 			return;
 
-		if (com.incomingQueue.empty())
+		if (observer.incomingQueue.empty())
 			continue;
 
 		std::pair<BlockType, std::vector<uint8_t>> packet;
-		com.incomingQueue.wait_and_pop(packet);
+        observer.incomingQueue.wait_and_pop(packet);
 
 		uint32_t id = (packet.second[0] << 8) | packet.second[1];
 		std::vector<uint8_t> data(packet.second.begin() + 2, packet.second.end() - 4);
@@ -260,8 +258,10 @@ void ComManager::watchControlPanel()
 	}
 }
 
-ComManager::ComManager(const ICommunicationInterface &com) : com(com)
-{ }
+ComManager::ComManager(ICommunicationInterface* com) : com(com)
+{
+
+}
 
 std::vector<uint8_t> ComManager::transfer2Way()
 {
@@ -281,6 +281,6 @@ std::vector<uint8_t> ComManager::transfer2Way()
 
     watchThread.join();
 
-    com.closeCom();
+    com->closeCom();
 	return outputData;
 }

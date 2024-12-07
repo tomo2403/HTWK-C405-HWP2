@@ -5,7 +5,7 @@
 using namespace ioManager;
 
 ComInterface driver = ComInterface();
-ComManager comManager = ComManager(driver);
+ComManager comManager = ComManager(&driver);
 
 int main()
 {
