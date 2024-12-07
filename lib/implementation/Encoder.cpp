@@ -76,6 +76,7 @@ void Encoder::insertByteIntoBuffer(const uint8_t &byte, const uint8_t &atBit)
 
 bool Encoder::hasData()
 {
+	std::lock_guard<std::mutex> lock(mtx);
 	if (dataVectorOffset_Index >= dataVector.size() && bufferEndBit == -1 && !endBlockWasSent && dataVector.size() != 0)
 	{
 		leftShiftNibbleIntoBuffer(escapeSequence);
@@ -117,6 +118,7 @@ uint8_t Encoder::upcomingNibble()
 
 uint8_t Encoder::nextNibble()
 {
+	std::lock_guard<std::mutex> lock(mtx);
 	if (controlBlockIsQueued && previousNibble != 0)
 	{
 		std::vector<uint8_t> tmp = storage.dataVector;
@@ -187,6 +189,7 @@ std::vector<uint8_t> Encoder::encodeAll()
 
 void Encoder::interruptWithControlBlock(const std::vector<uint8_t> &controlVector)
 {
+	std::lock_guard<std::mutex> lock(mtx);
 	if (previousNibble == 0x00 && previousNibbleExists)
 	{
 		this->storage.dataVector = controlVector;
@@ -233,7 +236,7 @@ uint8_t Encoder::upcomingNibbleFromStorage()
 {
 	if (storage.bufferEndBit >= 3)
 	{
-		return (storage.buffer >> storage.bufferEndBit-3) & 0x0F;
+		return (storage.buffer >> (storage.bufferEndBit-3)) & 0x0F;
 	}
 	else if (storage.dataVector.size() > storage.dataVectorOffset_Index)
 	{

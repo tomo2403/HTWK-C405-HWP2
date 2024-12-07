@@ -75,8 +75,7 @@ void ComManager::connect()
 	crc.attachCRC(data);
 	while (!cp.isConnected())
 	{
-		std::thread sendThread([this](std::vector<uint8_t> &data)
-							   { sendResponse(data); }, std::ref(data));
+		std::thread sendThread(&ComManager::sendData, this, std::ref(data));
 		sendThread.join();
 
 		auto now = std::chrono::steady_clock::now();
@@ -93,6 +92,7 @@ void ComManager::receiveData()
 
 	while (cp.isConnected() || !cp.isCloseCmdReceived())
 	{
+		std::lock_guard<std::mutex> lock(mtx);
 		if (!com->isDataAvailable())
 			continue;
 
@@ -149,7 +149,6 @@ void ComManager::processIncomingQueue()
 
 void ComManager::processOutgoingQueue()
 {
-	Logger(DEBUG) << "Processing outgoing packets...";
 	std::promise<void> sendDataPromise;
 	std::future<void> sendDataFuture = sendDataPromise.get_future();
 
@@ -169,11 +168,10 @@ void ComManager::processOutgoingQueue()
 			if (sendResponseThread.joinable())
 			{
 				sendResponseThread.join();
-				std::vector<uint8_t> response;
-				outgoingResponseQueue.wait_and_pop(response);
-				sendResponseThread = std::thread([this](std::vector<uint8_t> &data)
-												 { sendResponse(data); }, std::ref(response));
 			}
+			std::vector<uint8_t> response;
+			outgoingResponseQueue.wait_and_pop(response);
+			sendResponseThread = std::thread(&ComManager::sendResponse, this, std::ref(response));
 		}
 
 		if (sendDataFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
@@ -186,37 +184,31 @@ void ComManager::processOutgoingQueue()
 			{
 				sendDataThread.join();
 			}
-			sendDataPromise = std::promise<void>();
-			sendDataFuture = sendDataPromise.get_future();
-			sendDataThread = std::thread([this, &sendDataPromise](const std::vector<uint8_t> &data)
-										 {
-											 sendData(data);
-											 sendDataPromise.set_value();
-										 }, std::ref(packet));
+			sendDataThread = std::thread(&ComManager::sendData, this, std::ref(packet));
 
-//			std::unique_lock<std::mutex> lock(mtx);
-//			if (cv.wait_for(lock, std::chrono::seconds(10), [this]{ return !cp.responses.empty(); }))
-//			{
-//				// Received a response within the timeout
-//				std::pair<uint16_t, Flags> response;
-//				cp.responses.wait_and_pop(response);
-//
-//				if (response.second == Flags::RECEIVED)
-//				{
-//					// Continue with the next packet
-//					continue;
-//				}
-//				else if (response.second == Flags::RESEND)
-//				{
-//					errors++;
-//					nextPacketId = response.first;
-//				}
-//			}
-//			else
-//			{
-//				// Timeout occurred, resend the last packet
-//				nextPacketId--;
-//			}
+			std::unique_lock<std::mutex> lock(mtx);
+			if (cv.wait_for(lock, std::chrono::seconds(10), [this]{ return !cp.responses.empty(); }))
+			{
+				// Received a response within the timeout
+				std::pair<uint16_t, Flags> response;
+				cp.responses.wait_and_pop(response);
+
+				if (response.second == Flags::RECEIVED)
+				{
+					// Continue with the next packet
+					continue;
+				}
+				else if (response.second == Flags::RESEND)
+				{
+					errors++;
+					nextPacketId = response.first;
+				}
+			}
+			else
+			{
+				// Timeout occurred, resend the last packet
+				nextPacketId--;
+			}
 		}
 		else
 		{
@@ -226,35 +218,50 @@ void ComManager::processOutgoingQueue()
 			{
 				sendResponseThread.join();
 			}
-			sendResponsePromise = std::promise<void>();
-			sendResponseFuture = sendResponsePromise.get_future();
-			sendResponseThread = std::thread([this, &sendResponsePromise](std::vector<uint8_t> &data)
-											 {
-												 sendResponse(data);
-												 sendResponsePromise.set_value();
-											 }, std::ref(data));
+			sendResponseThread = std::thread(&ComManager::sendResponse, this, std::ref(data));
+		}
+	}
+}
+
+void ComManager::watchControlPanel()
+{
+	while(!cp.isConnected()){}
+
+	auto start = std::chrono::steady_clock::now();
+	Logger(DEBUG) << "Watching control panel...";
+	while (true)
+	{
+		if (!cp.isConnected() && cp.isCloseCmdReceived())
+		{
+			Logger(DEBUG) << "Connection closed!";
+			return;
 		}
 
-		Logger(INFO, true) << "Sending packet " << nextPacketId << " of " << outgoingData.size() << " packets. Errors: " << errors;
+		auto now = std::chrono::steady_clock::now();
+		auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
+		Logger(INFO, true) << "Packet " << nextPacketId << "/" << outgoingData.size() << " | Errors: " << errors << " | " << elapsed << "s elapsed";
+		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	}
 }
 
 std::vector<uint8_t> ComManager::transfer2Way(std::vector<uint8_t> inputData)
 {
 	prepareOutgoingQueue(std::move(inputData));
-	Logger(DEBUG) << "Starting queue threads...";
-	std::thread receiveThread([this]()
-							  { receiveData(); });
-	std::thread incomingThread([this]()
-							   { processIncomingQueue(); });
 
-	connect();
-	std::thread outgoingThread([this]()
-							   { processOutgoingQueue(); });
+	connectThread = std::thread(&ComManager::connect, this);
+	std::thread watchThread(&ComManager::watchControlPanel, this);
+
+	Logger(DEBUG) << "Starting queue threads...";
+	std::thread receiveThread(&ComManager::receiveData, this);
+	std::thread incomingThread(&ComManager::processIncomingQueue, this);
+
+	connectThread.join();
+	std::thread outgoingThread(&ComManager::processOutgoingQueue, this);
 
 	receiveThread.join();
 	incomingThread.join();
 	outgoingThread.join();
+	watchThread.join();
 
 	Logger(DEBUG) << "Queues stopped.";
 	return outputData;

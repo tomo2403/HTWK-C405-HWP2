@@ -6,6 +6,7 @@
 class Codec
 {
 protected:
+	mutable std::mutex mtx;
     uint32_t buffer;
     bool previousNibbleExists;
     uint8_t previousNibble;

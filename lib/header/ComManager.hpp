@@ -14,12 +14,13 @@
 class ComManager
 {
 private:
-	std::mutex mtx;
+	mutable std::mutex mtx;
 	std::condition_variable cv;
 	bool responsePending = false;
 
 	std::thread sendDataThread;
 	std::thread sendResponseThread;
+	std::thread connectThread;
 
 	ControlPanel cp;
 	Encoder encoder;
@@ -52,6 +53,8 @@ public:
 	void processIncomingQueue();
 
 	void processOutgoingQueue();
+
+	void watchControlPanel();
 
 	std::vector<uint8_t> transfer2Way(std::vector<uint8_t> inputData);
 };
