@@ -17,12 +17,12 @@ void Decoder::initialize()
 	this->dataVector = std::vector<uint8_t>();
 }
 
-void Decoder::addObserver(IDecoderObserver *observer)
+void Decoder::addObserver(DecoderObserver *observer)
 {
 	observers.push_back(observer);
 }
 
-void Decoder::removeObserver(IDecoderObserver *observer)
+void Decoder::removeObserver(DecoderObserver *observer)
 {
 	observers.erase(std::remove(observers.begin(), observers.end(), observer), observers.end());
 }
@@ -36,7 +36,7 @@ void Decoder::processCommand(const uint8_t &command)
 		initialize();
 		dataVectorIsLocked = false;
 		currentBlockType = dataBlock;
-		for (IDecoderObserver *observer : observers)
+		for (DecoderObserver *observer : observers)
 		{
 			observer->beginBlockReceived(dataBlock);
 		}
@@ -51,7 +51,7 @@ void Decoder::processCommand(const uint8_t &command)
 		dataVectorIsLocked = false;
 		currentBlockType = controlBlock;
 		storageHoldsData = true;
-		for (IDecoderObserver *observer : observers)
+		for (DecoderObserver *observer : observers)
 		{
 			observer->beginBlockReceived(controlBlock);
 		}
@@ -67,7 +67,7 @@ void Decoder::processCommand(const uint8_t &command)
 	case endBlockDefault:
 	case endBlockFallback:
 		flushBufferIntoDataVector();
-		for (IDecoderObserver *observer : observers)
+		for (DecoderObserver *observer : observers)
 		{
 			observer->endBlockReceived(currentBlockType, dataVector);
 		}

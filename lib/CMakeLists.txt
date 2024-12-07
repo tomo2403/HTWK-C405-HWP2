@@ -1,16 +1,20 @@
 add_library(lib STATIC lib.cpp lib.hpp
-        header/CodecCommand.hpp
         header/BlockType.hpp
-        header/IDecoderObserver.hpp
-        header/ThreadSafeQueue.hpp
-        implementation/Logger.cpp
-        header/Logger.hpp
-        implementation/CRC.cpp
-        header/CRC.hpp
-        implementation/ControlPanel.cpp
+        header/Codec.hpp
+        header/CodecCommand.hpp
         header/ControlPanel.hpp
-        implementation/Logger.cpp
+        header/CRC.hpp
+        header/Decoder.hpp
+        header/DecoderObserver.hpp
+        header/Encoder.hpp
+        header/ICommunicationInterface.hpp
+        header/Logger.hpp
+        header/ThreadSafeQueue.hpp
+        implementation/Codec.cpp
+        implementation/ControlPanel.cpp
         implementation/CRC.cpp
-        implementation/Encoder.cpp
         implementation/Decoder.cpp
-        implementation/Codec.cpp)
+        implementation/DecoderObserver.cpp
+        implementation/Encoder.cpp
+        implementation/Logger.cpp
+)

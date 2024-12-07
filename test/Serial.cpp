@@ -1,31 +1,31 @@
 #include "Serial.hpp"
 
-void Serial::openPort()
+void ICommunicationInterface::open()
 {
     drv.setRegister(&DDRA, 0x0F);
 }
 
-int Serial::closePort() const
+int ICommunicationInterface::close() const
 {
     Logger(DEBUG) << "Closing serial port...";
     return 0;
 }
 
-ssize_t Serial::writeByte(uint8_t data)
+ssize_t ICommunicationInterface::writeByte(uint8_t data)
 {
     std::lock_guard<std::mutex> lock(drvMutex);
     drv.setRegister(&PORTA, data);
     return 0;
 }
 
-ssize_t Serial::readByte(uint8_t &data)
+ssize_t ICommunicationInterface::readByte(uint8_t &data)
 {
     std::lock_guard<std::mutex> lock(drvMutex);
     data = drv.getRegister(&PINA) >> 4;
     return 0;
 }
 
-bool Serial::isDataAvailable()
+bool ICommunicationInterface::isDataAvailable()
 {
     uint8_t nibble;
     readByte(nibble);

@@ -2,14 +2,13 @@
 #include <condition_variable>
 #include <mutex>
 #include <future>
-#include "Serial.hpp"
-#include "SerialCommunication.hpp"
+#include "ComInterface.hpp"
 
 using namespace ioManager;
 
-Serial serial;
+ComInterface serial;
 ControlPanel cp;
-SerialCommunication com(serial, cp);
+DecoderObserver com(&serial, &cp);
 Encoder encoder;
 CRC crc;
 uint16_t nextPacketId = 0;
@@ -269,16 +268,32 @@ void prepareOutgoingQueue(std::vector<uint8_t> &inputData)
 	}
 }
 
+void receiveData()
+{
+	Decoder decoder;
+	decoder.addObserver(&com);
+
+	while(cp.isConnected() || !cp.isCloseCmdReceived())
+	{
+		if (!serial.isDataAvailable())
+			continue;
+
+		uint8_t byte;
+		serial.readByte(byte);
+		decoder.nextNibble(byte);
+	}
+}
+
 int main()
 {
-	serial.openPort();
+	serial.openCom();
 
 	std::vector<uint8_t> inputData = getBinaryInput();
 	std::vector<uint8_t> outputData;
 
 	prepareOutgoingQueue(inputData);
 
-	std::thread receiveThread(&SerialCommunication::receiveData, &com);
+	std::thread receiveThread(receiveData);
 
 	Logger(DEBUG) << "Staring queue threads...";
 	std::thread incomingThread(processIncomingQueue, std::ref(outputData));
@@ -294,7 +309,7 @@ int main()
 
 	watchThread.join();
 
-	serial.closePort();
+	serial.closeCom();
 	setBinaryOutput(outputData);
 	return 0;
 }

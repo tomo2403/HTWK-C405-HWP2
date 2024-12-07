@@ -1,6 +1,6 @@
-#include "Serial.hpp"
+#include "ComInterface.hpp"
 
-void Serial::openPort()
+void ComInterface::openCom()
 {
 	Logger(DEBUG) << "Opening serial port...";
 	const char *portName = SERIAL_PORT;
@@ -41,19 +41,19 @@ void Serial::openPort()
 	}
 	else
 	{
-		Logger(DEBUG) << "Serial buffers flushed successfully.";
+		Logger(DEBUG) << "ICommunicationInterface buffers flushed successfully.";
 	}
 
-	Logger(INFO) << "Serial port open!";
+	Logger(INFO) << "ICommunicationInterface port open!";
 }
 
-int Serial::closePort() const
+void ComInterface::closeCom()
 {
 	Logger(DEBUG) << "Closing serial port...";
-	return close(serialPort);
+	close(serialPort);
 }
 
-ssize_t Serial::writeByte(uint8_t data) const
+void ComInterface::writeByte(uint8_t data)
 {
 	ssize_t n = write(serialPort, &data, sizeof(data));
 	if (n < 0)
@@ -61,20 +61,18 @@ ssize_t Serial::writeByte(uint8_t data) const
 		throw std::runtime_error("Error writing to serial port!");
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	return n;
 }
 
-ssize_t Serial::readByte(uint8_t &data) const
+void ComInterface::readByte(uint8_t &data)
 {
 	ssize_t m = read(serialPort, &data, sizeof(data));
 	if (m < 0)
 	{
 		throw std::runtime_error("Error reading from serial port!");
 	}
-	return m;
 }
 
-bool Serial::isDataAvailable() const
+bool ComInterface::isDataAvailable()
 {
 	int bytesAvailable;
 	if (ioctl(serialPort, FIONREAD, &bytesAvailable) == -1)

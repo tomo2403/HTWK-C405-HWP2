@@ -13,7 +13,7 @@
 
 #include "../lib/header/Logger.hpp"
 
-class Serial
+class ICommunicationInterface
 {
 public:
     B15F& drv = B15F::getInstance();
@@ -42,11 +42,11 @@ public:
 	/**
 	 * @brief Sets up the serial port with the specified settings.
 	 */
-	void openPort();
+	void open();
 
 	/**
 	 * @brief Closes the serial port.
 	 * @return 0 if the serial port was closed successfully, -1 otherwise.
 	 */
-	int closePort() const;
+	int close() const;
 };

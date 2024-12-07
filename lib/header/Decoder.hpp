@@ -1,33 +1,33 @@
 #pragma once
 
 #include "Codec.hpp"
-#include "IDecoderObserver.hpp"
+#include "DecoderObserver.hpp"
 
 class Decoder : public Codec
 {
 private:
 	struct Storage
 	{
-		uint32_t buffer;
-		bool previousNibbleExists;
-		uint8_t previousNibble;
-		int8_t bufferEndBit;
-		bool EscapedModeIsActive;
-		uint8_t dataVectorBuffer;
-		uint8_t dataVectorBufferShiftCount;
+		uint32_t buffer{};
+		bool previousNibbleExists{};
+		uint8_t previousNibble{};
+		int8_t bufferEndBit{};
+		bool EscapedModeIsActive{};
+		uint8_t dataVectorBuffer{};
+		uint8_t dataVectorBufferShiftCount{};
 		std::vector<uint8_t> dataVector;
 		BlockType currentBlockType;
 	};
 
-	bool EscapedModeIsActive;
+	bool EscapedModeIsActive{};
 	bool dataVectorIsLocked = true;
 
-	uint8_t dataVectorBuffer;
-	uint8_t dataVectorBufferShiftCount;
+	uint8_t dataVectorBuffer{};
+	uint8_t dataVectorBufferShiftCount{};
 
 	std::vector<uint8_t> dataVector;
 
-	std::vector<IDecoderObserver *> observers;
+	std::vector<DecoderObserver *> observers;
 
 	BlockType currentBlockType;
 
@@ -49,9 +49,9 @@ private:
 public:
 	Decoder();
 
-	void addObserver(IDecoderObserver *observer);
+	void addObserver(DecoderObserver *observer);
 
-	void removeObserver(IDecoderObserver *observer);
+	void removeObserver(DecoderObserver *observer);
 
 	void nextNibble(const uint8_t &nibble);
 };

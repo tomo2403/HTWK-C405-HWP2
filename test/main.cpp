@@ -7,9 +7,9 @@
 
 using namespace ioManager;
 
-Serial serial;
+ICommunicationInterface serial;
 ControlPanel cp;
-SerialCommunication com(serial, cp);
+DecoderObserver com(serial, cp);
 Encoder encoder;
 CRC crc;
 uint16_t nextPacketId = 0;
@@ -265,14 +265,14 @@ void prepareOutgoingQueue(std::vector<uint8_t> &inputData)
 
 int main()
 {
-    serial.openPort();
+	serial.open();
 
     std::vector<uint8_t> inputData = getBinaryInput();
     std::vector<uint8_t> outputData;
 
     prepareOutgoingQueue(inputData);
 
-    std::thread receiveThread(&SerialCommunication::receiveData, &com);
+    std::thread receiveThread(&DecoderObserver::receiveData, &com);
 
     Logger(DEBUG) << "Staring queue threads...";
     std::thread incomingThread(processIncomingQueue, std::ref(outputData));
@@ -288,7 +288,7 @@ int main()
 
     watchThread.join();
 
-    serial.closePort();
+	serial.close();
     setBinaryOutput(outputData);
     return 0;
 }
