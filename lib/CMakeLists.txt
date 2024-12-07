@@ -2,6 +2,7 @@ add_library(lib STATIC lib.cpp lib.hpp
         header/BlockType.hpp
         header/Codec.hpp
         header/CodecCommand.hpp
+        header/ComManager.hpp
         header/ControlPanel.hpp
         header/CRC.hpp
         header/Decoder.hpp
@@ -11,6 +12,7 @@ add_library(lib STATIC lib.cpp lib.hpp
         header/Logger.hpp
         header/ThreadSafeQueue.hpp
         implementation/Codec.cpp
+        implementation/ComManager.cpp
         implementation/ControlPanel.cpp
         implementation/CRC.cpp
         implementation/Decoder.cpp

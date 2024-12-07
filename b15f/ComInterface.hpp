@@ -12,41 +12,46 @@
 #include <b15f/b15f.h>
 
 #include "../lib/header/Logger.hpp"
+#include "../lib/header/ICommunicationInterface.hpp"
 
-class ICommunicationInterface
+#define SERIAL_PORT "/dev/cu.usbserial-140"
+
+class ComInterface : public ICommunicationInterface
 {
-public:
-    B15F& drv = B15F::getInstance();
+private:
+	int serialPort{}; /**< The file descriptor for the serial port. */
+	B15F& drv = B15F::getInstance();
 	uint8_t previouslyReceivedNibble{};
-    std::mutex drvMutex;
+	std::mutex drvMutex;
 
+public:
 	/**
 	 * @brief Writes a byte of data to the serial port.
 	 * @param data The byte of data to write.
 	 * @return The number of bytes written, or -1 on error.
 	 */
-	ssize_t writeByte(uint8_t data);
+	void writeByte(uint8_t data) override;
 
 	/**
 	 * @brief Reads a byte of data from the serial port.
 	 * @return The byte of data read, or -1 on error.
 	 */
-	ssize_t readByte(uint8_t &data);
+	void readByte(uint8_t &data) override;
 
 	/**
  	 * @brief Checks if data is available in the serial buffer.
 	 * @return True if data is available, false otherwise.
 	 */
-	[[nodiscard]] bool isDataAvailable();
+	[[nodiscard]] bool isDataAvailable() override;
 
 	/**
 	 * @brief Sets up the serial port with the specified settings.
 	 */
-	void open();
+	void openCom() override;
 
 	/**
 	 * @brief Closes the serial port.
 	 * @return 0 if the serial port was closed successfully, -1 otherwise.
 	 */
-	int close() const;
+	void closeCom() override;
 };

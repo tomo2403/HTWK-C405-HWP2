@@ -12,6 +12,6 @@ void DecoderObserver::endBlockReceived(const BlockType &blockType, const std::ve
 	incomingQueue.push(std::make_pair(blockType, dataVector));
 }
 
-DecoderObserver::DecoderObserver(ICommunicationInterface* serial, ControlPanel* cp) : serial(serial), cp(cp)
+DecoderObserver::DecoderObserver(ControlPanel* cp) : cp(cp)
 {
 }

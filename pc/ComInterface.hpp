@@ -17,9 +17,10 @@
 
 class ComInterface : public ICommunicationInterface
 {
-public:
+private:
 	int serialPort{}; /**< The file descriptor for the serial port. */
 
+public:
 	/**
 	 * @brief Writes a byte of data to the serial port.
 	 * @param data The byte of data to write.

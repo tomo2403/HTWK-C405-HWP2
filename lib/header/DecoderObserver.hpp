@@ -11,16 +11,13 @@ class DecoderObserver
 {
 private:
 	ControlPanel* cp;
-	ICommunicationInterface* serial;
 
 public:
 	ThreadSafeQueue<std::pair<BlockType, std::vector<uint8_t>>> incomingQueue; /**< A queue to store incoming packets. */
 
-	DecoderObserver(ICommunicationInterface* serial, ControlPanel* cp);
+	explicit DecoderObserver(ControlPanel* cp);
 
 	void beginBlockReceived(const BlockType &blockType);
 
 	void endBlockReceived(const BlockType &blockType, const std::vector<uint8_t> &dataVector);
-
-	void receiveData();
 };
