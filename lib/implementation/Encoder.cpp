@@ -76,7 +76,7 @@ void Encoder::insertByteIntoBuffer(const uint8_t &byte, const uint8_t &atBit)
 
 bool Encoder::hasData()
 {
-	if (dataVectorOffset_Index >= dataVector.size() && bufferEndBit == -1 && !endBlockWasSent)
+	if (dataVectorOffset_Index >= dataVector.size() && bufferEndBit == -1 && !endBlockWasSent && dataVector.size() != 0)
 	{
 		leftShiftNibbleIntoBuffer(escapeSequence);
 		// TODO: Implement Fallback sequence

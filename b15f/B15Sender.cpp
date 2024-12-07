@@ -1,8 +1,14 @@
 #include "B15Sender.hpp"
 
-B15Sender::B15Sender(B15F& drv, Decoder& decoder, Encoder& encoder,const std::vector<uint8_t> &rawDataToSend)
+#ifdef DEBUG_MODE
+    B15Sender::B15Sender(B15Fake& drv, Decoder& decoder, Encoder& encoder,const std::vector<uint8_t> &rawDataToSend)
+#else
+    B15Sender::B15Sender(B15F& drv, Decoder& decoder, Encoder& encoder,const std::vector<uint8_t> &rawDataToSend)
+#endif
     : drv(drv), encoder(encoder), decoder(decoder), rawDataToSend(rawDataToSend)
-{ }
+{ 
+    decoder.addObserver(this);
+}
 
 void B15Sender::beginBlockReceived(const BlockType &blockType)
 {
@@ -50,7 +56,7 @@ void B15Sender::endBlockReceived(const BlockType &blockType, const std::vector<u
 
     if (dataVector.size() != 7 && connectionEstablished)
     {
-        // resend package;
+        encoder.inputDataBlock(getPackageById(prevPacketID));
     }
 
     // TODO: Potential bug, if msb is not received first.
@@ -69,20 +75,27 @@ void B15Sender::endBlockReceived(const BlockType &blockType, const std::vector<u
         encoder.inputDataBlock(getPackageById(prevPacketID));
     }
 
-    if (!connectionEstablished && dataVector.at(3) == Flags::CONNECT)
+    if (!connectionEstablished && dataVector.at(2) == Flags::CONNECT)
     {
         connectionEstablished = true;
         encoder.inputDataBlock(getPackageById(++prevPacketID));
     }
 
-    if (dataVector.at(3) == Flags::RESEND)
+    if (dataVector.at(2) == Flags::RESEND)
     {
         encoder.inputDataBlock(getPackageById(prevPacketID));
     }
 
-    if (dataVector.at(3) == Flags::RECEIVED)
+    if (dataVector.at(2) == Flags::RECEIVED)
     {
         encoder.inputDataBlock(getPackageById(++prevPacketID));
+        
+        if (hasSentEverything())
+        {
+            std::vector<uint8_t> transferfinishedPackage = controlPanel.createControlBlock(Flags::TRANSFER_FINISHED, 0);
+            crcGenerator.attachCRC(transferfinishedPackage);
+            encoder.interruptWithControlBlock(transferfinishedPackage);
+        }
     }
 }
 
@@ -97,4 +110,19 @@ void B15Sender::send()
     {
         encoder.inputDataBlock(getPackageById(prevPacketID));
     }
+    else if (!connectionEstablished)
+    {
+        std::vector<uint8_t> connectPacket = controlPanel.createControlBlock(Flags::CONNECT, 0);
+        crcGenerator.attachCRC(connectPacket);
+        encoder.interruptWithControlBlock(connectPacket);
+        Logger(INFO) << "Began sending connectPacket.";
+    }
+}
+
+bool B15Sender::hasSentEverything()
+{
+    // This const int must remain here. If rawDataToSend.size() is put directly into the equation,
+    // it always evaluates to TRUE, no matter what. Why?!
+    const int vectorSize = rawDataToSend.size();
+    return prevPacketID * packetSize >= vectorSize && !encoder.hasData();
 }

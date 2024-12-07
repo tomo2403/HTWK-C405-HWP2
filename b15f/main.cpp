@@ -1,21 +1,37 @@
-#include <b15f/b15f.h>
+#include "b15global.hpp"
+#ifndef DEBUG_MODE
+    #include <b15f/b15f.h>
+#endif
 #include "../lib/lib.hpp"
 #include "B15Receiver.hpp"
 #include "B15Sender.hpp"
 
 int main()
 {
-	B15F& drv = B15F::getInstance();
 	Decoder decoder = Decoder();
 	Encoder encoder = Encoder();
+
+	#ifdef DEBUG_MODE
+		std::vector<uint8_t> incommingData =
+		{0x00, 0x00, 0x00, 0x30, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x90, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x80, 0x00, 0x50, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+		std::vector<uint8_t>  outgoingData =
+		{0x12, 0x34, 0x56};
+
+
+		B15Fake drv = B15Fake(incommingData);
+		B15Sender sender = B15Sender(drv, decoder, encoder, outgoingData);
+	#else
+		B15F& drv = B15F::getInstance();
+		B15Sender sender = B15Sender(drv, decoder, encoder, ioManager::getBinaryInput());
+	#endif
 
 	// 7-4 inbound, 3-0 outbound
 	drv.setRegister(&DDRA, 0x0F);
 	
 	B15Receiver receiver = B15Receiver(drv, decoder, encoder);
-	B15Sender sender = B15Sender(drv, decoder, encoder, ioManager::getBinaryInput());
 
-	while(true)
+	while(!sender.hasSentEverything() || !receiver.hasEverythingReceived())
 	{
 		receiver.receive();
 		sender.send();
