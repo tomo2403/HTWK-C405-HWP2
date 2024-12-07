@@ -4,17 +4,17 @@
 
 using namespace ioManager;
 
-ComInterface serial = ComInterface();
-ComManager comManager = ComManager(&serial);
+ComInterface interface = ComInterface();
+ComManager comManager = ComManager(&interface);
 
 int main()
 {
-	serial.openCom();
+	interface.openCom();
 
 	std::vector<uint8_t> inputData = getBinaryInput();
-	comManager.prepareOutgoingQueue(inputData);
+	std::vector<uint8_t> outputData = comManager.transfer2Way(inputData);
 
-	std::vector<uint8_t> outputData = comManager.transfer2Way();
 	setBinaryOutput(outputData);
+	interface.closeCom();
 	return 0;
 }

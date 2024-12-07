@@ -1,16 +1,18 @@
+#include <utility>
+
 #include "../header/ComManager.hpp"
+
+ComManager::ComManager(ICommunicationInterface *com) : com(com)
+{
+
+}
 
 void ComManager::sendData(const std::vector<uint8_t> &data)
 {
-	std::unique_lock<std::mutex> lock(mtx);
-	while (responsePending)
-	{
-		cv.wait(lock);
-	}
-
 	encoder.inputDataBlock(data);
 	while (encoder.hasData())
 	{
+		std::unique_lock<std::mutex> lock(mtx);
 		while (responsePending)
 		{
 			cv.wait(lock);
@@ -111,7 +113,7 @@ void ComManager::processIncomingQueue()
 			continue;
 
 		std::pair<BlockType, std::vector<uint8_t>> packet;
-        observer.incomingQueue.wait_and_pop(packet);
+		observer.incomingQueue.wait_and_pop(packet);
 
 		uint32_t id = (packet.second[0] << 8) | packet.second[1];
 		std::vector<uint8_t> data(packet.second.begin() + 2, packet.second.end() - 4);
@@ -147,7 +149,7 @@ void ComManager::processIncomingQueue()
 
 void ComManager::processOutgoingQueue()
 {
-	Logger(DEBUG) << "Watching control panel...";
+	Logger(DEBUG) << "Processing outgoing packets...";
 	std::promise<void> sendDataPromise;
 	std::future<void> sendDataFuture = sendDataPromise.get_future();
 
@@ -192,29 +194,29 @@ void ComManager::processOutgoingQueue()
 											 sendDataPromise.set_value();
 										 }, std::ref(packet));
 
-			std::unique_lock<std::mutex> lock(mtx);
-			if (cv.wait_for(lock, std::chrono::seconds(10), [this]{ return !cp.responses.empty(); }))
-			{
-				// Received a response within the timeout
-				std::pair<uint16_t, Flags> response;
-				cp.responses.wait_and_pop(response);
-
-				if (response.second == Flags::RECEIVED)
-				{
-					// Continue with the next packet
-					continue;
-				}
-				else if (response.second == Flags::RESEND)
-				{
-					errors++;
-					nextPacketId = response.first;
-				}
-			}
-			else
-			{
-				// Timeout occurred, resend the last packet
-				nextPacketId--;
-			}
+//			std::unique_lock<std::mutex> lock(mtx);
+//			if (cv.wait_for(lock, std::chrono::seconds(10), [this]{ return !cp.responses.empty(); }))
+//			{
+//				// Received a response within the timeout
+//				std::pair<uint16_t, Flags> response;
+//				cp.responses.wait_and_pop(response);
+//
+//				if (response.second == Flags::RECEIVED)
+//				{
+//					// Continue with the next packet
+//					continue;
+//				}
+//				else if (response.second == Flags::RESEND)
+//				{
+//					errors++;
+//					nextPacketId = response.first;
+//				}
+//			}
+//			else
+//			{
+//				// Timeout occurred, resend the last packet
+//				nextPacketId--;
+//			}
 		}
 		else
 		{
@@ -237,50 +239,23 @@ void ComManager::processOutgoingQueue()
 	}
 }
 
-void ComManager::watchControlPanel()
+std::vector<uint8_t> ComManager::transfer2Way(std::vector<uint8_t> inputData)
 {
-	while (!cp.isConnected())
-	{
-		connect();
-	}
+	prepareOutgoingQueue(std::move(inputData));
+	Logger(DEBUG) << "Starting queue threads...";
+	std::thread receiveThread([this]()
+							  { receiveData(); });
+	std::thread incomingThread([this]()
+							   { processIncomingQueue(); });
 
-	Logger(DEBUG) << "Watching control panel...";
-	while (true)
-	{
-		if (!cp.isConnected() && cp.isCloseCmdReceived())
-		{
-			Logger(DEBUG) << "Connection closed!";
-			return;
-		}
+	connect();
+	std::thread outgoingThread([this]()
+							   { processOutgoingQueue(); });
 
-		Logger(INFO, true) << "Sending packet " << nextPacketId << " of " << outgoingData.size() << " packets. Errors: " << errors;
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-	}
-}
+	receiveThread.join();
+	incomingThread.join();
+	outgoingThread.join();
 
-ComManager::ComManager(ICommunicationInterface* com) : com(com)
-{
-
-}
-
-std::vector<uint8_t> ComManager::transfer2Way()
-{
-    std::thread receiveThread([this]() { receiveData(); });
-
-    Logger(DEBUG) << "Starting queue threads...";
-    std::thread incomingThread([this]() { processIncomingQueue(); });
-    std::thread outgoingThread([this]() { processOutgoingQueue(); });
-
-    std::thread watchThread([this]() { watchControlPanel(); });
-
-    receiveThread.join();
-    incomingThread.join();
-    outgoingThread.join();
-
-    Logger(DEBUG) << "Queues stopped.";
-
-    watchThread.join();
-
-    com->closeCom();
+	Logger(DEBUG) << "Queues stopped.";
 	return outputData;
 }

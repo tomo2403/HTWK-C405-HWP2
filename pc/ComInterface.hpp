@@ -18,36 +18,36 @@
 class ComInterface : public ICommunicationInterface
 {
 private:
-	int serialPort{}; /**< The file descriptor for the serial port. */
+	int serialPort{}; /**< The file descriptor for the interface port. */
 
 public:
 	/**
-	 * @brief Writes a byte of data to the serial port.
+	 * @brief Writes a byte of data to the interface port.
 	 * @param data The byte of data to write.
 	 * @return The number of bytes written, or -1 on error.
 	 */
 	void writeByte(uint8_t data) override;
 
 	/**
-	 * @brief Reads a byte of data from the serial port.
+	 * @brief Reads a byte of data from the interface port.
 	 * @return The byte of data read, or -1 on error.
 	 */
 	void readByte(uint8_t &data) override;
 
 	/**
- 	 * @brief Checks if data is available in the serial buffer.
+ 	 * @brief Checks if data is available in the interface buffer.
 	 * @return True if data is available, false otherwise.
 	 */
 	[[nodiscard]] bool isDataAvailable() override;
 
 	/**
-	 * @brief Sets up the serial port with the specified settings.
+	 * @brief Sets up the interface port with the specified settings.
 	 */
 	void openCom() override;
 
 	/**
-	 * @brief Closes the serial port.
-	 * @return 0 if the serial port was closed successfully, -1 otherwise.
+	 * @brief Closes the interface port.
+	 * @return 0 if the interface port was closed successfully, -1 otherwise.
 	 */
 	void closeCom() override;
 };

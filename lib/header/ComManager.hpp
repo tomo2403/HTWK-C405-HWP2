@@ -53,7 +53,5 @@ public:
 
 	void processOutgoingQueue();
 
-	void watchControlPanel();
-
-	std::vector<uint8_t> transfer2Way();
+	std::vector<uint8_t> transfer2Way(std::vector<uint8_t> inputData);
 };
