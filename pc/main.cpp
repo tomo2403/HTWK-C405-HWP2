@@ -11,7 +11,7 @@ Serial serial;
 ControlPanel cp;
 SerialCommunication com(serial, cp);
 Encoder encoder;
-CRC crc(0x04C11DB7, 0xFFFFFFFF);
+CRC crc;
 uint16_t nextPacketId = 0;
 u_long errors = 0;
 
@@ -25,12 +25,17 @@ bool responsePending = false;
 std::thread sendDataThread;
 std::thread sendResponseThread;
 
-void sendData(const std::vector<uint8_t> &data)
+void sendData(const std::vector<uint8_t>& data)
 {
+	std::unique_lock<std::mutex> lock(mtx);
+	while (responsePending)
+	{
+		cv.wait(lock);
+	}
+
 	encoder.inputDataBlock(data);
 	while (encoder.hasData())
 	{
-		std::unique_lock<std::mutex> lock(mtx);
 		while (responsePending)
 		{
 			cv.wait(lock);
@@ -68,15 +73,15 @@ void connect()
 	Logger(INFO) << "Connecting...";
 	std::vector<uint8_t> data = cp.createControlBlock(Flags::CONNECT, 0);
 	crc.attachCRC(data);
-	while (!cp.isConnected())
+	while (true)
 	{
 		std::thread sendThread(sendResponse, std::ref(data));
 		sendThread.join();
 
 		auto now = std::chrono::steady_clock::now();
 		auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
-		Logger(INFO, true) << "Connecting... " << elapsed << "s elapsed";
-		std::this_thread::sleep_for(std::chrono::milliseconds(485));
+		//Logger(INFO, true) << "Connecting... " << elapsed << "s elapsed";
+		std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 	}
 	Logger(INFO) << "Connected!";
 }
@@ -166,14 +171,14 @@ void processOutgoingQueue()
 			}
 			sendDataPromise = std::promise<void>();
 			sendDataFuture = sendDataPromise.get_future();
-			sendDataThread = std::thread([&sendDataPromise](std::vector<uint8_t> &data)
+			sendDataThread = std::thread([&sendDataPromise](const std::vector<uint8_t>& data)
 										 {
 											 sendData(data);
 											 sendDataPromise.set_value();
 										 }, std::ref(packet));
 
 			std::unique_lock<std::mutex> lock(mtx);
-			if (cv.wait_for(lock, std::chrono::seconds(5), []
+			if (cv.wait_for(lock, std::chrono::seconds(10), []
 			{ return !cp.responses.empty(); }))
 			{
 				// Received a response within the timeout
@@ -277,13 +282,13 @@ int main()
 
 	Logger(DEBUG) << "Staring queue threads...";
 	std::thread incomingThread(processIncomingQueue, std::ref(outputData));
-	std::thread outgoingThread(processOutgoingQueue);
+	//std::thread outgoingThread(processOutgoingQueue);
 
 	std::thread watchThread(watchControlPanel);
 
 	receiveThread.join();
 	incomingThread.join();
-	outgoingThread.join();
+	//outgoingThread.join();
 
 	Logger(DEBUG) << "Queues stopped.";
 
