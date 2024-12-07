@@ -2,7 +2,7 @@
 
 void SerialCommunication::beginBlockReceived(const BlockType &blockType)
 {
-
+	cp.connect();
 }
 
 void SerialCommunication::endBlockReceived(const BlockType &blockType, const std::vector<uint8_t> &dataVector)
