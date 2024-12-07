@@ -73,15 +73,15 @@ void connect()
 	Logger(INFO) << "Connecting...";
 	std::vector<uint8_t> data = cp.createControlBlock(Flags::CONNECT, 0);
 	crc.attachCRC(data);
-	while (true)
+	while (!cp.isConnected())
 	{
 		std::thread sendThread(sendResponse, std::ref(data));
 		sendThread.join();
 
 		auto now = std::chrono::steady_clock::now();
 		auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
-		//Logger(INFO, true) << "Connecting... " << elapsed << "s elapsed";
-		std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+		Logger(INFO, true) << "Connecting... " << elapsed << "s elapsed";
+		std::this_thread::sleep_for(std::chrono::milliseconds(480));
 	}
 	Logger(INFO) << "Connected!";
 }
@@ -282,13 +282,13 @@ int main()
 
 	Logger(DEBUG) << "Staring queue threads...";
 	std::thread incomingThread(processIncomingQueue, std::ref(outputData));
-	//std::thread outgoingThread(processOutgoingQueue);
+	std::thread outgoingThread(processOutgoingQueue);
 
 	std::thread watchThread(watchControlPanel);
 
 	receiveThread.join();
 	incomingThread.join();
-	//outgoingThread.join();
+	outgoingThread.join();
 
 	Logger(DEBUG) << "Queues stopped.";
 
