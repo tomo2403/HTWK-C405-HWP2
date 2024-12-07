@@ -20,6 +20,7 @@ enum Flags : uint8_t {
 class ControlPanel
 {
 private:
+	mutable std::mutex mtx;
 	bool connected = false;
 	bool everythingSent = false;
 	bool everythingReceived = false;

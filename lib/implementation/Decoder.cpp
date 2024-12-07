@@ -115,6 +115,7 @@ void Decoder::flushBufferIntoDataVector()
 
 void Decoder::nextNibble(const uint8_t &nibble)
 {
+	std::lock_guard<std::mutex> lock(mtx);
 	if (EscapedModeIsActive)
 	{
 		processCommand(nibble);
