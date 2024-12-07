@@ -11,6 +11,19 @@ uint8_t reverseNibble(uint8_t nibble)
 	return nibble;
 }
 
+uint8_t reverseByte(uint8_t byte)
+{
+	byte = ((byte & 0b00000001) << 7) | // Bit 0 -> Bit 7
+		   ((byte & 0b00000010) << 5) | // Bit 1 -> Bit 6
+		   ((byte & 0b00000100) << 3) | // Bit 2 -> Bit 5
+		   ((byte & 0b00001000) << 1) | // Bit 3 -> Bit 4
+		   ((byte & 0b00010000) >> 1) | // Bit 4 -> Bit 3
+		   ((byte & 0b00100000) >> 3) | // Bit 5 -> Bit 2
+		   ((byte & 0b01000000) >> 5) | // Bit 6 -> Bit 1
+		   ((byte & 0b10000000) >> 7);  // Bit 7 -> Bit 0
+	return byte;
+}
+
 uint8_t readNibble()
 {
 	uint8_t portD = (PIND & 0b11000000) >> 6; // Lese D6 und D7
@@ -20,7 +33,7 @@ uint8_t readNibble()
 }
 
 void writeNibble(uint8_t nibble) {
-	PORTD = (PORTD & 0b11000011) | ((nibble & 0b00001111) << 2);
+	PORTD = reverseByte((PORTD & 0b11000011) | ((nibble & 0b00001111) << 2));
 }
 
 void setup()
