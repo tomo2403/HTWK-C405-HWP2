@@ -115,6 +115,7 @@ void B15Sender::send()
         std::vector<uint8_t> connectPacket = controlPanel.createControlBlock(Flags::CONNECT, 0);
         crcGenerator.attachCRC(connectPacket);
         encoder.interruptWithControlBlock(connectPacket);
+        Logger(INFO) << "Began sending connectPacket.";
     }
 }
 

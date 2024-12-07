@@ -1,0 +1,17 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "Run with Pipe",
+        "type": "shell",
+        "command": "${workspaceFolder}/sample_data_1kb.bin | ${workspaceFolder}/build/b15f/b15f > ${workspaceFolder}/output.bin",
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": [],
+        "detail": "Runs meinProgramm with input from a file and outputs to another file"
+      }
+    ]
+  }
+  
