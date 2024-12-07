@@ -56,7 +56,7 @@ void B15Sender::endBlockReceived(const BlockType &blockType, const std::vector<u
 
     if (dataVector.size() != 7 && connectionEstablished)
     {
-        // resend package;
+        encoder.inputDataBlock(getPackageById(prevPacketID));
     }
 
     // TODO: Potential bug, if msb is not received first.
@@ -89,16 +89,18 @@ void B15Sender::endBlockReceived(const BlockType &blockType, const std::vector<u
     if (dataVector.at(2) == Flags::RECEIVED)
     {
         encoder.inputDataBlock(getPackageById(++prevPacketID));
+        
+        if (hasSentEverything())
+        {
+            std::vector<uint8_t> transferfinishedPackage = controlPanel.createControlBlock(Flags::TRANSFER_FINISHED, 0);
+            crcGenerator.attachCRC(transferfinishedPackage);
+            encoder.interruptWithControlBlock(transferfinishedPackage);
+        }
     }
 }
 
 void B15Sender::send()
 {
-    if (hasSentEverything())
-    {
-        return;
-    }
-
     if (encoder.hasData())
     {
         drv.setRegister(&PORTA, encoder.nextNibble());

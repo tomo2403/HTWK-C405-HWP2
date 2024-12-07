@@ -31,7 +31,7 @@ int main()
 	
 	B15Receiver receiver = B15Receiver(drv, decoder, encoder);
 
-	while(!sender.hasSentEverything())
+	while(!sender.hasSentEverything() || !receiver.hasEverythingReceived())
 	{
 		receiver.receive();
 		sender.send();

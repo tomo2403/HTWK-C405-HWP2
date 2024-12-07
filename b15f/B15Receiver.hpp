@@ -21,6 +21,7 @@ private:
     uint8_t previouslyReceivedNibble;
     std::vector<uint8_t> receivedData;
     CRC crcGenerator = CRC(0x00, 0x00); // TODO: update CRC-Poly
+    bool everythingReceived = false;
 
     bool isDifferentFromPrevious(const uint8_t &nibble);
 
@@ -28,6 +29,8 @@ public:
 
     void beginBlockReceived(const BlockType &blockType) override;
     void endBlockReceived(const BlockType &blockType, const std::vector<uint8_t> &dataVector) override;
+
+    bool hasEverythingReceived();
 
     void receive();
 
