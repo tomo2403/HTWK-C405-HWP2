@@ -70,7 +70,7 @@ void connect()
 	crc.attachCRC(data);
 	while (!cp.isConnected())
 	{
-		std::thread sendThread(sendData, std::ref(data));
+		std::thread sendThread(sendResponse, std::ref(data));
 		sendThread.join();
 
 		auto now = std::chrono::steady_clock::now();
@@ -131,6 +131,9 @@ void processOutgoingQueue()
 	Logger(DEBUG) << "Watching control panel...";
 	std::promise<void> sendDataPromise;
 	std::future<void> sendDataFuture = sendDataPromise.get_future();
+
+	std::promise<void> sendResponsePromise;
+	std::future<void> sendResponseFuture = sendResponsePromise.get_future();
 
 	while (true)
 	{
@@ -198,16 +201,16 @@ void processOutgoingQueue()
 		{
 			std::vector<uint8_t> data = cp.createControlBlock(Flags::TRANSFER_FINISHED, 0);
 			crc.attachCRC(data);
-			if (sendDataThread.joinable())
+			if (sendResponseThread.joinable())
 			{
-				sendDataThread.join();
+				sendResponseThread.join();
 			}
-			sendDataPromise = std::promise<void>();
-			sendDataFuture = sendDataPromise.get_future();
-			sendDataThread = std::thread([&sendDataPromise](std::vector<uint8_t> &data)
+			sendResponsePromise = std::promise<void>();
+			sendResponseFuture = sendResponsePromise.get_future();
+			sendResponseThread = std::thread([&sendResponsePromise](std::vector<uint8_t> &data)
 										 {
-											 sendData(data);
-											 sendDataPromise.set_value();
+											 sendResponse(data);
+											 sendResponsePromise.set_value();
 										 }, std::ref(data));
 		}
 
