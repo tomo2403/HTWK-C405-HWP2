@@ -20,7 +20,7 @@ private:
     ControlPanel controlPanel;
     uint8_t previouslyReceivedNibble;
     std::vector<uint8_t> receivedData;
-    CRC crcGenerator = CRC(0x00, 0x00); // TODO: update CRC-Poly
+    CRC crcGenerator = CRC();
     bool everythingReceived = false;
 
     bool isDifferentFromPrevious(const uint8_t &nibble);

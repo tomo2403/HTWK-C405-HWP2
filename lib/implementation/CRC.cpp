@@ -1,11 +1,5 @@
 #include "../header/CRC.hpp"
 
-CRC::CRC(uint32_t polynomial, uint32_t initialValue)
-{
-	this->polynomial = polynomial;
-	this->initialValue = initialValue;
-}
-
 uint32_t CRC::calculateCRC(const std::vector<uint8_t> &data) const
 {
 	uint32_t crc = initialValue;

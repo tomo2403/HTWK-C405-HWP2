@@ -18,7 +18,7 @@ private:
     int32_t prevPacketID  = -1;
     Decoder& decoder;
     Encoder& encoder;
-    CRC crcGenerator = CRC(0x00, 0x00);
+    CRC crcGenerator = CRC();
     Timer timer = Timer();
     std::vector<uint8_t> rawDataToSend;
     bool connectionEstablished = false;

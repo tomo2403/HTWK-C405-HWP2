@@ -13,12 +13,6 @@
 class CRC
 {
 public:
-	/**
-	 * @brief Konstruktor, erstellt neue "CRC-Fabrik"
-	 * @param polynomial Generator-Polynom, mit welchem die CRC-Werte berechnet werden sollen.
-	 * @param initialValue Initialwert den der CRC-Wert hat, noch bevor irgendeine Brechung durchgeführt wurde. Falls nicht gesetzt, wird dieser Wert "0x00000000".
-	 */
-	explicit CRC(uint32_t polynomial, uint32_t initialValue = 0x00000000);
 
 	/**
 	 * @brief Berechnet 32-Bit CRC-Wert über gegebene Daten.
@@ -44,6 +38,6 @@ public:
 	[[nodiscard]] bool validateCRC(const std::vector<uint8_t> &data, uint32_t receivedCRC) const;
 
 private:
-	uint32_t polynomial;
-	uint32_t initialValue;
+	uint32_t polynomial = 0x04c11db7;
+	uint32_t initialValue = 0xffffffff;
 };
