@@ -68,4 +68,6 @@ public:
 	 * @return True if the close command was received, false otherwise.
 	 */
 	[[nodiscard]] bool isCloseCmdReceived() const;
+
+    void connect();
 };

@@ -48,3 +48,8 @@ std::vector<uint8_t> ControlPanel::createControlBlock(uint8_t flags, uint32_t pa
 
     return data;
 }
+
+void ControlPanel::connect()
+{
+    connected = true;
+}
