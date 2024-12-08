@@ -88,7 +88,7 @@ void ComManager::connect()
 
 void ComManager::receiveData()
 {
-	decoder.addObserver(&observer);
+	decoder.addObserver(this);
 
 	while (cp.isConnected() || !cp.isCloseCmdReceived())
 	{
@@ -109,11 +109,11 @@ void ComManager::processIncomingQueue()
 		if (!cp.isConnected() && cp.isCloseCmdReceived())
 			return;
 
-		if (observer.incomingQueue.empty())
+		if (incomingQueue.empty())
 			continue;
 
 		std::pair<BlockType, std::vector<uint8_t>> packet;
-		observer.incomingQueue.wait_and_pop(packet);
+		incomingQueue.wait_and_pop(packet);
 
 		uint32_t id = (packet.second[0] << 8) | packet.second[1];
 		std::vector<uint8_t> data(packet.second.begin() + 2, packet.second.end() - 4);
@@ -138,7 +138,7 @@ void ComManager::processIncomingQueue()
 			{
 				response = cp.createControlBlock(Flags::RESEND, id);
 			}
-			outgoingResponseQueue.push(response);
+			outgoingControlQueue.push(response);
 		}
 		else
 		{
@@ -163,14 +163,14 @@ void ComManager::processOutgoingQueue()
 		if (!cp.isConnected())
 			continue;
 
-		if (!outgoingResponseQueue.empty())
+		if (!outgoingControlQueue.empty())
 		{
 			if (sendResponseThread.joinable())
 			{
 				sendResponseThread.join();
 			}
 			std::vector<uint8_t> response;
-			outgoingResponseQueue.wait_and_pop(response);
+			outgoingControlQueue.wait_and_pop(response);
 			sendResponseThread = std::thread(&ComManager::sendResponse, this, std::ref(response));
 		}
 
@@ -265,4 +265,19 @@ std::vector<uint8_t> ComManager::transfer2Way(std::vector<uint8_t> inputData)
 
 	Logger(DEBUG) << "Queues stopped.";
 	return outputData;
+}
+
+void ComManager::beginBlockReceived(const BlockType &blockType)
+{
+	if (!cp.isConnected() && cp.isCloseCmdReceived())
+	{
+		cp.connect();
+	}
+}
+
+void ComManager::endBlockReceived(const BlockType &blockType, const std::vector<uint8_t> &dataVector)
+{
+	if (dataVector.size() < 7)
+		return;
+	incomingQueue.push(std::make_pair(blockType, dataVector));
 }

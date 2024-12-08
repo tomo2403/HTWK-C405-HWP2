@@ -16,7 +16,6 @@ add_library(lib STATIC lib.cpp lib.hpp
         implementation/ControlPanel.cpp
         implementation/CRC.cpp
         implementation/Decoder.cpp
-        implementation/DecoderObserver.cpp
         implementation/Encoder.cpp
         implementation/Logger.cpp
 )

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "cstdint"
-#include "vector"
-#include "thread"
+#include <cstdint>
+#include <vector>
+#include <thread>
 #include <future>
 
 #include "Logger.hpp"
@@ -10,8 +10,9 @@
 #include "Encoder.hpp"
 #include "Decoder.hpp"
 #include "CRC.hpp"
+#include "ICommunicationInterface.hpp"
 
-class ComManager
+class ComManager : DecoderObserver
 {
 private:
 	mutable std::mutex mtx;
@@ -22,19 +23,20 @@ private:
 	std::thread sendResponseThread;
 	std::thread connectThread;
 
+	std::vector<std::vector<uint8_t>> outgoingData{};
+	ThreadSafeQueue<std::vector<uint8_t>> outgoingControlQueue;
+	ThreadSafeQueue<std::pair<BlockType, std::vector<uint8_t>>> incomingQueue;
+	uint16_t nextPacketId = 0;
+	u_long errors = 0;
+
 	ControlPanel cp;
 	Encoder encoder;
 	Decoder decoder;
 	CRC crc;
 	ICommunicationInterface* com;
-	DecoderObserver observer = DecoderObserver(&cp);
 
 	std::vector<uint8_t> outputData{};
 
-	std::vector<std::vector<uint8_t>> outgoingData{};
-	ThreadSafeQueue<std::vector<uint8_t>> outgoingResponseQueue;
-	uint16_t nextPacketId = 0;
-	u_long errors = 0;
 
 	void sendData(const std::vector<uint8_t> &data);
 
@@ -57,4 +59,8 @@ public:
 	void watchControlPanel();
 
 	std::vector<uint8_t> transfer2Way(std::vector<uint8_t> inputData);
+
+	void beginBlockReceived(const BlockType &blockType) override;
+
+	void endBlockReceived(const BlockType &blockType, const std::vector<uint8_t> &dataVector) override;
 };
