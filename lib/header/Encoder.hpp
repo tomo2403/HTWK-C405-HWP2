@@ -1,60 +1,43 @@
 #pragma once
 
-#include "Codec.hpp"
-#include "BlockType.hpp"
+#include <stack>
 
-class Encoder : public Codec
+#include "Encoder.hpp"
+#include "DataStorage.hpp"
+
+class Encoder
 {
 private:
-	struct Storage
+	struct Task
 	{
-		uint32_t buffer;
-		bool previousNibbleExists;
-		uint8_t previousNibble;
-		int8_t bufferEndBit;
-		std::vector<uint8_t> dataVector;
-		uint32_t dataVectorOffset_Index;
-		bool justEscaped;
+		DataStorage dataStorage;
 		BlockType blockType;
-		bool endBlockWasSent;
+		bool startSequenceSent;
+		bool endSequenceIsInTransmission;
 	};
 
-	std::vector<uint8_t> dataVector;
-	uint32_t dataVectorOffset_Index;
-	bool justEscaped;
-	BlockType blockType;
-	bool endBlockWasSent;
-
-	bool controlBlockIsQueued = false;
-	bool storageHoldsData;
-	Storage storage;
-
-	void initialize();
+	uint8_t escNibbleQueue;
+	uint8_t previousNibble;
 	
-	void insertNibbleIntoBuffer(const uint8_t &nibble, const uint8_t &atBit);
+	std::stack<Task> taskStack;
 
-	void insertByteIntoBuffer(const uint8_t &byte, const uint8_t &atBit);
-
-	uint8_t upcomingNibble();
-
-	void insertStartBlockIntoBuffer();
-
-	void saveCurrentAttributes();
-
-	void restoreSavedAttributes();
-
-	uint8_t upcomingNibbleFromStorage();
-
+	uint8_t determineStartCommand();
+	uint8_t determineEndCommand();
+	uint8_t determinePrevNibbleAgainCommand();
+	uint8_t determineEscSeqAsDataCommand();
+	
 public:
-	Encoder();
+	// Encoder();
 
-	void inputDataBlock(const std::vector<uint8_t> &dataVector);
+	// [[deprecated("Use pushBlock(...) instead")]] void inputDataBlock(const std::vector<uint8_t> &dataVector);
 
-	void interruptWithControlBlock(const std::vector<uint8_t> &controlVector);
+	// [[deprecated("Use pushBlock(...) instead")]] void interruptWithControlBlock(const std::vector<uint8_t> &controlVector);
+
+	void pushBlock(const BlockType &blockType, const std::vector<uint8_t> &data);
+
+	void forcePushBlock(const BlockType &blockType, const std::vector<uint8_t> &data);
 
 	bool hasData();
-
-	uint8_t nextByte();
 
 	uint8_t nextNibble();
 

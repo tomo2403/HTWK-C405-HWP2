@@ -1,244 +1,146 @@
-#include <iostream>
-#include <bitset>
+#include "../lib.hpp"
 
-#include "../header/Encoder.hpp"
-#include "../header/CodecCommand.hpp"
-
-Encoder::Encoder()
+void Encoder::forcePushBlock(const BlockType &blockType, const std::vector<uint8_t> &data)
 {
-	initialize();
-	this->storageHoldsData = false;
-	this->storage = Storage();
+	Task task;
+	task.dataStorage = DataStorage(data);
+	task.blockType = blockType;
+	task.startSequenceSent = false;
+	task.endSequenceIsInTransmission = false;
+	
+	taskStack.push(task);
 }
 
-void Encoder::initialize()
+void Encoder::pushBlock(const BlockType &blockType, const std::vector<uint8_t> &data)
 {
-	Codec::initialize();
-	this->dataVectorOffset_Index = 0;
-	this->justEscaped = false;
-	this->endBlockWasSent = false;
+    if (taskStack.size() >= 2)
+    {
+        throw std::runtime_error("Warning: The Encoder currently has two or more tasks in the stack. Adding more tasks may affect the stability of the transmission. If you still wish to add a task, consider using forcePushBlock() to bypass this check.");
+    }
+	forcePushBlock(blockType, data);
 }
 
-void Encoder::insertStartBlockIntoBuffer()
-{
-	leftShiftNibbleIntoBuffer(CodecCommand::escapeSequence);
-
-	if (blockType == controlBlock && upcomingNibble() != CodecCommand::beginControlBlockDefault)
-	{
-		leftShiftNibbleIntoBuffer(CodecCommand::beginControlBlockDefault);
-	}
-	else if (blockType == controlBlock && upcomingNibble() == CodecCommand::beginControlBlockDefault)
-	{
-		leftShiftNibbleIntoBuffer(CodecCommand::beginControlBlockFallback);
-	}
-	else if (blockType == dataBlock && upcomingNibble() != CodecCommand::beginDataBlockDefault)
-	{
-		leftShiftNibbleIntoBuffer(CodecCommand::beginDataBlockDefault);
-	}
-	else if (blockType == dataBlock && upcomingNibble() == CodecCommand::beginDataBlockDefault)
-	{
-		leftShiftNibbleIntoBuffer(CodecCommand::beginDataBlockFallback);
-	}
-
-	bufferEndBit += 8;
-	justEscaped = true;
-}
-
-void Encoder::inputDataBlock(const std::vector<uint8_t> &dataVector)
-{
-	initialize();
-	this->blockType = dataBlock;
-	this->dataVector = dataVector;
-	insertStartBlockIntoBuffer();
-}
-
-void Encoder::insertNibbleIntoBuffer(const uint8_t &nibble, const uint8_t &atBit)
-{
-	if (atBit > 27)
-	{
-		throw std::out_of_range("The buffer is 32bit in size and the sequence 4bit long.");
-	}
-
-	buffer &= ~(0xF << atBit);
-	buffer |= (static_cast<uint32_t>(nibble & 0x0F) << atBit);
-}
-
-void Encoder::insertByteIntoBuffer(const uint8_t &byte, const uint8_t &atBit)
-{
-	if (atBit > 24)
-	{
-		throw std::out_of_range("The buffer is 32bit in size and the sequence 8bit long.");
-	}
-
-	buffer &= ~(0xFF << atBit);
-	buffer |= (static_cast<uint32_t>(byte) << (atBit));
-}
 
 bool Encoder::hasData()
 {
-	if (dataVectorOffset_Index >= dataVector.size() && bufferEndBit == -1 && !endBlockWasSent && dataVector.size() != 0)
-	{
-		leftShiftNibbleIntoBuffer(escapeSequence);
-		// TODO: Implement Fallback sequence
-		if (storageHoldsData && upcomingNibbleFromStorage() == CodecCommand::endBlockDefault)
-		{
-			leftShiftNibbleIntoBuffer(CodecCommand::endBlockFallback);
-		} 
-		else
-		{
-			leftShiftNibbleIntoBuffer(CodecCommand::endBlockDefault);
-		}
-
-		bufferEndBit += 8;
-		justEscaped = true;
-		endBlockWasSent = true;
-	} else if (dataVectorOffset_Index >= dataVector.size() && bufferEndBit == -1 && endBlockWasSent && storageHoldsData)
-	{
-		restoreSavedAttributes();
-		storageHoldsData = false;
-	}
-
-	return dataVectorOffset_Index < dataVector.size() || bufferEndBit != -1;
-}
-
-uint8_t Encoder::upcomingNibble()
-{
-	if (bufferEndBit < 7 && dataVectorOffset_Index < dataVector.size())
-	{
-		return dataVector.at(dataVectorOffset_Index) >> 4;
-	}
-	else if (bufferEndBit == 3 && dataVectorOffset_Index >= dataVector.size())
-	{
-		return 0x00; // fishy
-	}
-
-	return getNibbleSlice(bufferEndBit - 7);
+	return taskStack.size() > 0;
 }
 
 uint8_t Encoder::nextNibble()
 {
-	if (controlBlockIsQueued && previousNibble != 0)
+	// TODO: Prev Nibble is being set nowhere -> loop!
+
+	if (!hasData())
 	{
-		std::vector<uint8_t> tmp = storage.dataVector;
-		interruptWithControlBlock(tmp);
-		controlBlockIsQueued = false;
+		throw std::out_of_range("The Encoder does not have data.");
 	}
 
-	if (bufferEndBit < 3 && dataVectorOffset_Index < dataVector.size())
+	// The previous edge case required extensive escaping,
+	// the rest of its escape-sequence is being sent here,
+	// before the next data nibble can be precessed.
+	if (escNibbleQueue != 0x00)
 	{
-		leftShiftByteIntoBuffer(dataVector.at(dataVectorOffset_Index++));
-		bufferEndBit += 8;
-	}
-
-	if (currentNibble() == previousNibble && previousNibbleExists)
-	{
-		const uint8_t upcomingNib = upcomingNibble();
-		insertNibbleIntoBuffer(escapeSequence, bufferEndBit-3);
-
-		if (upcomingNib == CodecCommand::insertPrevNibbleAgainDefault)
+		if (taskStack.top().endSequenceIsInTransmission)
 		{
-			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertPrevNibbleAgainFallback, bufferEndBit-3);
+			taskStack.pop();
+		}
+		
+		const uint8_t tmpEscNibbleQueue = escNibbleQueue;
+		escNibbleQueue = 0x00;
+		return tmpEscNibbleQueue & 0x0F;
+	}
+
+	// The current task has no more data.
+	if (taskStack.top().dataStorage.empty())
+	{
+		escNibbleQueue = determineEndCommand();
+		taskStack.top().endSequenceIsInTransmission = true;
+		return CodecCommand::escapeSequence;
+	}
+
+	// The current task has not yet sent a start-seq.
+	if (!taskStack.top().startSequenceSent)
+	{
+		escNibbleQueue = determineStartCommand();
+		taskStack.top().startSequenceSent = true;
+		return CodecCommand::escapeSequence;
+	}
+
+	// Edge-Case: Same nibble back-to-back.
+	if (previousNibble == taskStack.top().dataStorage.peek_nibble())
+	{
+		escNibbleQueue = determinePrevNibbleAgainCommand();
+		return CodecCommand::escapeSequence;
+	}
+
+	// Edge-Case: Esc-Seq appears a regular data nibble.
+	if (previousNibble == CodecCommand::escapeSequence)
+	{
+		return determineEscSeqAsDataCommand();
+	}
+
+	// Default-Case
+	return taskStack.top().dataStorage.pop_nibble();
+}
+
+uint8_t Encoder::determineStartCommand()
+{
+	if (taskStack.top().blockType == BlockType::dataBlock)
+	{
+		if (taskStack.top().dataStorage.peek_nibble() == CodecCommand::beginDataBlockDefault)
+		{
+			return CodecCommand::beginDataBlockFallback;
 		}
 		else
 		{
-			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertPrevNibbleAgainDefault, bufferEndBit-3);
+			return CodecCommand::beginControlBlockDefault;
 		}
-		justEscaped = true;
-	}
-
-	if (currentNibble() == escapeSequence && !justEscaped)
-	{
-		if (upcomingNibble() == CodecCommand::insertEscSeqAsDataDefault)
-		{
-			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataFallback, bufferEndBit-3);
-		}
-		else
-		{
-			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataDefault, bufferEndBit-3);
-		}
-	}
-
-	justEscaped = false;
-	const uint8_t currentNib = currentNibble();
-	bufferEndBit -= 4;
-	previousNibble = currentNib;
-	previousNibbleExists = true;
-	return currentNib;
-}
-
-uint8_t Encoder::nextByte()
-{
-	uint8_t byte = 0x00;
-	byte = (byte | nextNibble()) << 4;
-	byte |= nextNibble();
-
-	return byte;
-}
-
-std::vector<uint8_t> Encoder::encodeAll()
-{
-	std::vector<uint8_t> encodedData{};
-	while (hasData())
-	{
-		encodedData.push_back(nextByte());
-	}
-	return encodedData;
-}
-
-void Encoder::interruptWithControlBlock(const std::vector<uint8_t> &controlVector)
-{
-	if (previousNibble == 0x00 && previousNibbleExists)
-	{
-		this->storage.dataVector = controlVector;
-		controlBlockIsQueued = true;
 	}
 	else
 	{
-		saveCurrentAttributes();
-		initialize();
-		this->blockType = controlBlock;
-		this->dataVector = controlVector;
-		this->storageHoldsData = true;
-		insertStartBlockIntoBuffer();
+		if (taskStack.top().dataStorage.peek_nibble() == CodecCommand::beginControlBlockDefault)
+		{
+			return CodecCommand::beginControlBlockFallback;
+		}
+		else
+		{
+			return CodecCommand::beginControlBlockDefault;
+		}
 	}
 }
 
-void Encoder::saveCurrentAttributes()
+uint8_t Encoder::determineEndCommand()
 {
-	this->storage.buffer = this->buffer;
-	this->storage.previousNibbleExists = this->previousNibbleExists;
-	this->storage.previousNibble = this->previousNibble;
-	this->storage.bufferEndBit = this->bufferEndBit;
-	this->storage.dataVector = this->dataVector;
-	this->storage.dataVectorOffset_Index = this->dataVectorOffset_Index;
-	this->storage.justEscaped = this->justEscaped;
-	this->storage.blockType = this->blockType;
-	this->storage.endBlockWasSent = this->endBlockWasSent;
-}
-
-void Encoder::restoreSavedAttributes()
-{
-    this->buffer = this->storage.buffer;
-    this->previousNibbleExists = this->storage.previousNibbleExists;
-    this->previousNibble = this->storage.previousNibble;
-    this->bufferEndBit = this->storage.bufferEndBit;
-    this->dataVector = this->storage.dataVector;
-    this->dataVectorOffset_Index = this->storage.dataVectorOffset_Index;
-    this->justEscaped = this->storage.justEscaped;
-    this->blockType = this->storage.blockType;
-    this->endBlockWasSent = this->storage.endBlockWasSent;
-}
-
-uint8_t Encoder::upcomingNibbleFromStorage()
-{
-	if (storage.bufferEndBit >= 3)
+	if (taskStack.top().dataStorage.peek_nibble() == CodecCommand::endBlockDefault)
 	{
-		return (storage.buffer >> storage.bufferEndBit-3) & 0x0F;
+		return CodecCommand::endBlockFallback;
 	}
-	else if (storage.dataVector.size() > storage.dataVectorOffset_Index)
+	else
 	{
-		return storage.dataVector.at(storage.dataVectorOffset_Index) >> 4;
+		return CodecCommand::endBlockDefault;
 	}
+}
 
-	return 0x00; // fishy
+uint8_t Encoder::determinePrevNibbleAgainCommand()
+{
+	if (taskStack.top().dataStorage.peek_nibble() == CodecCommand::insertPrevNibbleAgainDefault)
+	{
+		return CodecCommand::insertPrevNibbleAgainFallback;
+	}
+	else
+	{
+		return CodecCommand::insertPrevNibbleAgainDefault;
+	}
+}
+
+uint8_t Encoder::determineEscSeqAsDataCommand()
+{
+	if (taskStack.top().dataStorage.peek_nibble() == CodecCommand::insertEscSeqAsDataDefault)
+	{
+		return CodecCommand::insertEscSeqAsDataFallback;
+	}
+	else
+	{
+		return CodecCommand::insertEscSeqAsDataDefault;
+	}
 }
