@@ -11,9 +11,7 @@ private:
     bool nextNibbleIsHighNibble;
     
 public:
-    // TODO: Remove default constructor.
-    DataStorage();
-    DataStorage(const std::vector<uint8_t> dataVector_byte);
+    DataStorage(const std::vector<uint8_t> &dataVector_byte);
 
     uint8_t peek_nibble();
     uint8_t pop_nibble();

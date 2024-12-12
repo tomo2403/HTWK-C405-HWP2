@@ -1,20 +1,21 @@
 #include "../lib.hpp"
 
+Encoder::Task::Task(const BlockType &blockType, const std::vector<uint8_t>& dataVector_byte)
+    : dataStorage(DataStorage(dataVector_byte)),
+      blockType(blockType),
+      startSequenceSent(false)
+{}
+
 void Encoder::forcePushBlock(const BlockType &blockType, const std::vector<uint8_t> &data)
 {
-	Task task;
-	task.dataStorage = DataStorage(data);
-	task.blockType = blockType;
-	task.startSequenceSent = false;
-	
-	taskStack.push(task);
+	taskStack.push(Task(blockType, data));
 }
 
 void Encoder::pushBlock(const BlockType &blockType, const std::vector<uint8_t> &data)
 {
     if (taskStack.size() >= 2)
     {
-        throw std::runtime_error("Warning: The Encoder currently has two or more tasks in the stack. Adding more tasks may affect the stability of the transmission. If you still wish to add a task, consider using forcePushBlock() to bypass this check.");
+        throw std::runtime_error("Encoder: WARNING - The Encoder currently has two or more tasks in the stack. Adding more tasks may affect the stability of the transmission. If you still wish to add a task, use forcePushBlock(...) to bypass this check.");
     }
 	forcePushBlock(blockType, data);
 }
@@ -29,7 +30,7 @@ uint8_t Encoder::nextNibble()
 {
 	if (!hasData())
 	{
-		throw std::out_of_range("The Encoder does not have data.");
+		throw std::out_of_range("Encoder: No data to encode.");
 	}
 
 	uint8_t nibbleToReturn = 0x00;
@@ -49,14 +50,14 @@ uint8_t Encoder::nextNibble()
 		escNibbleQueue = determineEndCommand();
 		nibbleToReturn = CodecCommand::escapeSequence;
 	}
-	// The current task has not yet sent a start-seq.
+	// The current task has not yet sent a start-sequence.
 	else if (!taskStack.top().startSequenceSent)
 	{
 		escNibbleQueue = determineStartCommand();
 		taskStack.top().startSequenceSent = true;
 		nibbleToReturn = CodecCommand::escapeSequence;
 	}
-	// Edge-Case: Same nibble back-to-back.
+	// Edge-Case: Same nibble in succession.
 	else if (previousNibble == taskStack.top().dataStorage.peek_nibble())
 	{
 		escNibbleQueue = determinePrevNibbleAgainCommand();
@@ -143,4 +144,18 @@ uint8_t Encoder::determineEscSeqAsDataCommand()
 	{
 		return CodecCommand::insertEscSeqAsDataDefault;
 	}
+}
+
+// ==============================================================================================
+// DEPRECATED methods DEPRECATED methods DEPRECATED methods DEPRECATED methods DEPRECATED methods 
+// ==============================================================================================
+
+void Encoder::inputDataBlock(const std::vector<uint8_t> &dataVector)
+{
+	pushBlock(BlockType::dataBlock, dataVector);
+}
+
+void Encoder::interruptWithControlBlock(const std::vector<uint8_t> &controlVector)
+{
+	pushBlock(BlockType::controlBlock, controlVector);
 }

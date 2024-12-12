@@ -13,6 +13,8 @@ private:
 		DataStorage dataStorage;
 		BlockType blockType;
 		bool startSequenceSent;
+
+		Task(const BlockType &blockType, const std::vector<uint8_t> &dataVector_byte);
 	};
 
 	uint8_t escNibbleQueue;
@@ -26,10 +28,6 @@ private:
 	uint8_t determineEscSeqAsDataCommand();
 	
 public:
-	// [[deprecated("Use pushBlock(...) instead")]] void inputDataBlock(const std::vector<uint8_t> &dataVector);
-
-	// [[deprecated("Use pushBlock(...) instead")]] void interruptWithControlBlock(const std::vector<uint8_t> &controlVector);
-
 	void pushBlock(const BlockType &blockType, const std::vector<uint8_t> &data);
 
 	void forcePushBlock(const BlockType &blockType, const std::vector<uint8_t> &data);
@@ -38,5 +36,7 @@ public:
 
 	uint8_t nextNibble();
 
-	std::vector<uint8_t> encodeAll();
+	[[deprecated("Use pushBlock(...) instead")]] void inputDataBlock(const std::vector<uint8_t> &dataVector);
+
+	[[deprecated("Use pushBlock(...) instead")]] void interruptWithControlBlock(const std::vector<uint8_t> &controlVector);
 };

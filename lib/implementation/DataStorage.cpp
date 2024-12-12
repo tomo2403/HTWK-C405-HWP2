@@ -2,17 +2,12 @@
 
 #include <stdexcept>
 
-DataStorage::DataStorage()
-{
-
-}
-
-DataStorage::DataStorage(std::vector<uint8_t> dataVector_byte)
+DataStorage::DataStorage(const std::vector<uint8_t> &dataVector_byte)
     : dataVector_byte(dataVector_byte)
 {
     if(dataVector_byte.empty())
     {
-        throw std::invalid_argument("The provided vector must not be empty.");
+        throw std::invalid_argument("DataStorage: The provided vector must not be empty.");
     }
     
 
@@ -24,7 +19,7 @@ uint8_t DataStorage::peek_nibble()
 {
     if(empty())
     {
-        throw std::out_of_range("Attempted to access an element from empty storage.");
+        throw std::out_of_range("DataStorage: Attempted to access an element from empty storage.");
     }
 
     if (nextNibbleIsHighNibble)
