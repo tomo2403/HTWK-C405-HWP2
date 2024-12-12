@@ -6,7 +6,6 @@ void Encoder::forcePushBlock(const BlockType &blockType, const std::vector<uint8
 	task.dataStorage = DataStorage(data);
 	task.blockType = blockType;
 	task.startSequenceSent = false;
-	task.endSequenceIsInTransmission = false;
 	
 	taskStack.push(task);
 }
@@ -23,64 +22,60 @@ void Encoder::pushBlock(const BlockType &blockType, const std::vector<uint8_t> &
 
 bool Encoder::hasData()
 {
-	return taskStack.size() > 0;
+	return taskStack.size() > 0 || escNibbleQueue != 0x00;
 }
 
 uint8_t Encoder::nextNibble()
 {
-	// TODO: Prev Nibble is being set nowhere -> loop!
-
 	if (!hasData())
 	{
 		throw std::out_of_range("The Encoder does not have data.");
 	}
 
+	uint8_t nibbleToReturn = 0x00;
+
 	// The previous edge case required extensive escaping,
 	// the rest of its escape-sequence is being sent here,
 	// before the next data nibble can be precessed.
 	if (escNibbleQueue != 0x00)
-	{
-		if (taskStack.top().endSequenceIsInTransmission)
-		{
-			taskStack.pop();
-		}
-		
-		const uint8_t tmpEscNibbleQueue = escNibbleQueue;
+	{	
+		nibbleToReturn = escNibbleQueue & 0x0F;
 		escNibbleQueue = 0x00;
-		return tmpEscNibbleQueue & 0x0F;
 	}
-
 	// The current task has no more data.
-	if (taskStack.top().dataStorage.empty())
+	else if (taskStack.top().dataStorage.empty())
 	{
+		taskStack.pop();
 		escNibbleQueue = determineEndCommand();
-		taskStack.top().endSequenceIsInTransmission = true;
-		return CodecCommand::escapeSequence;
+		nibbleToReturn = CodecCommand::escapeSequence;
 	}
-
 	// The current task has not yet sent a start-seq.
-	if (!taskStack.top().startSequenceSent)
+	else if (!taskStack.top().startSequenceSent)
 	{
 		escNibbleQueue = determineStartCommand();
 		taskStack.top().startSequenceSent = true;
-		return CodecCommand::escapeSequence;
+		nibbleToReturn = CodecCommand::escapeSequence;
 	}
-
 	// Edge-Case: Same nibble back-to-back.
-	if (previousNibble == taskStack.top().dataStorage.peek_nibble())
+	else if (previousNibble == taskStack.top().dataStorage.peek_nibble())
 	{
 		escNibbleQueue = determinePrevNibbleAgainCommand();
-		return CodecCommand::escapeSequence;
+		nibbleToReturn = CodecCommand::escapeSequence;
 	}
-
 	// Edge-Case: Esc-Seq appears a regular data nibble.
-	if (previousNibble == CodecCommand::escapeSequence)
+	else if (previousNibble == CodecCommand::escapeSequence)
 	{
-		return determineEscSeqAsDataCommand();
+		nibbleToReturn = determineEscSeqAsDataCommand();
+	}
+	// Default-Case
+	else
+	{
+		nibbleToReturn = taskStack.top().dataStorage.pop_nibble();
 	}
 
-	// Default-Case
-	return taskStack.top().dataStorage.pop_nibble();
+	previousNibble = nibbleToReturn;
+	return nibbleToReturn;
+	
 }
 
 uint8_t Encoder::determineStartCommand()
@@ -111,9 +106,14 @@ uint8_t Encoder::determineStartCommand()
 
 uint8_t Encoder::determineEndCommand()
 {
-	if (taskStack.top().dataStorage.peek_nibble() == CodecCommand::endBlockDefault)
+	if (taskStack.size() == 0)
 	{
-		return CodecCommand::endBlockFallback;
+		return CodecCommand::endBlockDefault; 
+	}
+
+	else if (taskStack.top().dataStorage.empty() || taskStack.top().dataStorage.peek_nibble() != CodecCommand::endBlockDefault)
+	{
+		return CodecCommand::endBlockDefault;
 	}
 	else
 	{

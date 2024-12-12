@@ -33,7 +33,7 @@ uint8_t DataStorage::peek_nibble()
     }
     else
     {
-        return dataVector_byte.at(dataVectorOffset) && 0x0F;
+        return dataVector_byte.at(dataVectorOffset) & 0x0F;
     }
 }
 
@@ -53,7 +53,7 @@ uint8_t DataStorage::pop_nibble()
 
 bool DataStorage::empty()
 {
-    if(dataVectorOffset > dataVector_byte.size())
+    if(dataVectorOffset >= dataVector_byte.size())
     {
         return true;
     }

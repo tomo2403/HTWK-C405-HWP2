@@ -13,7 +13,6 @@ private:
 		DataStorage dataStorage;
 		BlockType blockType;
 		bool startSequenceSent;
-		bool endSequenceIsInTransmission;
 	};
 
 	uint8_t escNibbleQueue;
@@ -27,8 +26,6 @@ private:
 	uint8_t determineEscSeqAsDataCommand();
 	
 public:
-	// Encoder();
-
 	// [[deprecated("Use pushBlock(...) instead")]] void inputDataBlock(const std::vector<uint8_t> &dataVector);
 
 	// [[deprecated("Use pushBlock(...) instead")]] void interruptWithControlBlock(const std::vector<uint8_t> &controlVector);
