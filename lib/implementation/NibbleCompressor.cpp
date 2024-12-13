@@ -1,5 +1,7 @@
 #include "../header/NibbleCompressor.hpp"
 
+#include <stdexcept>
+
 NibbleCompressor::NibbleCompressor(const size_t &size)
     : buffer(0x00), nextNibbleIsHighNibble(true), dataVector_byte(std::vector<uint8_t>())
 {
