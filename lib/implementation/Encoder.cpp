@@ -65,6 +65,7 @@ uint8_t Encoder::nextNibble()
 	// Edge-Case: Same nibble in succession.
 	else if (previousNibble == taskStack.top().dataStorage.peek_nibble())
 	{
+		taskStack.top().dataStorage.pop_nibble();
 		escNibbleQueue = determinePrevNibbleAgainCommand();
 		nibbleToReturn = CodecCommand::escapeSequence;
 	}
@@ -111,7 +112,6 @@ uint8_t Encoder::determineEndCommand()
 	{
 		return CodecCommand::endBlockDefault; 
 	}
-
 	else if (taskStack.top().dataStorage.empty() || taskStack.top().dataStorage.peek_nibble() != CodecCommand::endBlockDefault)
 	{
 		return CodecCommand::endBlockDefault;
@@ -124,7 +124,11 @@ uint8_t Encoder::determineEndCommand()
 
 uint8_t Encoder::determinePrevNibbleAgainCommand()
 {
-	if (taskStack.top().dataStorage.peek_nibble() == CodecCommand::insertPrevNibbleAgainDefault)
+	if (taskStack.top().dataStorage.empty())
+	{
+		return CodecCommand::insertPrevNibbleAgainDefault;
+	}
+	else if (taskStack.top().dataStorage.peek_nibble() == CodecCommand::insertPrevNibbleAgainDefault)
 	{
 		return CodecCommand::insertPrevNibbleAgainFallback;
 	}
