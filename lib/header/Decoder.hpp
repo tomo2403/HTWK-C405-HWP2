@@ -3,48 +3,23 @@
 #include "Codec.hpp"
 #include "IDecoderObserver.hpp"
 
-class Decoder : public Codec
+class Decoder
 {
 private:
-	struct Storage
+	struct Task
 	{
-		uint32_t buffer;
-		bool previousNibbleExists;
-		uint8_t previousNibble;
-		int8_t bufferEndBit;
-		bool EscapedModeIsActive;
-		uint8_t dataVectorBuffer;
-		uint8_t dataVectorBufferShiftCount;
-		std::vector<uint8_t> dataVector;
-		BlockType currentBlockType;
+		NibbleCompressor nibbleCompressor;
+		BlockType blockType;
+
+		// Task(const BlockType &blockType);
 	};
 
-	bool EscapedModeIsActive;
-	bool dataVectorIsLocked = true;
-
-	uint8_t dataVectorBuffer;
-	uint8_t dataVectorBufferShiftCount;
-
-	std::vector<uint8_t> dataVector;
-
+	// How is Data without propper start-Sequence treated?
+	
+	bool escapeModeActive;
 	std::vector<IDecoderObserver *> observers;
 
-	BlockType currentBlockType;
-
-	bool storageHoldsData = false;
-	Storage storage = Storage();
-
-	void processCommand(const uint8_t &command);
-
-	void writeToDataVector(const uint8_t &nibble);
-
-	void flushBufferIntoDataVector();
-
-	void initialize();
-
-	void saveCurrentAttributes();
-
-	void restoreSavedAttributes();
+	std::stack<Task> taskStack;
 
 public:
 	Decoder();
