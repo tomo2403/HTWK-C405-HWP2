@@ -12,13 +12,13 @@ void ComInterface::closeCom()
 
 void ComInterface::writeByte(uint8_t data)
 {
-	std::lock_guard<std::mutex> lock(drvMutex);
+	std::lock_guard lock(drvMutex);
 	drv.setRegister(&PORTA, data);
 }
 
 void ComInterface::readByte(uint8_t &data)
 {
-	std::lock_guard<std::mutex> lock(drvMutex);
+	std::lock_guard lock(drvMutex);
 	data = drv.getRegister(&PINA) >> 4;
 }
 

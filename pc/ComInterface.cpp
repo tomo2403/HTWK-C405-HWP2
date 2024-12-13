@@ -3,7 +3,7 @@
 void ComInterface::openCom()
 {
 	Logger(DEBUG) << "Opening interface port...";
-	const char *portName = SERIAL_PORT;
+	const auto portName = SERIAL_PORT;
 	serialPort = open(portName, O_RDWR | O_NOCTTY | O_NDELAY);
 
 	if (serialPort < 0)
@@ -53,7 +53,7 @@ void ComInterface::closeCom()
 	close(serialPort);
 }
 
-void ComInterface::writeByte(uint8_t data)
+void ComInterface::writeByte(const uint8_t data)
 {
 	ssize_t n = write(serialPort, &data, sizeof(data));
 	if (n < 0)

@@ -4,8 +4,8 @@
 
 using namespace ioManager;
 
-ComInterface interface = ComInterface();
-ComManager comManager = ComManager(&interface);
+auto interface = ComInterface();
+auto comManager = ComManager(&interface);
 
 int main()
 {

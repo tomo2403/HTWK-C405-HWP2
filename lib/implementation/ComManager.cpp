@@ -12,7 +12,7 @@ void ComManager::sendData(const std::vector<uint8_t> &data)
 	encoder.inputDataBlock(data);
 	while (encoder.hasData())
 	{
-		std::unique_lock<std::mutex> lock(mtx);
+		std::unique_lock lock(mtx);
 		while (responsePending)
 		{
 			cv.wait(lock);
@@ -25,7 +25,7 @@ void ComManager::sendData(const std::vector<uint8_t> &data)
 void ComManager::sendResponse(const std::vector<uint8_t> &data)
 {
 	{
-		std::lock_guard<std::mutex> lock(mtx);
+		std::lock_guard lock(mtx);
 		responsePending = true;
 	}
 
@@ -36,7 +36,7 @@ void ComManager::sendResponse(const std::vector<uint8_t> &data)
 	}
 
 	{
-		std::lock_guard<std::mutex> lock(mtx);
+		std::lock_guard lock(mtx);
 		responsePending = false;
 	}
 	cv.notify_all();
@@ -50,12 +50,12 @@ void ComManager::prepareOutgoingQueue(std::vector<uint8_t> inputData)
 	uint16_t i = 0;
 	while (!inputData.empty())
 	{
-		std::vector<uint8_t> data = {static_cast<uint8_t>(i >> 8), static_cast<uint8_t>(i++)};
+		std::vector data = {static_cast<uint8_t>(i >> 8), static_cast<uint8_t>(i++)};
 
-		size_t bytesToSend = std::min(static_cast<size_t>(64), inputData.size());
+		const size_t bytesToSend = std::min(static_cast<size_t>(64), inputData.size());
 		data.insert(data.end(), inputData.begin(), inputData.begin() + bytesToSend);
 
-		uint32_t crcValue = crc.calculateCRC(data);
+		const uint32_t crcValue = crc.calculateCRC(data);
 		data.push_back(crcValue >> 24);
 		data.push_back((crcValue >> 16) & 0xFF);
 		data.push_back((crcValue >> 8) & 0xFF);
@@ -69,9 +69,9 @@ void ComManager::prepareOutgoingQueue(std::vector<uint8_t> inputData)
 
 void ComManager::connect()
 {
-	auto start = std::chrono::steady_clock::now();
+	const auto start = std::chrono::steady_clock::now();
 	Logger(INFO) << "Connecting...";
-	std::vector<uint8_t> data = cp.createControlBlock(Flags::CONNECT, 0);
+	std::vector<uint8_t> data = cp.createControlBlock(CONNECT, 0);
 	crc.attachCRC(data);
 	while (!cp.isConnected())
 	{
@@ -92,7 +92,7 @@ void ComManager::receiveData()
 
 	while (cp.isConnected() || !cp.isCloseCmdReceived())
 	{
-		std::lock_guard<std::mutex> lock(mtx);
+		std::lock_guard lock(mtx);
 		if (!com->isDataAvailable())
 			continue;
 
@@ -115,28 +115,28 @@ void ComManager::processIncomingQueue()
 		std::pair<BlockType, std::vector<uint8_t>> packet;
 		incomingQueue.wait_and_pop(packet);
 
-		uint32_t id = (packet.second[0] << 8) | packet.second[1];
-		std::vector<uint8_t> data(packet.second.begin() + 2, packet.second.end() - 4);
-		uint32_t receivedCrc = (packet.second[packet.second.size() - 4] << 24) | (packet.second[packet.second.size() - 3] << 16) |
+		const uint32_t id = (packet.second[0] << 8) | packet.second[1];
+		std::vector data(packet.second.begin() + 2, packet.second.end() - 4);
+		const uint32_t receivedCrc = (packet.second[packet.second.size() - 4] << 24) | (packet.second[packet.second.size() - 3] << 16) |
 							   (packet.second[packet.second.size() - 2] << 8) | packet.second[packet.second.size() - 1];
-		bool valid = crc.validateCRC({packet.second.begin(), packet.second.end() - 4}, receivedCrc);
+		const bool valid = crc.validateCRC({packet.second.begin(), packet.second.end() - 4}, receivedCrc);
 
-		if (packet.first == BlockType::controlBlock)
+		if (packet.first == controlBlock)
 		{
 			if (valid)
 				cp.processControlBlock(packet.second[2], id);
 		}
-		else if (packet.first == BlockType::dataBlock)
+		else if (packet.first == dataBlock)
 		{
 			std::vector<uint8_t> response;
 			if (valid)
 			{
 				outputData.insert(outputData.end(), data.begin(), data.end());
-				response = cp.createControlBlock(Flags::RECEIVED, id);
+				response = cp.createControlBlock(RECEIVED, id);
 			}
 			else
 			{
-				response = cp.createControlBlock(Flags::RESEND, id);
+				response = cp.createControlBlock(RESEND, id);
 			}
 			outgoingControlQueue.push(response);
 		}
@@ -150,7 +150,7 @@ void ComManager::processIncomingQueue()
 void ComManager::processOutgoingQueue()
 {
 	std::promise<void> sendDataPromise;
-	std::future<void> sendDataFuture = sendDataPromise.get_future();
+	const std::future<void> sendDataFuture = sendDataPromise.get_future();
 
 	std::promise<void> sendResponsePromise;
 	std::future<void> sendResponseFuture = sendResponsePromise.get_future();
@@ -186,19 +186,20 @@ void ComManager::processOutgoingQueue()
 			}
 			sendDataThread = std::thread(&ComManager::sendData, this, std::ref(packet));
 
-			std::unique_lock<std::mutex> lock(mtx);
+			std::unique_lock lock(mtx);
 			if (cv.wait_for(lock, std::chrono::seconds(10), [this]{ return !cp.responses.empty(); }))
 			{
 				// Received a response within the timeout
 				std::pair<uint16_t, Flags> response;
 				cp.responses.wait_and_pop(response);
 
-				if (response.second == Flags::RECEIVED)
+				if (response.second == RECEIVED)
 				{
 					// Continue with the next packet
 					continue;
 				}
-				else if (response.second == Flags::RESEND)
+
+				if (response.second == RESEND)
 				{
 					errors++;
 					nextPacketId = response.first;
@@ -212,7 +213,7 @@ void ComManager::processOutgoingQueue()
 		}
 		else
 		{
-			std::vector<uint8_t> data = cp.createControlBlock(Flags::TRANSFER_FINISHED, 0);
+			std::vector<uint8_t> data = cp.createControlBlock(TRANSFER_FINISHED, 0);
 			crc.attachCRC(data);
 			if (sendResponseThread.joinable())
 			{
@@ -223,11 +224,11 @@ void ComManager::processOutgoingQueue()
 	}
 }
 
-void ComManager::watchControlPanel()
+void ComManager::watchControlPanel() const
 {
 	while(!cp.isConnected()){}
 
-	auto start = std::chrono::steady_clock::now();
+	const auto start = std::chrono::steady_clock::now();
 	Logger(DEBUG) << "Watching control panel...";
 	while (true)
 	{

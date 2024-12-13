@@ -5,6 +5,8 @@
 class ICommunicationInterface
 {
 public:
+	virtual ~ICommunicationInterface() = default;
+
 	[[nodiscard]] virtual bool isDataAvailable() = 0;
 
 	virtual void writeByte(uint8_t data) = 0;

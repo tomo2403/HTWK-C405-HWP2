@@ -5,6 +5,9 @@
 
 class DecoderObserver
 {
+protected:
+	~DecoderObserver() = default;
+
 public:
 	virtual void beginBlockReceived(const BlockType &blockType) = 0;
 

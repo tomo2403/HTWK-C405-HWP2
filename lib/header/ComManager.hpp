@@ -12,7 +12,7 @@
 #include "CRC.hpp"
 #include "ICommunicationInterface.hpp"
 
-class ComManager : DecoderObserver
+class ComManager final : DecoderObserver
 {
 private:
 	mutable std::mutex mtx;
@@ -56,7 +56,7 @@ public:
 
 	void processOutgoingQueue();
 
-	void watchControlPanel();
+	void watchControlPanel() const;
 
 	std::vector<uint8_t> transfer2Way(std::vector<uint8_t> inputData);
 

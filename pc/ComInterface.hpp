@@ -15,7 +15,7 @@
 
 #define SERIAL_PORT "/dev/cu.usbserial-140"
 
-class ComInterface : public ICommunicationInterface
+class ComInterface final : public ICommunicationInterface
 {
 private:
 	int serialPort{}; /**< The file descriptor for the interface port. */
