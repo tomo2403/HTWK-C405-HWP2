@@ -21,7 +21,6 @@ private:
 	bool responsePending = false;
 
 	std::thread sendDataThread;
-	std::thread sendResponseThread;
 	std::thread connectThread;
 
 	std::vector<std::vector<uint8_t> > outgoingData{};
@@ -39,9 +38,7 @@ private:
 	std::vector<uint8_t> outputData{};
 
 
-	void sendData(const std::vector<uint8_t> &data);
-
-	void sendResponse(const std::vector<uint8_t> &data);
+	void sendData();
 
 public:
 	explicit ComManager(ICommunicationInterface *com);

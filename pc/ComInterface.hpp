@@ -13,7 +13,7 @@
 #include "../lib/header/Logger.hpp"
 #include "../lib/header/ICommunicationInterface.hpp"
 
-#define SERIAL_PORT "/dev/cu.usbserial-140"
+
 
 class ComInterface final : public ICommunicationInterface
 {

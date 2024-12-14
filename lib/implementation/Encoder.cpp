@@ -25,7 +25,7 @@ void Encoder::pushBlock(const BlockType &blockType, const std::vector<uint8_t> &
 }
 
 
-bool Encoder::hasData() const
+bool Encoder::hasData()
 {
 	std::lock_guard lock(mtx);
 	return !taskStack.empty() || escNibbleQueue != 0x00;

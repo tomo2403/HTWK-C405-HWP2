@@ -12,7 +12,7 @@ void ComInterface::openCom()
 		exit(1);
 	}
 
-	struct termios tty{};
+	termios tty{};
 	memset(&tty, 0, sizeof(tty));
 
 	if (tcgetattr(serialPort, &tty) != 0)
@@ -55,8 +55,7 @@ void ComInterface::closeCom()
 
 void ComInterface::writeByte(const uint8_t data)
 {
-	ssize_t n = write(serialPort, &data, sizeof(data));
-	if (n < 0)
+	if (const ssize_t n = write(serialPort, &data, sizeof(data)); n < 0)
 	{
 		throw std::runtime_error("Error writing to interface port!");
 	}
@@ -65,8 +64,7 @@ void ComInterface::writeByte(const uint8_t data)
 
 void ComInterface::readByte(uint8_t &data)
 {
-	ssize_t m = read(serialPort, &data, sizeof(data));
-	if (m < 0)
+	if (const ssize_t m = read(serialPort, &data, sizeof(data)); m < 0)
 	{
 		throw std::runtime_error("Error reading from interface port!");
 	}

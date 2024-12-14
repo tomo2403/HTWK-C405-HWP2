@@ -37,7 +37,7 @@ public:
 
 	void forcePushBlock(const BlockType &blockType, const std::vector<uint8_t> &data);
 
-	[[nodiscard]] bool hasData() const;
+	[[nodiscard]] bool hasData();
 
 	uint8_t nextNibble();
 

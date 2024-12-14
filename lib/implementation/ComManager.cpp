@@ -6,39 +6,13 @@ ComManager::ComManager(ICommunicationInterface *com) : com(com)
 {
 }
 
-void ComManager::sendData(const std::vector<uint8_t> &data)
+void ComManager::sendData()
 {
-	encoder.inputDataBlock(data);
-	while (encoder.hasData())
+	while (!cp.isCloseCmdReceived() || !cp.isConnected())
 	{
-		std::unique_lock lock(mtx);
-		while (responsePending)
-		{
-			cv.wait(lock);
-		}
-
-		com->writeByte(encoder.nextNibble());
+		if (encoder.hasData())
+			com->writeByte(encoder.nextNibble());
 	}
-}
-
-void ComManager::sendResponse(const std::vector<uint8_t> &data)
-{
-	{
-		std::lock_guard lock(mtx);
-		responsePending = true;
-	}
-
-	encoder.interruptWithControlBlock(data);
-	while (encoder.hasData())
-	{
-		com->writeByte(encoder.nextNibble());
-	}
-
-	{
-		std::lock_guard lock(mtx);
-		responsePending = false;
-	}
-	cv.notify_all();
 }
 
 void ComManager::prepareOutgoingQueue(std::vector<uint8_t> inputData)
@@ -74,8 +48,8 @@ void ComManager::connect()
 	crc.attachCRC(data);
 	while (!cp.isConnected())
 	{
-		std::thread sendThread(&ComManager::sendData, this, std::ref(data));
-		sendThread.join();
+		encoder.pushBlock(controlBlock, data);
+		while (encoder.hasData()) {}
 
 		auto now = std::chrono::steady_clock::now();
 		auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
@@ -89,7 +63,7 @@ void ComManager::receiveData()
 {
 	decoder.addObserver(this);
 
-	while (cp.isConnected() || !cp.isCloseCmdReceived())
+	while (!cp.isCloseCmdReceived())
 	{
 		std::lock_guard lock(mtx);
 		if (!com->isDataAvailable())
@@ -148,12 +122,6 @@ void ComManager::processIncomingQueue()
 
 void ComManager::processOutgoingQueue()
 {
-	std::promise<void> sendDataPromise;
-	const std::future<void> sendDataFuture = sendDataPromise.get_future();
-
-	std::promise<void> sendResponsePromise;
-	std::future<void> sendResponseFuture = sendResponsePromise.get_future();
-
 	while (true)
 	{
 		if (!cp.isConnected() && cp.isCloseCmdReceived())
@@ -164,17 +132,12 @@ void ComManager::processOutgoingQueue()
 
 		if (!outgoingControlQueue.empty())
 		{
-			if (sendResponseThread.joinable())
-			{
-				sendResponseThread.join();
-			}
 			std::vector<uint8_t> response;
 			outgoingControlQueue.wait_and_pop(response);
-			sendResponseThread = std::thread(&ComManager::sendResponse, this, std::ref(response));
+			encoder.pushBlock(controlBlock, response);
 		}
 
-		if (sendDataFuture.wait_for(std::chrono::seconds(0)) == std::future_status::ready)
-			continue;
+		// TODO: Timeout for response
 
 		if (nextPacketId < outgoingData.size())
 		{
@@ -183,7 +146,7 @@ void ComManager::processOutgoingQueue()
 			{
 				sendDataThread.join();
 			}
-			sendDataThread = std::thread(&ComManager::sendData, this, std::ref(packet));
+			encoder.pushBlock(dataBlock, packet);
 
 			std::unique_lock lock(mtx);
 			if (cv.wait_for(lock, std::chrono::seconds(10), [this] { return !cp.responses.empty(); }))
@@ -214,11 +177,7 @@ void ComManager::processOutgoingQueue()
 		{
 			std::vector<uint8_t> data = cp.createControlBlock(TRANSFER_FINISHED, 0);
 			crc.attachCRC(data);
-			if (sendResponseThread.joinable())
-			{
-				sendResponseThread.join();
-			}
-			sendResponseThread = std::thread(&ComManager::sendResponse, this, std::ref(data));
+			encoder.pushBlock(controlBlock, data);
 		}
 	}
 }
@@ -272,7 +231,7 @@ std::vector<uint8_t> ComManager::transfer2Way(std::vector<uint8_t> inputData)
 
 void ComManager::beginBlockReceived(const BlockType &blockType)
 {
-	if (!cp.isConnected() && cp.isCloseCmdReceived())
+	if (!cp.isConnected() && !cp.isCloseCmdReceived())
 	{
 		cp.connect();
 	}
