@@ -1,14 +1,14 @@
-#include "Serial.hpp"
+#include "ComInterface.hpp"
 
-void Serial::openPort()
+void ComInterface::openCom()
 {
-	Logger(DEBUG) << "Opening serial port...";
-	const char *portName = SERIAL_PORT;
+	Logger(DEBUG) << "Opening interface port...";
+	const auto portName = SERIAL_PORT;
 	serialPort = open(portName, O_RDWR | O_NOCTTY | O_NDELAY);
 
 	if (serialPort < 0)
 	{
-		Logger(ERROR) << "Error opening serial port!";
+		Logger(ERROR) << "Error opening interface port!";
 		exit(1);
 	}
 
@@ -41,45 +41,43 @@ void Serial::openPort()
 	}
 	else
 	{
-		Logger(DEBUG) << "Serial buffers flushed successfully.";
+		Logger(DEBUG) << "ICommunicationInterface buffers flushed successfully.";
 	}
 
-	Logger(INFO) << "Serial port open!";
+	Logger(INFO) << "ICommunicationInterface port open!";
 }
 
-int Serial::closePort() const
+void ComInterface::closeCom()
 {
-	Logger(DEBUG) << "Closing serial port...";
-	return close(serialPort);
+	Logger(DEBUG) << "Closing interface port...";
+	close(serialPort);
 }
 
-ssize_t Serial::writeByte(uint8_t data) const
+void ComInterface::writeByte(const uint8_t data)
 {
 	ssize_t n = write(serialPort, &data, sizeof(data));
 	if (n < 0)
 	{
-		throw std::runtime_error("Error writing to serial port!");
+		throw std::runtime_error("Error writing to interface port!");
 	}
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
-	return n;
+	std::this_thread::sleep_for(std::chrono::milliseconds(40));
 }
 
-ssize_t Serial::readByte(uint8_t &data) const
+void ComInterface::readByte(uint8_t &data)
 {
 	ssize_t m = read(serialPort, &data, sizeof(data));
 	if (m < 0)
 	{
-		throw std::runtime_error("Error reading from serial port!");
+		throw std::runtime_error("Error reading from interface port!");
 	}
-	return m;
 }
 
-bool Serial::isDataAvailable() const
+bool ComInterface::isDataAvailable()
 {
 	int bytesAvailable;
 	if (ioctl(serialPort, FIONREAD, &bytesAvailable) == -1)
 	{
-		throw std::runtime_error("Error checking available data on serial port!");
+		throw std::runtime_error("Error checking available data on interface port!");
 	}
 	return bytesAvailable > 0;
 }

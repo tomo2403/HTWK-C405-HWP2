@@ -15,14 +15,14 @@ private:
 public:
 	void push(const T &item)
 	{
-		std::lock_guard<std::mutex> lock(mtx);
+		std::lock_guard lock(mtx);
 		queue.push(item);
 		cv.notify_one();
 	}
 
 	bool try_pop(T &item)
 	{
-		std::lock_guard<std::mutex> lock(mtx);
+		std::lock_guard lock(mtx);
 		if (queue.empty())
 		{
 			return false;
@@ -34,7 +34,7 @@ public:
 
 	void wait_and_pop(T &item)
 	{
-		std::unique_lock<std::mutex> lock(mtx);
+		std::unique_lock lock(mtx);
 		cv.wait(lock, [this]()
 		{ return !queue.empty(); });
 		item = queue.front();
@@ -43,7 +43,7 @@ public:
 
 	bool empty() const
 	{
-		std::lock_guard<std::mutex> lock(mtx);
+		std::lock_guard lock(mtx);
 		return queue.empty();
 	}
 };

@@ -26,7 +26,7 @@ namespace ioManager
 		Logger(INFO) << "Output written!";
 	}
 
-	std::vector<uint8_t> extractSubvector(const std::vector<uint8_t>& vec, size_t start, size_t length)
+	std::vector<uint8_t> extractSubvector(const std::vector<uint8_t>& vec, const size_t start, size_t length)
 	{
 		if (start >= vec.size()) {
 			return {};
@@ -36,6 +36,6 @@ namespace ioManager
 			length = vec.size() - start;
 		}
 
-		return std::vector<uint8_t>(vec.begin() + start, vec.begin() + start + length);
+		return {vec.begin() + start, vec.begin() + start + length};
 	}
 }

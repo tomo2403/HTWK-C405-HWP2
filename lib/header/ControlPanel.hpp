@@ -20,6 +20,7 @@ enum Flags : uint8_t {
 class ControlPanel
 {
 private:
+	mutable std::mutex mtx;
 	bool connected = false;
 	bool everythingSent = false;
 	bool everythingReceived = false;
@@ -35,7 +36,7 @@ public:
 	 * @param flags The flags to process.
 	 * @param packetId The packet id to process.
 	 */
-	void processControlBlock(uint8_t &flags, uint32_t packetId);
+	void processControlBlock(const uint8_t &flags, uint32_t packetId);
 
 	/**
 	 * @brief Creates a control block.
