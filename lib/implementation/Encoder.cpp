@@ -1,247 +1,169 @@
-#include <iostream>
-#include <bitset>
+#include "../lib.hpp"
 
-#include "../header/Encoder.hpp"
-#include "../header/CodecCommand.hpp"
+Encoder::Task::Task(const BlockType &blockType, const std::vector<uint8_t>& dataVector_byte)
+    : dataStorage(DataStorage(dataVector_byte)),
+      blockType(blockType),
+      startSequenceSent(false)
+{}
 
-Encoder::Encoder()
+void Encoder::forcePushBlock(const BlockType &blockType, const std::vector<uint8_t> &data)
 {
-	initialize();
-	this->storageHoldsData = false;
-	this->storage = Storage();
+	taskStack.push(Task(blockType, data));
 }
 
-void Encoder::initialize()
+void Encoder::pushBlock(const BlockType &blockType, const std::vector<uint8_t> &data)
 {
-	Codec::initialize();
-	this->dataVectorOffset_Index = 0;
-	this->justEscaped = false;
-	this->endBlockWasSent = false;
+    if (taskStack.size() >= 2)
+    {
+        throw std::runtime_error("Encoder: WARNING - The Encoder currently has two or more tasks in the stack. Adding more tasks may affect the stability of the transmission. If you still wish to add a task, use forcePushBlock(...) to bypass this check.");
+    }
+	forcePushBlock(blockType, data);
 }
 
-void Encoder::insertStartBlockIntoBuffer()
-{
-	leftShiftNibbleIntoBuffer(CodecCommand::escapeSequence);
-
-	if (blockType == controlBlock && upcomingNibble() != CodecCommand::beginControlBlockDefault)
-	{
-		leftShiftNibbleIntoBuffer(CodecCommand::beginControlBlockDefault);
-	}
-	else if (blockType == controlBlock && upcomingNibble() == CodecCommand::beginControlBlockDefault)
-	{
-		leftShiftNibbleIntoBuffer(CodecCommand::beginControlBlockFallback);
-	}
-	else if (blockType == dataBlock && upcomingNibble() != CodecCommand::beginDataBlockDefault)
-	{
-		leftShiftNibbleIntoBuffer(CodecCommand::beginDataBlockDefault);
-	}
-	else if (blockType == dataBlock && upcomingNibble() == CodecCommand::beginDataBlockDefault)
-	{
-		leftShiftNibbleIntoBuffer(CodecCommand::beginDataBlockFallback);
-	}
-
-	bufferEndBit += 8;
-	justEscaped = true;
-}
-
-void Encoder::inputDataBlock(const std::vector<uint8_t> &dataVector)
-{
-	initialize();
-	this->blockType = dataBlock;
-	this->dataVector = dataVector;
-	insertStartBlockIntoBuffer();
-}
-
-void Encoder::insertNibbleIntoBuffer(const uint8_t &nibble, const uint8_t &atBit)
-{
-	if (atBit > 27)
-	{
-		throw std::out_of_range("The buffer is 32bit in size and the sequence 4bit long.");
-	}
-
-	buffer &= ~(0xF << atBit);
-	buffer |= (static_cast<uint32_t>(nibble & 0x0F) << atBit);
-}
-
-void Encoder::insertByteIntoBuffer(const uint8_t &byte, const uint8_t &atBit)
-{
-	if (atBit > 24)
-	{
-		throw std::out_of_range("The buffer is 32bit in size and the sequence 8bit long.");
-	}
-
-	buffer &= ~(0xFF << atBit);
-	buffer |= (static_cast<uint32_t>(byte) << (atBit));
-}
 
 bool Encoder::hasData()
 {
-	std::lock_guard<std::mutex> lock(mtx);
-	if (dataVectorOffset_Index >= dataVector.size() && bufferEndBit == -1 && !endBlockWasSent && dataVector.size() != 0)
-	{
-		leftShiftNibbleIntoBuffer(escapeSequence);
-		// TODO: Implement Fallback sequence
-		if (storageHoldsData && upcomingNibbleFromStorage() == CodecCommand::endBlockDefault)
-		{
-			leftShiftNibbleIntoBuffer(CodecCommand::endBlockFallback);
-		} 
-		else
-		{
-			leftShiftNibbleIntoBuffer(CodecCommand::endBlockDefault);
-		}
-
-		bufferEndBit += 8;
-		justEscaped = true;
-		endBlockWasSent = true;
-	} else if (dataVectorOffset_Index >= dataVector.size() && bufferEndBit == -1 && endBlockWasSent && storageHoldsData)
-	{
-		restoreSavedAttributes();
-		storageHoldsData = false;
-	}
-
-	return dataVectorOffset_Index < dataVector.size() || bufferEndBit != -1;
-}
-
-uint8_t Encoder::upcomingNibble()
-{
-	if (bufferEndBit < 7 && dataVectorOffset_Index < dataVector.size())
-	{
-		return dataVector.at(dataVectorOffset_Index) >> 4;
-	}
-	else if (bufferEndBit == 3 && dataVectorOffset_Index >= dataVector.size())
-	{
-		return 0x00; // fishy
-	}
-
-	return getNibbleSlice(bufferEndBit - 7);
+	return taskStack.size() > 0 || escNibbleQueue != 0x00;
 }
 
 uint8_t Encoder::nextNibble()
 {
-	std::lock_guard<std::mutex> lock(mtx);
-	if (controlBlockIsQueued && previousNibble != 0)
+	if (!hasData())
 	{
-		std::vector<uint8_t> tmp = storage.dataVector;
-		interruptWithControlBlock(tmp);
-		controlBlockIsQueued = false;
+		throw std::out_of_range("Encoder: No data to encode.");
 	}
 
-	if (bufferEndBit < 3 && dataVectorOffset_Index < dataVector.size())
+	uint8_t nibbleToReturn = 0x00;
+
+	// The previous edge case required extensive escaping,
+	// the rest of its escape-sequence is being sent here,
+	// before the next data nibble can be precessed.
+	if (escNibbleQueue != 0x00)
+	{	
+		nibbleToReturn = escNibbleQueue & 0x0F;
+		escNibbleQueue = 0x00;
+	}
+	// The current task has not yet sent a start-sequence.
+	else if (!taskStack.top().startSequenceSent)
 	{
-		leftShiftByteIntoBuffer(dataVector.at(dataVectorOffset_Index++));
-		bufferEndBit += 8;
+		escNibbleQueue = determineStartCommand();
+		taskStack.top().startSequenceSent = true;
+		nibbleToReturn = CodecCommand::escapeSequence;
+	}
+	// Edge-Case: Esc-Seq appears a regular data nibble.
+	else if (previousNibble == CodecCommand::escapeSequence)
+	{
+		nibbleToReturn = determineEscSeqAsDataCommand();
+	}
+	// The current task has no more data.
+	else if (taskStack.top().dataStorage.empty())
+	{
+		taskStack.pop();
+		escNibbleQueue = determineEndCommand();
+		nibbleToReturn = CodecCommand::escapeSequence;
+	}
+	// Edge-Case: Same nibble in succession.
+	else if (previousNibble == taskStack.top().dataStorage.peek_nibble())
+	{
+		taskStack.top().dataStorage.pop_nibble();
+		escNibbleQueue = determinePrevNibbleAgainCommand();
+		nibbleToReturn = CodecCommand::escapeSequence;
+	}
+	// Default-Case
+	else
+	{
+		nibbleToReturn = taskStack.top().dataStorage.pop_nibble();
 	}
 
-	if (currentNibble() == previousNibble && previousNibbleExists)
-	{
-		const uint8_t upcomingNib = upcomingNibble();
-		insertNibbleIntoBuffer(escapeSequence, bufferEndBit-3);
+	previousNibble = nibbleToReturn;
+	return nibbleToReturn;
+	
+}
 
-		if (upcomingNib == CodecCommand::insertPrevNibbleAgainDefault)
+uint8_t Encoder::determineStartCommand()
+{
+	if (taskStack.top().blockType == BlockType::dataBlock)
+	{
+		if (taskStack.top().dataStorage.peek_nibble() == CodecCommand::beginDataBlockDefault)
 		{
-			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertPrevNibbleAgainFallback, bufferEndBit-3);
+			return CodecCommand::beginDataBlockFallback;
 		}
 		else
 		{
-			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertPrevNibbleAgainDefault, bufferEndBit-3);
+			return CodecCommand::beginControlBlockDefault;
 		}
-		justEscaped = true;
 	}
-
-	if (currentNibble() == escapeSequence && !justEscaped)
+	else
 	{
-		if (upcomingNibble() == CodecCommand::insertEscSeqAsDataDefault)
+		if (taskStack.top().dataStorage.peek_nibble() == CodecCommand::beginControlBlockDefault)
 		{
-			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataFallback, bufferEndBit-3);
+			return CodecCommand::beginControlBlockFallback;
 		}
 		else
 		{
-			gracefullyInsertNibbleIntoBuffer(CodecCommand::insertEscSeqAsDataDefault, bufferEndBit-3);
+			return CodecCommand::beginControlBlockDefault;
 		}
 	}
-
-	justEscaped = false;
-	const uint8_t currentNib = currentNibble();
-	bufferEndBit -= 4;
-	previousNibble = currentNib;
-	previousNibbleExists = true;
-	return currentNib;
 }
 
-uint8_t Encoder::nextByte()
+uint8_t Encoder::determineEndCommand()
 {
-	uint8_t byte = 0x00;
-	byte = (byte | nextNibble()) << 4;
-	byte |= nextNibble();
-
-	return byte;
-}
-
-std::vector<uint8_t> Encoder::encodeAll()
-{
-	std::vector<uint8_t> encodedData{};
-	while (hasData())
+	if (taskStack.size() == 0)
 	{
-		encodedData.push_back(nextByte());
+		return CodecCommand::endBlockDefault; 
 	}
-	return encodedData;
+	else if (taskStack.top().dataStorage.empty() || taskStack.top().dataStorage.peek_nibble() != CodecCommand::endBlockDefault)
+	{
+		return CodecCommand::endBlockDefault;
+	}
+	else
+	{
+		return CodecCommand::endBlockDefault;
+	}
+}
+
+uint8_t Encoder::determinePrevNibbleAgainCommand()
+{
+	if (taskStack.top().dataStorage.empty())
+	{
+		return CodecCommand::insertPrevNibbleAgainDefault;
+	}
+	else if (taskStack.top().dataStorage.peek_nibble() == CodecCommand::insertPrevNibbleAgainDefault)
+	{
+		return CodecCommand::insertPrevNibbleAgainFallback;
+	}
+	else
+	{
+		return CodecCommand::insertPrevNibbleAgainDefault;
+	}
+}
+
+uint8_t Encoder::determineEscSeqAsDataCommand()
+{
+	if (taskStack.top().dataStorage.empty())
+	{
+		return CodecCommand::insertEscSeqAsDataDefault;
+	}
+	else if (taskStack.top().dataStorage.peek_nibble() == CodecCommand::insertEscSeqAsDataDefault)
+	{
+		return CodecCommand::insertEscSeqAsDataFallback;
+	}
+	else
+	{
+		return CodecCommand::insertEscSeqAsDataDefault;
+	}
+}
+
+// ==============================================================================================
+// DEPRECATED methods DEPRECATED methods DEPRECATED methods DEPRECATED methods DEPRECATED methods 
+// ==============================================================================================
+
+void Encoder::inputDataBlock(const std::vector<uint8_t> &dataVector)
+{
+	pushBlock(BlockType::dataBlock, dataVector);
 }
 
 void Encoder::interruptWithControlBlock(const std::vector<uint8_t> &controlVector)
 {
-	std::lock_guard<std::mutex> lock(mtx);
-	if (previousNibble == 0x00 && previousNibbleExists)
-	{
-		this->storage.dataVector = controlVector;
-		controlBlockIsQueued = true;
-	}
-	else
-	{
-		saveCurrentAttributes();
-		initialize();
-		this->blockType = controlBlock;
-		this->dataVector = controlVector;
-		this->storageHoldsData = true;
-		insertStartBlockIntoBuffer();
-	}
-}
-
-void Encoder::saveCurrentAttributes()
-{
-	this->storage.buffer = this->buffer;
-	this->storage.previousNibbleExists = this->previousNibbleExists;
-	this->storage.previousNibble = this->previousNibble;
-	this->storage.bufferEndBit = this->bufferEndBit;
-	this->storage.dataVector = this->dataVector;
-	this->storage.dataVectorOffset_Index = this->dataVectorOffset_Index;
-	this->storage.justEscaped = this->justEscaped;
-	this->storage.blockType = this->blockType;
-	this->storage.endBlockWasSent = this->endBlockWasSent;
-}
-
-void Encoder::restoreSavedAttributes()
-{
-    this->buffer = this->storage.buffer;
-    this->previousNibbleExists = this->storage.previousNibbleExists;
-    this->previousNibble = this->storage.previousNibble;
-    this->bufferEndBit = this->storage.bufferEndBit;
-    this->dataVector = this->storage.dataVector;
-    this->dataVectorOffset_Index = this->storage.dataVectorOffset_Index;
-    this->justEscaped = this->storage.justEscaped;
-    this->blockType = this->storage.blockType;
-    this->endBlockWasSent = this->storage.endBlockWasSent;
-}
-
-uint8_t Encoder::upcomingNibbleFromStorage()
-{
-	if (storage.bufferEndBit >= 3)
-	{
-		return (storage.buffer >> (storage.bufferEndBit-3)) & 0x0F;
-	}
-	else if (storage.dataVector.size() > storage.dataVectorOffset_Index)
-	{
-		return storage.dataVector.at(storage.dataVectorOffset_Index) >> 4;
-	}
-
-	return 0x00; // fishy
+	pushBlock(BlockType::controlBlock, controlVector);
 }

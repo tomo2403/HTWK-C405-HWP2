@@ -3,157 +3,103 @@
 #include "../header/Decoder.hpp"
 #include "../header/CodecCommand.hpp"
 
+Decoder::Task::Task(const BlockType &blockType)
+    : blockType(blockType), nibbleCompressor(NibbleCompressor())
+{
+}
+
 Decoder::Decoder()
 {
-	initialize();
 }
 
-void Decoder::initialize()
-{
-	Codec::initialize();
-	this->EscapedModeIsActive = false;
-	this->dataVectorBuffer = 0x00;
-	this->dataVectorBufferShiftCount = 0;
-	this->dataVector = std::vector<uint8_t>();
-}
-
-void Decoder::addObserver(DecoderObserver *observer)
+void Decoder::addObserver(IDecoderObserver *observer)
 {
 	observers.push_back(observer);
 }
 
-void Decoder::removeObserver(DecoderObserver *observer)
+void Decoder::removeObserver(IDecoderObserver *observer)
 {
 	observers.erase(std::remove(observers.begin(), observers.end(), observer), observers.end());
 }
 
-void Decoder::processCommand(const uint8_t &command)
+void Decoder::nextNibble(const uint8_t &nibble)
 {
-	switch (command & 0x0F)
+	if (nibble == CodecCommand::escapeSequence)
+	{
+		escapeModeActive = true;
+	}
+	else if (escapeModeActive)
+	{
+		processCommand(static_cast<CodecCommand>(nibble));
+		escapeModeActive = false;
+	}
+	else
+	{
+		previousNibble = nibble;
+		taskStack.top().nibbleCompressor.pushBack(nibble);
+	}
+}
+
+void Decoder::processCommand(const CodecCommand &command)
+{
+	switch (command)
 	{
 	case beginDataBlockDefault:
 	case beginDataBlockFallback:
-		initialize();
-		dataVectorIsLocked = false;
-		currentBlockType = dataBlock;
-		for (DecoderObserver *observer : observers)
-		{
-			observer->beginBlockReceived(dataBlock);
-		}
+		processBeginDataBlockCommand();
 		break;
+
 	case beginControlBlockDefault:
 	case beginControlBlockFallback:
-		if (!dataVectorIsLocked && !storageHoldsData)
-		{
-			saveCurrentAttributes();
-			initialize();
-		}
-		dataVectorIsLocked = false;
-		currentBlockType = controlBlock;
-		storageHoldsData = true;
-		for (DecoderObserver *observer : observers)
-		{
-			observer->beginBlockReceived(controlBlock);
-		}
+		processBeginControlBlockCommand();
 		break;
-	case insertEscSeqAsDataDefault:
-	case insertEscSeqAsDataFallback:
-		writeToDataVector(escapeSequence);
-		break;
-	case insertPrevNibbleAgainDefault:
-	case insertPrevNibbleAgainFallback:
-		writeToDataVector(previousNibble);
-		break;
+
 	case endBlockDefault:
 	case endBlockFallback:
-		flushBufferIntoDataVector();
-		for (DecoderObserver *observer : observers)
-		{
-			observer->endBlockReceived(currentBlockType, dataVector);
-		}
+		processEndBlockCommand();
+		break;
 
-		if (!storageHoldsData)
-		{
-			dataVectorIsLocked = true;
-		}
+	case insertPrevNibbleAgainDefault:
+	case insertPrevNibbleAgainFallback:
+		processInsertPrevNibbleAgainCommand();
+		break;
 
-		restoreSavedAttributes();
-		storageHoldsData = false;
+	case insertEscSeqAsDataDefault:
+	case insertEscSeqAsDataFallback:
+		processInsertEscSeqAsDefaultCommand();
+		break;
+
 	default:
 		break;
 	}
 }
 
-void Decoder::writeToDataVector(const uint8_t &nibble)
+void Decoder::processBeginDataBlockCommand()
 {
-	if (dataVectorIsLocked) return;
-	
-	if (dataVectorBufferShiftCount == 2)
-	{
-		dataVector.push_back(dataVectorBuffer);
-		dataVectorBufferShiftCount = 0;
-	}
-
-	dataVectorBuffer <<= 4;
-	dataVectorBuffer |= nibble & 0x0F;
-	dataVectorBufferShiftCount++;
-	previousNibble = nibble;
+	taskStack.push(Task(BlockType::dataBlock));
 }
 
-void Decoder::flushBufferIntoDataVector()
+void Decoder::processBeginControlBlockCommand()
 {
-	while (bufferEndBit >= 3)
-	{
-		writeToDataVector(getNibbleSlice(bufferEndBit - 3));
-		bufferEndBit -= 4;
-	}
-
-	dataVector.push_back(dataVectorBuffer);
-
-	// TODO: Exception, wenn ein Nibble zu wenig!
+	taskStack.push(Task(BlockType::controlBlock));
 }
 
-void Decoder::nextNibble(const uint8_t &nibble)
+void Decoder::processEndBlockCommand()
 {
-	std::lock_guard<std::mutex> lock(mtx);
-	if (EscapedModeIsActive)
+	for (auto observer : observers)
 	{
-		processCommand(nibble);
-		EscapedModeIsActive = false;
-		return;
+		observer->endBlockReceived(taskStack.top().blockType, taskStack.top().nibbleCompressor.getData());
 	}
 
-	if (nibble == escapeSequence)
-	{
-		EscapedModeIsActive = true;
-		return;
-	}
-
-	writeToDataVector(nibble);
+	taskStack.pop();
 }
 
-void Decoder::saveCurrentAttributes()
+void Decoder::processInsertPrevNibbleAgainCommand()
 {
-	this->storage.buffer = this->buffer;
-	this->storage.previousNibbleExists = this->previousNibbleExists;
-	this->storage.previousNibble = this->previousNibble;
-	this->storage.bufferEndBit = this->bufferEndBit;
-	this->storage.dataVector = this->dataVector;
-	this->storage.EscapedModeIsActive = this->EscapedModeIsActive;
-	this->storage.dataVectorBuffer = this->dataVectorBuffer;
-	this->storage.dataVectorBufferShiftCount = this->dataVectorBufferShiftCount;
-	this->storage.currentBlockType = this->currentBlockType;
+	taskStack.top().nibbleCompressor.pushBack(previousNibble);
 }
 
-void Decoder::restoreSavedAttributes()
+void Decoder::processInsertEscSeqAsDefaultCommand()
 {
-    this->buffer = this->storage.buffer;
-    this->previousNibbleExists = this->storage.previousNibbleExists;
-    this->previousNibble = this->storage.previousNibble;
-    this->bufferEndBit = this->storage.bufferEndBit;
-    this->dataVector = this->storage.dataVector;
-    this->EscapedModeIsActive = this->storage.EscapedModeIsActive;
-    this->dataVectorBuffer = this->storage.dataVectorBuffer;
-    this->dataVectorBufferShiftCount = this->storage.dataVectorBufferShiftCount;
-    this->currentBlockType = this->storage.currentBlockType;
+	taskStack.top().nibbleCompressor.pushBack(static_cast<uint8_t>(static_cast<uint8_t>(CodecCommand::escapeSequence)));
 }

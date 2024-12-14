@@ -1,57 +1,45 @@
 #pragma once
 
-#include "Codec.hpp"
-#include "DecoderObserver.hpp"
+#include <stack>
 
-class Decoder : public Codec
+#include "NibbleCompressor.hpp"
+#include "BlockType.hpp"
+#include "IDecoderObserver.hpp"
+#include "CodecCommand.hpp"
+
+class Decoder
 {
 private:
-	struct Storage
+	struct Task
 	{
-		uint32_t buffer{};
-		bool previousNibbleExists{};
-		uint8_t previousNibble{};
-		int8_t bufferEndBit{};
-		bool EscapedModeIsActive{};
-		uint8_t dataVectorBuffer{};
-		uint8_t dataVectorBufferShiftCount{};
-		std::vector<uint8_t> dataVector;
-		BlockType currentBlockType;
+		NibbleCompressor nibbleCompressor;
+		BlockType blockType;
+
+		Task(const BlockType &blockType);
 	};
 
-	bool EscapedModeIsActive{};
-	bool dataVectorIsLocked = true;
+	// How is Data without propper start-Sequence treated?
+	
+	bool escapeModeActive;
+	uint8_t previousNibble;
+	
+	std::vector<IDecoderObserver *> observers;
+	std::stack<Task> taskStack;
 
-	uint8_t dataVectorBuffer{};
-	uint8_t dataVectorBufferShiftCount{};
+	void processCommand(const CodecCommand &command);
 
-	std::vector<uint8_t> dataVector;
-
-	std::vector<DecoderObserver *> observers;
-
-	BlockType currentBlockType;
-
-	bool storageHoldsData = false;
-	Storage storage = Storage();
-
-	void processCommand(const uint8_t &command);
-
-	void writeToDataVector(const uint8_t &nibble);
-
-	void flushBufferIntoDataVector();
-
-	void initialize();
-
-	void saveCurrentAttributes();
-
-	void restoreSavedAttributes();
+	void processBeginDataBlockCommand();
+	void processBeginControlBlockCommand();
+	void processEndBlockCommand();
+	void processInsertPrevNibbleAgainCommand();
+	void processInsertEscSeqAsDefaultCommand();
 
 public:
 	Decoder();
 
-	void addObserver(DecoderObserver *observer);
+	void addObserver(IDecoderObserver *observer);
 
-	void removeObserver(DecoderObserver *observer);
+	void removeObserver(IDecoderObserver *observer);
 
 	void nextNibble(const uint8_t &nibble);
 };
