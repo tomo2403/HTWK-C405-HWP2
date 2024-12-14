@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.25.1)
 project(lib)
 project(pc)
+project(pc2)
 project(b15f)
 
 set(CMAKE_CXX_STANDARD 20)
