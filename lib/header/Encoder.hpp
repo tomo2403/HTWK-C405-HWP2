@@ -17,10 +17,12 @@ private:
 		Task(const BlockType &blockType, const std::vector<uint8_t> &dataVector_byte);
 	};
 
-	uint8_t escNibbleQueue;
-	uint8_t previousNibble;
+	uint8_t escNibbleQueue{};
+	uint8_t previousNibble{};
 
 	std::stack<Task> taskStack;
+
+	std::mutex mtx;
 
 	uint8_t determineStartCommand();
 
@@ -35,7 +37,7 @@ public:
 
 	void forcePushBlock(const BlockType &blockType, const std::vector<uint8_t> &data);
 
-	bool hasData() const;
+	[[nodiscard]] bool hasData() const;
 
 	uint8_t nextNibble();
 

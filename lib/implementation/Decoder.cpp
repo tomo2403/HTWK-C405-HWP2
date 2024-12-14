@@ -11,16 +11,19 @@ Decoder::Decoder() = default;
 
 void Decoder::addObserver(IDecoderObserver *observer)
 {
+	std::lock_guard lock(mtx);
 	observers.push_back(observer);
 }
 
 void Decoder::removeObserver(IDecoderObserver *observer)
 {
+	std::lock_guard lock(mtx);
 	std::erase(observers, observer);
 }
 
 void Decoder::nextNibble(const uint8_t &nibble)
 {
+	std::lock_guard lock(mtx);
 	if (nibble == escapeSequence)
 	{
 		escapeModeActive = true;
@@ -83,7 +86,7 @@ void Decoder::processBeginControlBlockCommand()
 
 void Decoder::processEndBlockCommand()
 {
-	for (auto observer: observers)
+	for (const auto observer: observers)
 	{
 		observer->endBlockReceived(taskStack.top().blockType, taskStack.top().nibbleCompressor.getData());
 	}
@@ -93,10 +96,12 @@ void Decoder::processEndBlockCommand()
 
 void Decoder::processInsertPrevNibbleAgainCommand()
 {
-	taskStack.top().nibbleCompressor.pushBack(previousNibble);
+	if (!taskStack.empty())
+		taskStack.top().nibbleCompressor.pushBack(previousNibble);
 }
 
 void Decoder::processInsertEscSeqAsDefaultCommand()
 {
-	taskStack.top().nibbleCompressor.pushBack(escapeSequence);
+	if (!taskStack.empty())
+		taskStack.top().nibbleCompressor.pushBack(escapeSequence);
 }

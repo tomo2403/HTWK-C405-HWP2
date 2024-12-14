@@ -9,11 +9,13 @@ Encoder::Task::Task(const BlockType &blockType, const std::vector<uint8_t> &data
 
 void Encoder::forcePushBlock(const BlockType &blockType, const std::vector<uint8_t> &data)
 {
+	std::lock_guard lock(mtx);
 	taskStack.emplace(blockType, data);
 }
 
 void Encoder::pushBlock(const BlockType &blockType, const std::vector<uint8_t> &data)
 {
+	std::lock_guard lock(mtx);
 	if (taskStack.size() >= 2)
 	{
 		throw std::runtime_error(
@@ -25,11 +27,13 @@ void Encoder::pushBlock(const BlockType &blockType, const std::vector<uint8_t> &
 
 bool Encoder::hasData() const
 {
+	std::lock_guard lock(mtx);
 	return !taskStack.empty() || escNibbleQueue != 0x00;
 }
 
 uint8_t Encoder::nextNibble()
 {
+	std::lock_guard lock(mtx);
 	if (!hasData())
 	{
 		throw std::out_of_range("Encoder: No data to encode.");
