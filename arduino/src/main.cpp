@@ -4,41 +4,42 @@ uint8_t lastReceived = -1;
 
 uint8_t reverseNibble(uint8_t nibble)
 {
-	nibble = ((nibble & 0b0001) << 3) | // Bit 0 -> Bit 3
-			 ((nibble & 0b0010) << 1) | // Bit 1 -> Bit 2
-			 ((nibble & 0b0100) >> 1) | // Bit 2 -> Bit 1
-			 ((nibble & 0b1000) >> 3);  // Bit 3 -> Bit 0
+	nibble = (nibble & 0b0001) << 3 | // Bit 0 -> Bit 3
+	         (nibble & 0b0010) << 1 | // Bit 1 -> Bit 2
+	         (nibble & 0b0100) >> 1 | // Bit 2 -> Bit 1
+	         (nibble & 0b1000) >> 3; // Bit 3 -> Bit 0
 	return nibble;
 }
 
 uint8_t reverseByte(uint8_t byte)
 {
-	byte = ((byte & 0b00000001) << 7) | // Bit 0 -> Bit 7
-		   ((byte & 0b00000010) << 5) | // Bit 1 -> Bit 6
-		   ((byte & 0b00000100) << 3) | // Bit 2 -> Bit 5
-		   ((byte & 0b00001000) << 1) | // Bit 3 -> Bit 4
-		   ((byte & 0b00010000) >> 1) | // Bit 4 -> Bit 3
-		   ((byte & 0b00100000) >> 3) | // Bit 5 -> Bit 2
-		   ((byte & 0b01000000) >> 5) | // Bit 6 -> Bit 1
-		   ((byte & 0b10000000) >> 7);  // Bit 7 -> Bit 0
+	byte = (byte & 0b00000001) << 7 | // Bit 0 -> Bit 7
+	       (byte & 0b00000010) << 5 | // Bit 1 -> Bit 6
+	       (byte & 0b00000100) << 3 | // Bit 2 -> Bit 5
+	       (byte & 0b00001000) << 1 | // Bit 3 -> Bit 4
+	       (byte & 0b00010000) >> 1 | // Bit 4 -> Bit 3
+	       (byte & 0b00100000) >> 3 | // Bit 5 -> Bit 2
+	       (byte & 0b01000000) >> 5 | // Bit 6 -> Bit 1
+	       (byte & 0b10000000) >> 7; // Bit 7 -> Bit 0
 	return byte;
 }
 
 uint8_t readNibble()
 {
-	uint8_t portD = (PIND & 0b11000000) >> 6; // Lese D6 und D7
-	uint8_t portB = (PINB & 0b00000011);      // Lese D8 und D9
-	uint8_t nibble = (portB << 2) | portD;
+	const uint8_t portD = (PIND & 0b11000000) >> 6; // Lese D6 und D7
+	const uint8_t portB = PINB & 0b00000011; // Lese D8 und D9
+	const uint8_t nibble = portB << 2 | portD;
 	return reverseNibble(nibble);
 }
 
-void writeNibble(uint8_t nibble) {
-	PORTD = reverseByte((PORTD & 0b11000011) | ((nibble & 0b00001111) << 2));
+void writeNibble(const uint8_t nibble)
+{
+	PORTD = reverseByte(PORTD & 0b11000011 | (nibble & 0b00001111) << 2);
 }
 
 void setup()
 {
-    Serial.begin(57600);
+	Serial.begin(57600);
 	pinMode(2, OUTPUT);
 	pinMode(3, OUTPUT);
 	pinMode(4, OUTPUT);
@@ -47,19 +48,15 @@ void setup()
 	pinMode(7, INPUT);
 	pinMode(8, INPUT);
 	pinMode(9, INPUT);
-
-	//DDRD &= ~(0b11000000); // Set D6 und D7 als Input
-	//DDRB &= ~(0b00000011); // Set D8 und D9 als Input
 }
 
 void loop()
 {
-	uint8_t received = readNibble();
+	const uint8_t received = readNibble();
 	if (received != lastReceived)
 	{
 		lastReceived = received;
 		Serial.write(received);
-		//Serial.println(received);
 	}
 
 	if (Serial.available())
