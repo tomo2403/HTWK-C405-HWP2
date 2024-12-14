@@ -13,7 +13,6 @@
 class CRC
 {
 public:
-
 	/**
 	 * @brief Berechnet 32-Bit CRC-Wert über gegebene Daten.
 	 *

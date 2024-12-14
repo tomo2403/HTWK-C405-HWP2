@@ -11,8 +11,8 @@ private:
     bool nextNibbleIsHighNibble;
 
 public:
-    NibbleCompressor(const size_t &size = 0);
-    
+    explicit NibbleCompressor(const size_t &size = 0);
+
     void pushBack(const uint8_t &nibble);
 
     std::vector<uint8_t> getData();

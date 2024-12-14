@@ -4,17 +4,18 @@
 #include <vector>
 #include "ThreadSafeQueue.hpp"
 
-enum Flags : uint8_t {
+enum Flags : uint8_t
+{
 	/** @brief The sender has delivered all data and is ready to close the connection. */
-	TRANSFER_FINISHED = 1 << 0,  // Bit 0
+	TRANSFER_FINISHED = 1 << 0, // Bit 0
 	/** @brief The sender will close the connection and is not receiving any new packets. */
-	CLOSE_CONNECTION  = 1 << 1,  // Bit 1
+	CLOSE_CONNECTION = 1 << 1, // Bit 1
 	/** @brief The receiver requests a resend of the packet with id provided. */
-	RESEND            = 1 << 2,  // Bit 2
-	/** @brief The sender wants to established a connection. */
-	CONNECT           = 1 << 3,  // Bit 3
+	RESEND = 1 << 2, // Bit 2
+	/** @brief The sender wants to establish a connection. */
+	CONNECT = 1 << 3, // Bit 3
 	/** @brief The receiver confirms that it has received the packet with id provided. */
-	RECEIVED		  = 1 << 4,  // Bit 4
+	RECEIVED = 1 << 4, // Bit 4
 };
 
 class ControlPanel
@@ -27,7 +28,7 @@ private:
 	bool closeCmdReceived = false;
 
 public:
-	ThreadSafeQueue<std::pair<uint16_t, Flags>> responses;
+	ThreadSafeQueue<std::pair<uint16_t, Flags> > responses;
 
 	ControlPanel() = default;
 
@@ -70,5 +71,5 @@ public:
 	 */
 	[[nodiscard]] bool isCloseCmdReceived() const;
 
-    void connect();
+	void connect();
 };

@@ -15,23 +15,27 @@ private:
 		NibbleCompressor nibbleCompressor;
 		BlockType blockType;
 
-		Task(const BlockType &blockType);
+		explicit Task(const BlockType &blockType);
 	};
 
-	// How is Data without propper start-Sequence treated?
-	
-	bool escapeModeActive;
-	uint8_t previousNibble;
-	
+	// How is Data without proper start-Sequence treated?
+
+	bool escapeModeActive{};
+	uint8_t previousNibble{};
+
 	std::vector<IDecoderObserver *> observers;
 	std::stack<Task> taskStack;
 
 	void processCommand(const CodecCommand &command);
 
 	void processBeginDataBlockCommand();
+
 	void processBeginControlBlockCommand();
+
 	void processEndBlockCommand();
+
 	void processInsertPrevNibbleAgainCommand();
+
 	void processInsertEscSeqAsDefaultCommand();
 
 public:

@@ -4,7 +4,6 @@
 
 ComManager::ComManager(ICommunicationInterface *com) : com(com)
 {
-
 }
 
 void ComManager::sendData(const std::vector<uint8_t> &data)
@@ -112,13 +111,13 @@ void ComManager::processIncomingQueue()
 		if (incomingQueue.empty())
 			continue;
 
-		std::pair<BlockType, std::vector<uint8_t>> packet;
+		std::pair<BlockType, std::vector<uint8_t> > packet;
 		incomingQueue.wait_and_pop(packet);
 
 		const uint32_t id = (packet.second[0] << 8) | packet.second[1];
 		std::vector data(packet.second.begin() + 2, packet.second.end() - 4);
 		const uint32_t receivedCrc = (packet.second[packet.second.size() - 4] << 24) | (packet.second[packet.second.size() - 3] << 16) |
-							   (packet.second[packet.second.size() - 2] << 8) | packet.second[packet.second.size() - 1];
+		                             (packet.second[packet.second.size() - 2] << 8) | packet.second[packet.second.size() - 1];
 		const bool valid = crc.validateCRC({packet.second.begin(), packet.second.end() - 4}, receivedCrc);
 
 		if (packet.first == controlBlock)
@@ -187,7 +186,7 @@ void ComManager::processOutgoingQueue()
 			sendDataThread = std::thread(&ComManager::sendData, this, std::ref(packet));
 
 			std::unique_lock lock(mtx);
-			if (cv.wait_for(lock, std::chrono::seconds(10), [this]{ return !cp.responses.empty(); }))
+			if (cv.wait_for(lock, std::chrono::seconds(10), [this] { return !cp.responses.empty(); }))
 			{
 				// Received a response within the timeout
 				std::pair<uint16_t, Flags> response;
@@ -226,7 +225,9 @@ void ComManager::processOutgoingQueue()
 
 void ComManager::watchControlPanel() const
 {
-	while(!cp.isConnected()){}
+	while (!cp.isConnected())
+	{
+	}
 
 	const auto start = std::chrono::steady_clock::now();
 	Logger(DEBUG) << "Watching control panel...";
@@ -240,7 +241,8 @@ void ComManager::watchControlPanel() const
 
 		auto now = std::chrono::steady_clock::now();
 		auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
-		Logger(INFO, true) << "Packet " << nextPacketId << "/" << outgoingData.size() << " | Errors: " << errors << " | " << elapsed << "s elapsed";
+		Logger(INFO, true) << "Packet " << nextPacketId << "/" << outgoingData.size() << " | Errors: " << errors << " | " << elapsed <<
+				"s elapsed";
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	}
 }

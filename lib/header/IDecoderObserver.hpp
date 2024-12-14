@@ -3,10 +3,10 @@
 #include <vector>
 #include "BlockType.hpp"
 
-class DecoderObserver
+class IDecoderObserver
 {
 protected:
-	~DecoderObserver() = default;
+	~IDecoderObserver() = default;
 
 public:
 	virtual void beginBlockReceived(const BlockType &blockType) = 0;

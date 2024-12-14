@@ -10,9 +10,10 @@
 #include "Encoder.hpp"
 #include "Decoder.hpp"
 #include "CRC.hpp"
+#include "IDecoderObserver.hpp"
 #include "ICommunicationInterface.hpp"
 
-class ComManager final : DecoderObserver
+class ComManager final : IDecoderObserver
 {
 private:
 	mutable std::mutex mtx;
@@ -23,9 +24,9 @@ private:
 	std::thread sendResponseThread;
 	std::thread connectThread;
 
-	std::vector<std::vector<uint8_t>> outgoingData{};
-	ThreadSafeQueue<std::vector<uint8_t>> outgoingControlQueue;
-	ThreadSafeQueue<std::pair<BlockType, std::vector<uint8_t>>> incomingQueue;
+	std::vector<std::vector<uint8_t> > outgoingData{};
+	ThreadSafeQueue<std::vector<uint8_t> > outgoingControlQueue;
+	ThreadSafeQueue<std::pair<BlockType, std::vector<uint8_t> > > incomingQueue;
 	uint16_t nextPacketId = 0;
 	u_long errors = 0;
 
@@ -33,7 +34,7 @@ private:
 	Encoder encoder;
 	Decoder decoder;
 	CRC crc;
-	ICommunicationInterface* com;
+	ICommunicationInterface *com;
 
 	std::vector<uint8_t> outputData{};
 
@@ -43,8 +44,7 @@ private:
 	void sendResponse(const std::vector<uint8_t> &data);
 
 public:
-
-	explicit ComManager(ICommunicationInterface* com);
+	explicit ComManager(ICommunicationInterface *com);
 
 	void prepareOutgoingQueue(std::vector<uint8_t> inputData);
 

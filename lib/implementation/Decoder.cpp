@@ -3,14 +3,11 @@
 #include "../header/Decoder.hpp"
 #include "../header/CodecCommand.hpp"
 
-Decoder::Task::Task(const BlockType &blockType)
-    : blockType(blockType), nibbleCompressor(NibbleCompressor())
+Decoder::Task::Task(const BlockType &blockType) : nibbleCompressor(NibbleCompressor()), blockType(blockType)
 {
 }
 
-Decoder::Decoder()
-{
-}
+Decoder::Decoder() = default;
 
 void Decoder::addObserver(IDecoderObserver *observer)
 {
@@ -19,12 +16,12 @@ void Decoder::addObserver(IDecoderObserver *observer)
 
 void Decoder::removeObserver(IDecoderObserver *observer)
 {
-	observers.erase(std::remove(observers.begin(), observers.end(), observer), observers.end());
+	std::erase(observers, observer);
 }
 
 void Decoder::nextNibble(const uint8_t &nibble)
 {
-	if (nibble == CodecCommand::escapeSequence)
+	if (nibble == escapeSequence)
 	{
 		escapeModeActive = true;
 	}
@@ -44,49 +41,49 @@ void Decoder::processCommand(const CodecCommand &command)
 {
 	switch (command)
 	{
-	case beginDataBlockDefault:
-	case beginDataBlockFallback:
-		processBeginDataBlockCommand();
-		break;
+		case beginDataBlockDefault:
+		case beginDataBlockFallback:
+			processBeginDataBlockCommand();
+			break;
 
-	case beginControlBlockDefault:
-	case beginControlBlockFallback:
-		processBeginControlBlockCommand();
-		break;
+		case beginControlBlockDefault:
+		case beginControlBlockFallback:
+			processBeginControlBlockCommand();
+			break;
 
-	case endBlockDefault:
-	case endBlockFallback:
-		processEndBlockCommand();
-		break;
+		case endBlockDefault:
+		case endBlockFallback:
+			processEndBlockCommand();
+			break;
 
-	case insertPrevNibbleAgainDefault:
-	case insertPrevNibbleAgainFallback:
-		processInsertPrevNibbleAgainCommand();
-		break;
+		case insertPrevNibbleAgainDefault:
+		case insertPrevNibbleAgainFallback:
+			processInsertPrevNibbleAgainCommand();
+			break;
 
-	case insertEscSeqAsDataDefault:
-	case insertEscSeqAsDataFallback:
-		processInsertEscSeqAsDefaultCommand();
-		break;
+		case insertEscSeqAsDataDefault:
+		case insertEscSeqAsDataFallback:
+			processInsertEscSeqAsDefaultCommand();
+			break;
 
-	default:
-		break;
+		default:
+			break;
 	}
 }
 
 void Decoder::processBeginDataBlockCommand()
 {
-	taskStack.push(Task(BlockType::dataBlock));
+	taskStack.emplace(dataBlock);
 }
 
 void Decoder::processBeginControlBlockCommand()
 {
-	taskStack.push(Task(BlockType::controlBlock));
+	taskStack.emplace(controlBlock);
 }
 
 void Decoder::processEndBlockCommand()
 {
-	for (auto observer : observers)
+	for (auto observer: observers)
 	{
 		observer->endBlockReceived(taskStack.top().blockType, taskStack.top().nibbleCompressor.getData());
 	}
@@ -101,5 +98,5 @@ void Decoder::processInsertPrevNibbleAgainCommand()
 
 void Decoder::processInsertEscSeqAsDefaultCommand()
 {
-	taskStack.top().nibbleCompressor.pushBack(static_cast<uint8_t>(static_cast<uint8_t>(CodecCommand::escapeSequence)));
+	taskStack.top().nibbleCompressor.pushBack(escapeSequence);
 }

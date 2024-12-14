@@ -1,7 +1,8 @@
 #include "../header/Logger.hpp"
 
 Logger::Logger(const LogLevel level, const bool rewriteLine) : level_(level), rewriteLine_(rewriteLine)
-{ }
+{
+}
 
 Logger::~Logger()
 {

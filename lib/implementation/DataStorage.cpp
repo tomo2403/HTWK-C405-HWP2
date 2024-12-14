@@ -5,19 +5,19 @@
 DataStorage::DataStorage(const std::vector<uint8_t> &dataVector_byte)
     : dataVector_byte(dataVector_byte)
 {
-    if(dataVector_byte.empty())
+    if (dataVector_byte.empty())
     {
         throw std::invalid_argument("DataStorage: The provided vector must not be empty.");
     }
-    
+
 
     this->dataVectorOffset = 0;
     this->nextNibbleIsHighNibble = true;
 }
 
-uint8_t DataStorage::peek_nibble()
+uint8_t DataStorage::peek_nibble() const
 {
-    if(empty())
+    if (empty())
     {
         throw std::out_of_range("DataStorage: Attempted to access an element from empty storage.");
     }
@@ -26,10 +26,7 @@ uint8_t DataStorage::peek_nibble()
     {
         return dataVector_byte.at(dataVectorOffset) >> 4;
     }
-    else
-    {
-        return dataVector_byte.at(dataVectorOffset) & 0x0F;
-    }
+    return dataVector_byte.at(dataVectorOffset) & 0x0F;
 }
 
 uint8_t DataStorage::pop_nibble()
@@ -46,9 +43,9 @@ uint8_t DataStorage::pop_nibble()
     return nextNibble;
 }
 
-bool DataStorage::empty()
+bool DataStorage::empty() const
 {
-    if(dataVectorOffset >= dataVector_byte.size())
+    if (dataVectorOffset >= dataVector_byte.size())
     {
         return true;
     }

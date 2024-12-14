@@ -11,7 +11,6 @@
  */
 enum CodecCommand
 {
-
     /**
      * @brief Only commands after the escapeSequence are recognized as such.
      *

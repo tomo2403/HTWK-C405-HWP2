@@ -36,7 +36,9 @@ public:
 	{
 		std::unique_lock lock(mtx);
 		cv.wait(lock, [this]()
-		{ return !queue.empty(); });
+		{
+			return !queue.empty();
+		});
 		item = queue.front();
 		queue.pop();
 	}

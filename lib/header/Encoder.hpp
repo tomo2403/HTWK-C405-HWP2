@@ -2,7 +2,7 @@
 
 #include <stack>
 
-#include "Encoder.hpp"
+#include "BlockType.hpp"
 #include "DataStorage.hpp"
 
 class Encoder
@@ -19,20 +19,23 @@ private:
 
 	uint8_t escNibbleQueue;
 	uint8_t previousNibble;
-	
+
 	std::stack<Task> taskStack;
 
 	uint8_t determineStartCommand();
+
 	uint8_t determineEndCommand();
+
 	uint8_t determinePrevNibbleAgainCommand();
+
 	uint8_t determineEscSeqAsDataCommand();
-	
+
 public:
 	void pushBlock(const BlockType &blockType, const std::vector<uint8_t> &data);
 
 	void forcePushBlock(const BlockType &blockType, const std::vector<uint8_t> &data);
 
-	bool hasData();
+	bool hasData() const;
 
 	uint8_t nextNibble();
 
