@@ -20,4 +20,7 @@ add_library(lib STATIC lib.cpp lib.hpp
         implementation/Encoder.cpp
         implementation/Logger.cpp
         implementation/NibbleCompressor.cpp
+        implementation/DataPacketAssembler.cpp
+        implementation/DataPacketDisassembler.cpp
+        utilities.cpp
 )

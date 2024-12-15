@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stack>
+#include <mutex>
 
 #include "NibbleCompressor.hpp"
 #include "BlockType.hpp"

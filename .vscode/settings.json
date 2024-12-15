@@ -92,5 +92,6 @@
         "spanstream": "cpp",
         "syncstream": "cpp",
         "stdfloat": "cpp"
-    }
+    },
+    "cSpell.enabled": true
 }

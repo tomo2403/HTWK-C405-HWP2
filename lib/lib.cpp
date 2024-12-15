@@ -25,17 +25,4 @@ namespace ioManager
 		std::cout.write(reinterpret_cast<const char *>(data.data()), data.size());
 		Logger(INFO) << "Output written!";
 	}
-
-	std::vector<uint8_t> extractSubvector(const std::vector<uint8_t>& vec, const size_t start, size_t length)
-	{
-		if (start >= vec.size()) {
-			return {};
-		}
-		
-		if (start + length > vec.size()) {
-			length = vec.size() - start;
-		}
-
-		return {vec.begin() + start, vec.begin() + start + length};
-	}
 }
