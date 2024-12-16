@@ -1,3 +1,5 @@
+#pragma once
+
 #include "CRC.hpp"
 
 enum Flags : uint8_t

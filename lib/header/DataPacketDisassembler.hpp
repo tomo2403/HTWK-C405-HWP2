@@ -1,3 +1,5 @@
+#pragma once
+
 #include "CRC.hpp"
 
 class DataPacketDisassembler
