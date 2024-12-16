@@ -4,7 +4,6 @@
 
 #include "../utilities.hpp"
 
-const CRC DataPacketDisassembler::crcCalculator = CRC();
 const uint8_t DataPacketDisassembler::dataBytesPerPacket = 64;
 
 DataPacketDisassembler::DataPacketDisassembler()
@@ -54,7 +53,7 @@ bool DataPacketDisassembler::processPacket(const std::vector<uint8_t> &packet, c
     }
 
     // TODO: More elegant crc solution
-    if (!crcCalculator.validateCRC(utilities::extractSubvector(packet, 0, packet.size()-4), crc))
+    if (!CRC::validateCRC(utilities::extractSubvector(packet, 0, packet.size()-4), crc))
     {
         return false;
     }

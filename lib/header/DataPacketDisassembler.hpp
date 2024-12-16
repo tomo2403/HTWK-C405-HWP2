@@ -3,8 +3,6 @@
 class DataPacketDisassembler
 {
 private:
-    const static CRC crcCalculator;
-
     const static uint8_t dataBytesPerPacket;
     std::vector<uint8_t> rawData;
 

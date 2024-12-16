@@ -23,9 +23,9 @@ public:
      * @param data Data over which the CRC value should be calculated.
      * @return uint32_t; (Only) 32-bit CRC value of the data.
      */
-    [[nodiscard]] uint32_t calculateCRC(const std::vector<uint8_t> &data) const;
+    [[nodiscard]] static uint32_t calculateCRC(const std::vector<uint8_t> &data);
 
-    void attachCRC(std::vector<uint8_t> &data) const;
+    static void attachCRC(std::vector<uint8_t> &data);
 
     /**
      * @brief Validates a CRC value.
@@ -34,9 +34,11 @@ public:
      * @see calculateCRC(myVector8) - Used to calculate the CRC value that will be compared with the given CRC value.
      * @return bool; TRUE if the CRC value matches the data; FALSE otherwise.
      */
-    [[nodiscard]] bool validateCRC(const std::vector<uint8_t> &data, uint32_t receivedCRC) const;
+    [[nodiscard]] static bool validateCRC(const std::vector<uint8_t> &data, uint32_t receivedCRC);
 
 private:
-    uint32_t polynomial = 0x04c11db7;
-    uint32_t initialValue = 0xffffffff;
+	CRC() = delete;
+
+    static const uint32_t polynomial = 0x04c11db7;
+    static const uint32_t initialValue = 0xffffffff;
 };

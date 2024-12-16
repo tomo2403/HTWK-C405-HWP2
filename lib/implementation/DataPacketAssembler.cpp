@@ -5,7 +5,6 @@
 
 #include "../utilities.hpp"
 
-const CRC DataPacketAssembler::crcCalculator = CRC();
 const uint8_t DataPacketAssembler::dataBytesPerPacket = 64;
 
 void DataPacketAssembler::packetAssembly_addId(std::vector<uint8_t> &packet, const uint16_t &id)
@@ -29,7 +28,7 @@ void DataPacketAssembler::packetAssembly_addData(std::vector<uint8_t> &packet, c
 
 void DataPacketAssembler::packetAssembly_addCrc(std::vector<uint8_t> &packet)
 {
-    const uint32_t crc = crcCalculator.calculateCRC(packet);
+    const uint32_t crc = CRC::calculateCRC(packet);
     
     packet.reserve(4);
 
