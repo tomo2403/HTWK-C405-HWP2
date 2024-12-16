@@ -25,11 +25,11 @@ const void ControlPacketAssembler::packetAssembly_addCrc(std::vector<uint8_t> &p
     }
 }
 
-const std::vector<uint8_t> ControlPacketAssembler::assemble(const uint8_t &flags, const uint32_t &packetId)
+const std::vector<uint8_t> ControlPacketAssembler::assemble(const uint8_t &flag, const uint32_t &packetId)
 {
     std::vector<uint8_t> packet;
     packetAssembly_addId(packet, packetId);
-    packetAssembly_addFlags(packet, flags);
+    packetAssembly_addFlags(packet, flag);
     packetAssembly_addCrc(packet);
 
     return packet;

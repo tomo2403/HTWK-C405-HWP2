@@ -2,7 +2,7 @@
 
 #include "CRC.hpp"
 
-enum Flags : uint8_t
+enum Flag : uint8_t
 {
 	/** @brief The sender has delivered all data and is ready to close the connection. */
 	TRANSFER_FINISHED = 1 << 0, // Bit 0
@@ -28,5 +28,5 @@ private:
     
 public:
     
-    static const std::vector<uint8_t> assemble(const uint8_t &flags, const uint32_t &packetId);
+    static const std::vector<uint8_t> assemble(const uint8_t &flag, const uint32_t &packetId);
 };
