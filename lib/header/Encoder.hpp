@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stack>
+#include <mutex>
 
 #include "BlockType.hpp"
 #include "DataStorage.hpp"

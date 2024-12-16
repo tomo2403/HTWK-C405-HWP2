@@ -1,5 +1,9 @@
 #include "lib.hpp"
 
+#include <iostream>
+
+#include "header/Logger.hpp"
+
 namespace ioManager
 {
 	std::vector<uint8_t> getBinaryInput()

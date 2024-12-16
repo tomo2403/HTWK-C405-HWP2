@@ -1,19 +1,4 @@
-add_library(lib STATIC lib.cpp lib.hpp
-        header/BlockType.hpp
-        header/CodecCommand.hpp
-        header/ComManager.hpp
-        header/ControlPanel.hpp
-        header/CRC.hpp
-        header/DataStorage.hpp
-        header/Decoder.hpp
-        header/Encoder.hpp
-        header/ICommunicationInterface.hpp
-        header/IDecoderObserver.hpp
-        header/Logger.hpp
-        header/NibbleCompressor.hpp
-        header/ThreadSafeQueue.hpp
-        implementation/ComManager.cpp
-        implementation/ControlPanel.cpp
+add_library(lib STATIC lib.cpp
         implementation/CRC.cpp
         implementation/DataStorage.cpp
         implementation/Decoder.cpp

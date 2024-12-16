@@ -1,4 +1,8 @@
-#include "../lib.hpp"
+#include "../header/Encoder.hpp"
+
+#include <stdexcept>
+
+#include "../header/CodecCommand.hpp"
 
 Encoder::Task::Task(const BlockType &blockType, const std::vector<uint8_t> &dataVector_byte)
 	: dataStorage(DataStorage(dataVector_byte)),
