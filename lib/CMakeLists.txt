@@ -8,5 +8,7 @@ add_library(lib STATIC lib.cpp
         implementation/DataPacketAssembler.cpp
         implementation/DataPacketDisassembler.cpp
         implementation/ControlPacketAssembler.cpp
+        implementation/ControlPacketDisassembler.cpp
+        implementation/Timer.cpp
         utilities.cpp
 )
