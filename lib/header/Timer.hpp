@@ -17,4 +17,6 @@ public:
 
     // uint: seconds
     double elapsed();
+
+    bool running();
 };
