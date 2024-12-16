@@ -4,43 +4,57 @@
 
 #include "../header/CodecCommand.hpp"
 
-Encoder::Task::Task(const BlockType &blockType, const std::vector<uint8_t> &dataVector_byte)
+Encoder::Task::Task(const BlockType &blockType, const std::vector<uint8_t> &dataVector_byte, const std::function<void()> &callback)
 	: dataStorage(DataStorage(dataVector_byte)),
 	  blockType(blockType),
-	  startSequenceSent(false)
+	  startSequenceSent(false),
+	  callback(callback)
 {
 }
 
-void Encoder::forcePushBlock(const BlockType &blockType, const std::vector<uint8_t> &data)
+void Encoder::forcePushBlock(const BlockType &blockType, const std::vector<uint8_t> &data, const std::function<void()> &callback)
 {
-	std::lock_guard lock(mtx);
-	taskStack.emplace(blockType, data);
+	taskStack.emplace(blockType, data, callback);
 }
 
-void Encoder::pushBlock(const BlockType &blockType, const std::vector<uint8_t> &data)
+void Encoder::pushBlock(const BlockType &blockType, const std::vector<uint8_t> &data, const std::function<void()> &callback)
 {
-	std::lock_guard lock(mtx);
 	if (taskStack.size() >= 2)
 	{
 		throw std::runtime_error(
 			"Encoder: WARNING - The Encoder currently has two or more tasks in the stack. Adding more tasks may affect the stability of the transmission. If you still wish to add a task, use forcePushBlock(...) to bypass this check.");
 	}
-	forcePushBlock(blockType, data);
+
+	if (blockType == controlBlock && callback != nullptr)
+	{
+		throw std::invalid_argument("Encoder: WARNING - A control block does not require a callback function. Callbacks are intended for data blocks only. If you still wish to add a callback, use forcePushBlock(...) to bypass this check.");
+	}
+
+	forcePushBlock(blockType, data, callback);
 }
 
 
 bool Encoder::hasData()
 {
-	std::lock_guard lock(mtx);
 	return !taskStack.empty() || escNibbleQueue != 0x00;
 }
 
 uint8_t Encoder::nextNibble()
 {
-	std::lock_guard lock(mtx);
 	if (!hasData())
 	{
 		throw std::out_of_range("Encoder: No data to encode.");
+	}
+
+	// The task giver can request a callback to be executed, if the
+	// data (handed in for encoding) is fully sent.
+	// This condition can only become true, if a callback was provided and
+	// if the nibbleToReturn is the very last nibble (the endCommand) of a
+	// block.
+	if(callbackQueue != nullptr)
+	{
+		callbackQueue();
+		callbackQueue = nullptr;
 	}
 
 	uint8_t nibbleToReturn = 0x00;
@@ -68,6 +82,7 @@ uint8_t Encoder::nextNibble()
 	// The current task has no more data.
 	else if (taskStack.top().dataStorage.empty())
 	{
+		callbackQueue = taskStack.top().callback;	
 		taskStack.pop();
 		escNibbleQueue = determineEndCommand();
 		nibbleToReturn = escapeSequence;
