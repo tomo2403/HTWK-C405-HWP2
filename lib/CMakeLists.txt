@@ -7,5 +7,6 @@ add_library(lib STATIC lib.cpp
         implementation/NibbleCompressor.cpp
         implementation/DataPacketAssembler.cpp
         implementation/DataPacketDisassembler.cpp
+        implementation/ControlPacketAssembler.cpp
         utilities.cpp
 )
