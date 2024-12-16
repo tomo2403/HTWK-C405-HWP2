@@ -2,9 +2,11 @@
 #include <vector>
 #include "../lib/header/DataPacketAssembler.hpp"
 #include "../lib/header/DataPacketDisassembler.hpp"
+#include "../lib/header/ControlPacketAssembler.hpp"
 
 int main() {
     std::vector<uint8_t> testData = {9, 3, 7, 1, 43, 4};
+    std::vector<uint8_t> control = ControlPacketAssembler::assemble(Flags::CONNECT, 5);
     
     DataPacketAssembler assembler(testData);
     
