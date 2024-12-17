@@ -6,12 +6,14 @@ struct InterthreadNotification
 {
     enum class Type
     {
-        /** @brief The receiver requests a resend of the packet with id provided. */
-        RESEND = 1 << 2, // Bit 2
-        /** @brief The sender wants to establish a connection. */
-        CONNECT = 1 << 3, // Bit 3
-        /** @brief The receiver confirms that it has received the packet with id provided. */
-        RECEIVED = 1 << 4, // Bit 4
+        START_SENDING_DATA,
+	    CLOSE_CONNECTION,
+        
+        FOREIGN_PACKET_RESEND,
+        FOREIGN_PACKET_RECEIVED,
+
+        OWN_PACKET_RESEND,
+        OWN_PACKET_RECEIVED
     };
 
     const Type type;

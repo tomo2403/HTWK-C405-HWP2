@@ -9,6 +9,12 @@ add_library(lib STATIC lib.cpp
         implementation/DataPacketDisassembler.cpp
         implementation/ControlPacketAssembler.cpp
         implementation/ControlPacketDisassembler.cpp
+        implementation/InterthreadNotification.cpp
         implementation/Timer.cpp
+
+        implementation/Sender/Sender.cpp
+        implementation/Sender/SenderState.cpp
+        implementation/Sender/SenderState_ReadyToConnect.cpp
+        implementation/Sender/SenderState_Sending.cpp
         utilities.cpp
 )
