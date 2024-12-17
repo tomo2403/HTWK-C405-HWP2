@@ -10,11 +10,11 @@ SenderResources::SenderResources(AtomicQueue<uint8_t>* datastreamQueue_outgoing,
 
 Sender::Sender(AtomicQueue<uint8_t>* datastreamQueue_outgoing, AtomicQueue<InterthreadNotification>* notificationQueue_incoming, const std::vector<uint8_t> &data)
 {
-    // Initialisiere die Ressourcen
     resources = std::make_unique<SenderResources>(datastreamQueue_outgoing, notificationQueue_incoming, data);
     
-    // Setze den Anfangszustand auf SenderState_ReadyToConnect
     currentState = std::make_unique<SenderState_ReadyToConnect>(this, resources.get());
+
+    running = true;
 }
 
 void Sender::setState(std::unique_ptr<SenderState> state)
@@ -24,7 +24,7 @@ void Sender::setState(std::unique_ptr<SenderState> state)
 
 void Sender::send()
 {
-    while(true)
+    while(running)
     {
         if (!resources->notificationQueue_incoming->empty())
         {
@@ -39,4 +39,9 @@ void Sender::send()
             currentState->processDataQueueIsEmpty();
         }
     }
+}
+
+void Sender::shutDown()
+{
+    running = false;
 }

@@ -4,6 +4,7 @@
 #include "../../header/ControlPacketAssembler.hpp"
 
 #include <stdexcept>
+#include <iostream>
 
 SenderState_Sending::SenderState_Sending(Sender* sender, SenderResources* resources)
     : SenderState(sender, resources)
@@ -44,11 +45,11 @@ void SenderState_Sending::processDataQueueIsEmpty()
     }
     else
     {
-        // sender->setState(std::make_unique<SenderState_ReadyToCloseConnection>(sender, resources));
+        sender->setState(std::make_unique<SenderState_ReadyToCloseConnection>(sender, resources));
     }
 }
 
 void SenderState_Sending::OnDataPacketSentCallback()
 {
-    // sender->setState(std::make_unique<SenderState_AwaitingResponse>(sender, resources));
+    sender->setState(std::make_unique<SenderState_AwaitingResponse>(sender, resources));
 }

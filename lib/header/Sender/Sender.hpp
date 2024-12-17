@@ -18,6 +18,8 @@ private:
     std::unique_ptr<SenderState> currentState;
     std::unique_ptr<SenderResources> resources;
 
+    bool running;
+
 public:
     Sender(AtomicQueue<uint8_t>* datastreamQueue_outgoing, AtomicQueue<InterthreadNotification>* notificationQueue_incoming, const std::vector<uint8_t> &data);
 
@@ -25,4 +27,6 @@ public:
 
     // To start in another thread
     void send();
+
+    void shutDown();
 };

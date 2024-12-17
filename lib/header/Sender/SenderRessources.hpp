@@ -9,8 +9,7 @@
 
 struct SenderResources
 {
-    static const uint8_t secondsUntilTimeout;
-
+    uint8_t timeOutCounter;
     uint16_t nextPacketToBeSent_id;
     bool shutDownAsap;
 
@@ -19,7 +18,6 @@ struct SenderResources
 
     Encoder encoder;
     DataPacketAssembler dataPacketAssembler;
-    Timer timer;
 
     SenderResources(AtomicQueue<uint8_t>* datastreamQueue_outgoing, AtomicQueue<InterthreadNotification>* notificationQueue_incoming, const std::vector<uint8_t> &data);
 };
