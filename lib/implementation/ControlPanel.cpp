@@ -29,27 +29,27 @@ void ControlPanel::processControlBlock(const uint8_t &flags, uint32_t packetId)
 	std::lock_guard lock(mtx);
 	if (flags & CLOSE_CONNECTION)
 		closeCmdReceived = true;
-	else if (flags & TRANSFER_FINISHED)
+	if (flags & TRANSFER_FINISHED)
 		everythingReceived = true;
-	else if (flags & RESEND)
-		responses.push(std::make_pair(packetId, RESEND));
-	else if (flags & CONNECT)
+	if (flags & AWAITING)
+		packetRequests.push(packetId);
+	if (flags & CONNECT)
 		connected = true;
-	else if (flags & RECEIVED)
-		responses.push(std::make_pair(packetId, RECEIVED));
 }
 
-std::vector<uint8_t> ControlPanel::createControlBlock(const uint8_t flags, const uint32_t packetId)
+std::vector<uint8_t> ControlPanel::createControlBlock(const uint8_t flags, const uint32_t packetId, CRC* crc)
 {
 	std::vector<uint8_t> data;
 	data.push_back(packetId >> 8);
 	data.push_back(packetId);
 	data.push_back(flags);
 
+	crc->attachCRC(data);
+
 	std::lock_guard lock(mtx);
 	if (flags & TRANSFER_FINISHED)
 		everythingSent = true;
-	else if (flags & CLOSE_CONNECTION)
+	if (flags & CLOSE_CONNECTION)
 		connected = false;
 
 	return data;

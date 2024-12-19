@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <vector>
 #include "ThreadSafeQueue.hpp"
+#include "CRC.hpp"
 
 enum Flags : uint8_t
 {
@@ -10,12 +11,10 @@ enum Flags : uint8_t
 	TRANSFER_FINISHED = 1 << 0, // Bit 0
 	/** @brief The sender will close the connection and is not receiving any new packets. */
 	CLOSE_CONNECTION = 1 << 1, // Bit 1
-	/** @brief The receiver requests a resend of the packet with id provided. */
-	RESEND = 1 << 2, // Bit 2
+	/** @brief The receiver requests the packet with id provided. */
+	CONNECT = 1 << 2, // Bit 2
 	/** @brief The sender wants to establish a connection. */
-	CONNECT = 1 << 3, // Bit 3
-	/** @brief The receiver confirms that it has received the packet with id provided. */
-	RECEIVED = 1 << 4, // Bit 4
+	AWAITING = 1 << 3, // Bit 3
 };
 
 class ControlPanel
@@ -28,7 +27,7 @@ private:
 	bool closeCmdReceived = false;
 
 public:
-	ThreadSafeQueue<std::pair<uint16_t, Flags> > responses;
+	ThreadSafeQueue<uint16_t> packetRequests;
 
 	ControlPanel() = default;
 
@@ -43,9 +42,10 @@ public:
 	 * @brief Creates a control block.
 	 * @param flags The flags to set.
 	 * @param packetId The packet id to set.
+	 * @param crc The CRC object to attach the CRC to.
 	 * @return The created control block.
 	 */
-	[[nodiscard]] std::vector<uint8_t> createControlBlock(uint8_t flags, uint32_t packetId);
+	[[nodiscard]] std::vector<uint8_t> createControlBlock(uint8_t flags, uint32_t packetId, CRC* crc);
 
 	/**
 	 * @brief Checks if the connection is established.
