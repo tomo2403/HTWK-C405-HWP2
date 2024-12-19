@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <vector>
 #include <thread>
-#include <future>
 
 #include "Logger.hpp"
 #include "ControlPanel.hpp"
@@ -15,10 +14,7 @@
 
 class ComManager final : IDecoderObserver
 {
-private:
 	mutable std::mutex mtx;
-	std::condition_variable cv;
-	bool responsePending = false;
 
 	std::thread sendDataThread;
 	std::thread connectThread;
@@ -26,7 +22,7 @@ private:
 	std::vector<std::vector<uint8_t> > outgoingData{};
 	ThreadSafeQueue<std::vector<uint8_t> > outgoingControlQueue;
 	ThreadSafeQueue<std::pair<BlockType, std::vector<uint8_t> > > incomingQueue;
-	uint16_t nextPacketId = 0;
+	uint8_t lastSendBlock = 0;
 	u_long errors = 0;
 
 	ControlPanel cp;

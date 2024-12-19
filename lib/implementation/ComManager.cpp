@@ -44,12 +44,15 @@ void ComManager::connect()
 {
 	const auto start = std::chrono::steady_clock::now();
 	Logger(INFO) << "Connecting...";
-	std::vector<uint8_t> data = cp.createControlBlock(CONNECT, 0);
+	std::vector<uint8_t> data = cp.createControlBlock(CONNECT, 0, &crc);
 	crc.attachCRC(data);
 	while (!cp.isConnected())
 	{
 		encoder.pushBlock(controlBlock, data);
-		while (encoder.hasData()) {}
+		while (encoder.hasData())
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		}
 
 		auto now = std::chrono::steady_clock::now();
 		auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
@@ -65,7 +68,6 @@ void ComManager::receiveData()
 
 	while (!cp.isCloseCmdReceived())
 	{
-		std::lock_guard lock(mtx);
 		if (!com->isDataAvailable())
 			continue;
 
@@ -101,16 +103,10 @@ void ComManager::processIncomingQueue()
 		}
 		else if (packet.first == dataBlock)
 		{
-			std::vector<uint8_t> response;
 			if (valid)
-			{
 				outputData.insert(outputData.end(), data.begin(), data.end());
-				response = cp.createControlBlock(RECEIVED, id);
-			}
-			else
-			{
-				response = cp.createControlBlock(RESEND, id);
-			}
+
+			std::vector<uint8_t> response = cp.createControlBlock(AWAITING, valid ? id + 1 : id, &crc);
 			outgoingControlQueue.push(response);
 		}
 		else
@@ -122,13 +118,19 @@ void ComManager::processIncomingQueue()
 
 void ComManager::processOutgoingQueue()
 {
+	std::chrono::time_point<std::chrono::steady_clock> lastSendTime;
+	while (!cp.isConnected())
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	}
+
+	// First packet
+	encoder.pushBlock(dataBlock, outgoingData[0]);
+
 	while (true)
 	{
 		if (!cp.isConnected() && cp.isCloseCmdReceived())
 			return;
-
-		if (!cp.isConnected())
-			continue;
 
 		if (!outgoingControlQueue.empty())
 		{
@@ -137,47 +139,30 @@ void ComManager::processOutgoingQueue()
 			encoder.pushBlock(controlBlock, response);
 		}
 
-		// TODO: Timeout for response
-
-		if (nextPacketId < outgoingData.size())
+		if (!cp.packetRequests.empty())
 		{
-			std::vector<uint8_t> packet = outgoingData[nextPacketId++];
-			if (sendDataThread.joinable())
-			{
-				sendDataThread.join();
-			}
-			encoder.pushBlock(dataBlock, packet);
+			uint16_t requestedPacket;
+			cp.packetRequests.wait_and_pop(requestedPacket);
 
-			std::unique_lock lock(mtx);
-			if (cv.wait_for(lock, std::chrono::seconds(10), [this] { return !cp.responses.empty(); }))
-			{
-				// Received a response within the timeout
-				std::pair<uint16_t, Flags> response;
-				cp.responses.wait_and_pop(response);
-
-				if (response.second == RECEIVED)
-				{
-					// Continue with the next packet
-					continue;
-				}
-
-				if (response.second == RESEND)
-				{
-					errors++;
-					nextPacketId = response.first;
-				}
-			}
+			std::vector<uint8_t> response;
+			if (requestedPacket >= outgoingData.size())
+				response = cp.createControlBlock(TRANSFER_FINISHED, outgoingData.size(), &crc);
 			else
-			{
-				// Timeout occurred, resend the last packet
-				nextPacketId--;
-			}
+				response = outgoingData[requestedPacket];
+
+			encoder.pushBlock(dataBlock, response);
+			lastSendTime = std::chrono::steady_clock::now();
+			std::lock_guard lock(mtx);
+			lastSendBlock = requestedPacket;
 		}
 		else
 		{
-			std::vector<uint8_t> data = cp.createControlBlock(TRANSFER_FINISHED, 0);
-			crc.attachCRC(data);
-			encoder.pushBlock(controlBlock, data);
+			if (std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - lastSendTime).count() > 5)
+			{
+				std::lock_guard lock(mtx);
+				encoder.pushBlock(dataBlock, outgoingData[lastSendBlock]);
+				lastSendTime = std::chrono::steady_clock::now();
+			}
 		}
 	}
 }
@@ -200,7 +185,8 @@ void ComManager::watchControlPanel() const
 
 		auto now = std::chrono::steady_clock::now();
 		auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - start).count();
-		Logger(INFO, true) << "Packet " << nextPacketId << "/" << outgoingData.size() << " | Errors: " << errors << " | " << elapsed <<
+		std::lock_guard lock(mtx);
+		Logger(INFO, true) << "Packet " << lastSendBlock << "/" << outgoingData.size() << " | Errors: " << errors << " | " << elapsed <<
 				"s elapsed";
 		std::this_thread::sleep_for(std::chrono::milliseconds(200));
 	}
