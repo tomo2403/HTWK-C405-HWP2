@@ -4,6 +4,9 @@
 
 class ICommunicationInterface
 {
+protected:
+	mutable std::mutex mtx;
+
 public:
 	virtual ~ICommunicationInterface() = default;
 

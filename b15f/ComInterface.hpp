@@ -1,26 +1,17 @@
 #pragma once
 
-#include <iostream>
-#include <cstdio>
 #include <cstdint>
-#include <cstring>
-#include <sys/fcntl.h>
 #include <sys/ioctl.h>
-#include <unistd.h>
-#include <termios.h>
-#include <thread>
 #include <b15f/b15f.h>
 
-#include "../lib/header/Logger.hpp"
 #include "../lib/header/ICommunicationInterface.hpp"
 
-class ComInterface : public ICommunicationInterface
+class ComInterface final : public ICommunicationInterface
 {
 private:
 	int serialPort{}; /**< The file descriptor for the interface port. */
 	B15F& drv = B15F::getInstance();
 	uint8_t previouslyReceivedNibble{};
-	std::mutex drvMutex;
 
 public:
 	/**
