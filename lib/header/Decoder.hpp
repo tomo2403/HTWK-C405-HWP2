@@ -26,7 +26,6 @@ private:
 
 	std::vector<IDecoderObserver *> observers;
 	std::stack<Task> taskStack;
-	std::mutex mtx;
 
 	void processCommand(const CodecCommand &command);
 

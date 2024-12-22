@@ -11,19 +11,16 @@ Decoder::Decoder() = default;
 
 void Decoder::addObserver(IDecoderObserver *observer)
 {
-	std::lock_guard lock(mtx);
 	observers.push_back(observer);
 }
 
 void Decoder::removeObserver(IDecoderObserver *observer)
 {
-	std::lock_guard lock(mtx);
 	std::erase(observers, observer);
 }
 
 void Decoder::nextNibble(const uint8_t &nibble)
 {
-	std::lock_guard lock(mtx);
 	if (nibble == escapeSequence)
 	{
 		escapeModeActive = true;

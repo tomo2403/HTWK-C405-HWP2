@@ -19,5 +19,5 @@ struct InterthreadNotification
     const Type type;
     const uint16_t referencedPacket_id;
 
-    InterthreadNotification(const Type &type, const uint16_t &referencedPacket_id);
+    InterthreadNotification(const Type &type, const uint16_t &referencedPacket_id = 0);
 };

@@ -5,7 +5,7 @@ project(pc2)
 project(b15f)
 project(test)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 
 add_subdirectory(lib)
 add_subdirectory(pc)

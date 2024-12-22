@@ -108,7 +108,7 @@ uint8_t Encoder::determineStartCommand()
 {
 	if (taskStack.top().blockType == dataBlock)
 	{
-		return taskStack.top().dataStorage.peek_nibble() == beginDataBlockDefault ? beginDataBlockFallback : beginControlBlockDefault;
+		return taskStack.top().dataStorage.peek_nibble() == beginDataBlockDefault ? beginDataBlockFallback : beginDataBlockFallback;
 	}
 
 	return taskStack.top().dataStorage.peek_nibble() == beginControlBlockDefault ? beginControlBlockFallback : beginControlBlockDefault;

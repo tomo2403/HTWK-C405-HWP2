@@ -18,5 +18,7 @@ add_library(lib STATIC lib.cpp
         implementation/Sender/SenderState_Sending.cpp
         implementation/Sender/SenderState_AwaitingResponse.cpp
         implementation/Sender/SenderState_ReadyToCloseConnection.cpp
+
+        implementation/Receiver/Receiver.cpp
         utilities.cpp
 )
