@@ -23,8 +23,7 @@ void SenderState_ReadyToConnect::processNotification()
 
 void SenderState_ReadyToConnect::processDataQueueIsEmpty()
 {
-    // Optional: Füge eine kleine Verzögerung hinzu, um die CPU-Auslastung zu reduzieren
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2500));
     const std::vector<uint8_t> controlBlock = ControlPacketAssembler::assemble(Flag::CONNECT, 0);
     resources->encoder.pushBlock(BlockType::controlBlock, controlBlock);
 }

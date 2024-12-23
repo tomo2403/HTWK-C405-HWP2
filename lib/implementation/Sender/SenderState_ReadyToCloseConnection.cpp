@@ -36,6 +36,7 @@ void SenderState_ReadyToCloseConnection::processNotification()
 
 void SenderState_ReadyToCloseConnection::processDataQueueIsEmpty()
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(2500));
     const std::vector<uint8_t> controlBlock = ControlPacketAssembler::assemble(Flag::CLOSE_CONNECTION, 0);
     resources->encoder.pushBlock(BlockType::controlBlock, controlBlock);
 }
