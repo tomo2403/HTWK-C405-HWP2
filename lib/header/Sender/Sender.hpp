@@ -8,6 +8,7 @@
 #include "../DataPacketAssembler.hpp"
 #include "../Timer.hpp"
 #include "../InterthreadNotification.hpp"
+#include "../AtomicBoolean.hpp"
 
 class SenderState;
 
@@ -29,4 +30,6 @@ public:
     void send();
 
     void shutDown();
+
+    bool* getAtomicBoolean_pointer();
 };

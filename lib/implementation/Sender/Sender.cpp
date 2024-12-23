@@ -45,3 +45,8 @@ void Sender::shutDown()
 {
     running = false;
 }
+
+bool* Sender::getAtomicBoolean_pointer()
+{
+    return &running;
+}

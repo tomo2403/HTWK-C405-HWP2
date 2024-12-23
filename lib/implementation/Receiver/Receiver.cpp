@@ -1,22 +1,28 @@
 #include "../../header/Receiver/Receiver.hpp"
+#include "../../lib.hpp"
 #include <iostream>
 
-Receiver::Receiver(AtomicQueue<uint8_t>* datastreamQueue_incoming, AtomicQueue<InterthreadNotification>* notificationQueue_outgoing)
-    : datastreamQueue_incoming(datastreamQueue_incoming), notificationQueue_outgoing(notificationQueue_outgoing), connectionEstablished(false)
+Receiver::Receiver(AtomicQueue<uint8_t>* datastreamQueue_incoming, AtomicQueue<InterthreadNotification>* notificationQueue_outgoing, bool* running)
+    : datastreamQueue_incoming(datastreamQueue_incoming), notificationQueue_outgoing(notificationQueue_outgoing), connectionEstablished(false), running(running)
 {
     decoder.addObserver(this);
     controlPacketDisassembler.addObserver(this);
 }
 
+Receiver::~Receiver()
+{
+    ioManager::setBinaryOutput(dataPacketDisassembler.getData());
+}
+
 void Receiver::receive()
 {
-    while (true)
+    while (*running)
     {
         std::optional<uint8_t> optionalValue = datastreamQueue_incoming->try_pop();
         
         if (optionalValue) {
-            std::cout << std::hex << (int) *optionalValue << std::endl;
             decoder.nextNibble(*optionalValue);
+            // std::cout << std::hex << (int) *optionalValue << std::endl;
         }
     }
 }
@@ -50,8 +56,8 @@ void Receiver::dataBlockReceived(const std::vector<uint8_t> &dataVector)
 {
     if(dataPacketDisassembler.processPacket(dataVector, nextPacketToBeReceived_id))
     {
-        nextPacketToBeReceived_id++;
         notificationQueue_outgoing->push(InterthreadNotification(InterthreadNotification::Type::FOREIGN_PACKET_RECEIVED, nextPacketToBeReceived_id));
+        nextPacketToBeReceived_id++;
     }
     else
     {

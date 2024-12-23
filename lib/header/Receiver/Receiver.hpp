@@ -7,6 +7,7 @@
 #include "../IDecoderObserver.hpp"
 #include "../IControlPacketDisassemblerObserver.hpp"
 #include "../ControlPacketDisassembler.hpp"
+#include "../AtomicBoolean.hpp"
 
 #include <memory>
 
@@ -20,7 +21,7 @@ private:
     DataPacketDisassembler dataPacketDisassembler;
     ControlPacketDisassembler controlPacketDisassembler;
 
-    // bool running;
+    bool* running;
     bool connectionEstablished;
     uint16_t nextPacketToBeReceived_id;
 
@@ -28,7 +29,8 @@ private:
     void dataBlockReceived(const std::vector<uint8_t> &dataVector);
 
 public:
-    Receiver(AtomicQueue<uint8_t>* datastreamQueue_incoming, AtomicQueue<InterthreadNotification>* notificationQueue_outgoing);
+    Receiver(AtomicQueue<uint8_t>* datastreamQueue_incoming, AtomicQueue<InterthreadNotification>* notificationQueue_outgoing, bool* running);
+    ~Receiver();
 
     // IDecoderObserver
 
