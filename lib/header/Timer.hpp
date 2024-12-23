@@ -17,7 +17,7 @@ public:
 
     void stop();
 
-    // uint: seconds
+    // unit: seconds
     double elapsed();
 
     bool running();
