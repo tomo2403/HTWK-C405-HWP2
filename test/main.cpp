@@ -9,7 +9,7 @@
 int main() {
     AtomicQueue<uint8_t> dataQueue;
     AtomicQueue<InterthreadNotification> notifications;
-    std::vector<uint8_t> data = ioManager::readFile("../../random_file.bin");
+    std::vector<uint8_t> data = ioManager::readFile("../../random.bin");
     // std::vector<uint8_t> data = ioManager::getBinaryInput();
 
     /*

@@ -1,10 +1,11 @@
 #include "../header/ControlPacketAssembler.hpp"
 
-const void ControlPacketAssembler::packetAssembly_addId(std::vector<uint8_t> &packet, const uint16_t &id)
+const void ControlPacketAssembler::packetAssembly_addId(std::vector<uint8_t> &packet, const uint32_t &id)
 {
-    packet.reserve(2);
-    packet.push_back(static_cast<uint8_t>(id >> 8));
-    packet.push_back(static_cast<uint8_t>(id & 0x0F));
+    packet.reserve(3);
+    packet.push_back(static_cast<uint8_t>((id >> 16) & 0xFF));
+    packet.push_back(static_cast<uint8_t>((id >> 8) & 0xFF));
+    packet.push_back(static_cast<uint8_t>((id >> 0) & 0xFF));
 }
 
 const void ControlPacketAssembler::packetAssembly_addFlags(std::vector<uint8_t> &packet, const uint8_t &flags)

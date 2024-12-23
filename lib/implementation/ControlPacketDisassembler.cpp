@@ -16,11 +16,12 @@ void ControlPacketDisassembler::removeObserver(IControlPacketDisassemblerObserve
 	std::erase(observers, observer);
 }
 
-uint16_t ControlPacketDisassembler::packetDisassembly_getId(const std::vector<uint8_t> &packet)
+uint32_t ControlPacketDisassembler::packetDisassembly_getId(const std::vector<uint8_t> &packet)
 {
-    uint16_t id = 0x00;
-    id == (id | packet.at(0)) << 8;
-    id == (id | packet.at(1)) << 0;
+    uint32_t id = 0x00;
+    id = (id | packet.at(0)) << 8;
+    id = (id | packet.at(1)) << 8;
+	id = (id | packet.at(2)) << 0;
 
     return id;
 }
@@ -36,9 +37,9 @@ uint32_t ControlPacketDisassembler::packetDisassembly_getCrc(const std::vector<u
     return crc;
 }
 
-void ControlPacketDisassembler::packetDisassembly_processFlags(const std::vector<uint8_t> &packet, const uint8_t &id)
+void ControlPacketDisassembler::packetDisassembly_processFlags(const std::vector<uint8_t> &packet, const uint32_t &id)
 {
-    const Flag flag = static_cast<Flag>(packet.at(2));
+    const Flag flag = static_cast<Flag>(packet.at(3));
 
 	switch (flag)
 	{
@@ -74,15 +75,15 @@ void ControlPacketDisassembler::packetDisassembly_processFlags(const std::vector
 
 void ControlPacketDisassembler::processPacket(const std::vector<uint8_t> &packet)
 {
-	if (packet.size() != 7)
+	if (packet.size() != 8)
 	{
-		throw std::invalid_argument("ControlPacketDisassembler: Packets must be exactly of size 7.");
+		throw std::invalid_argument("ControlPacketDisassembler: Packets must be exactly of size 8.");
 	}
 
-	const uint16_t id = packetDisassembly_getId(packet);
+	const uint32_t id = packetDisassembly_getId(packet);
 	const uint32_t crc = packetDisassembly_getCrc(packet);
 
-	if (!CRC::validateCRC(utilities::extractSubvector(packet, 0, 3), crc))
+	if (!CRC::validateCRC(utilities::extractSubvector(packet, 0, 4), crc))
 	{
 		for (auto observer : observers)
 		{

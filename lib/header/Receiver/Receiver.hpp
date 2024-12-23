@@ -23,7 +23,7 @@ private:
 
     bool* running;
     bool connectionEstablished;
-    uint16_t nextPacketToBeReceived_id;
+    uint32_t nextPacketToBeReceived_id;
 
     void controlBlockReceived(const std::vector<uint8_t> &dataVector);
     void dataBlockReceived(const std::vector<uint8_t> &dataVector);
@@ -39,8 +39,8 @@ public:
 
     // IControlPacketDisassemblerObserver
 
-    void on_received_received(const uint16_t &id) override;
-    void on_resend_received(const uint16_t &id) override;
+    void on_received_received(const uint32_t &id) override;
+    void on_resend_received(const uint32_t &id) override;
     void on_transferFinished_received() override;
     void on_closeConnection_received() override;
     void on_connect_received() override;

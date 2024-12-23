@@ -7,14 +7,15 @@
 
 const uint8_t DataPacketAssembler::dataBytesPerPacket = 64;
 
-void DataPacketAssembler::packetAssembly_addId(std::vector<uint8_t> &packet, const uint16_t &id)
+void DataPacketAssembler::packetAssembly_addId(std::vector<uint8_t> &packet, const u_int32_t &id)
 {
-    packet.reserve(2);
-    packet.push_back(static_cast<uint8_t>(id >> 8));
-    packet.push_back(static_cast<uint8_t>(id & 0xFF));
+    packet.reserve(3);
+    packet.push_back(static_cast<uint8_t>((id >> 16) & 0xFF));
+    packet.push_back(static_cast<uint8_t>((id >> 8) & 0xFF));
+    packet.push_back(static_cast<uint8_t>((id >> 0) & 0xFF));
 }
 
-void DataPacketAssembler::packetAssembly_addData(std::vector<uint8_t> &packet, const uint16_t &id)
+void DataPacketAssembler::packetAssembly_addData(std::vector<uint8_t> &packet, const uint32_t &id)
 {
     const size_t packetDataStartIndex = id * dataBytesPerPacket;
     const bool hasSufficientData = packetDataStartIndex + dataBytesPerPacket <= rawData.size();
@@ -48,7 +49,7 @@ DataPacketAssembler::DataPacketAssembler(const std::vector<uint8_t> &rawData)
     }
 }
 
-std::vector<uint8_t> DataPacketAssembler::getPacket(const uint16_t &id)
+std::vector<uint8_t> DataPacketAssembler::getPacket(const uint32_t &id)
 {
     std::vector<uint8_t> packet = std::vector<uint8_t>();
     packetAssembly_addId(packet, id);
@@ -58,7 +59,7 @@ std::vector<uint8_t> DataPacketAssembler::getPacket(const uint16_t &id)
     return packet;
 }
 
-bool DataPacketAssembler::packetDoesExist(const uint16_t &id)
+bool DataPacketAssembler::packetDoesExist(const uint32_t &id)
 {
     const size_t availableDatePackets = std::ceil(rawData.size() / static_cast<double>(dataBytesPerPacket));
     return availableDatePackets > id;

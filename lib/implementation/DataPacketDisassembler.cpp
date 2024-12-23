@@ -11,18 +11,19 @@ DataPacketDisassembler::DataPacketDisassembler()
 {
 }
 
-uint16_t DataPacketDisassembler::packetDisassembly_getId(const std::vector<uint8_t> &packet)
+uint32_t DataPacketDisassembler::packetDisassembly_getId(const std::vector<uint8_t> &packet)
 {
-    uint16_t id = 0x00;
+    uint32_t id = 0x00;
     id = (id | packet.at(0)) << 8;
-    id = (id | packet.at(1)) << 0;
+    id = (id | packet.at(1)) << 8;
+	id = (id | packet.at(2)) << 0;
 
     return id;
 }
 
 std::vector<uint8_t> DataPacketDisassembler::packetDisassembly_getData(const std::vector<uint8_t> &packet)
 {
-    return utilities::extractSubvector(packet, 2, packet.size()-6);
+    return utilities::extractSubvector(packet, 3, packet.size()-7);
 }
 
 uint32_t DataPacketDisassembler::packetDisassembly_getCrc(const std::vector<uint8_t> &packet)
@@ -36,14 +37,14 @@ uint32_t DataPacketDisassembler::packetDisassembly_getCrc(const std::vector<uint
     return crc;
 }
 
-bool DataPacketDisassembler::processPacket(const std::vector<uint8_t> &packet, const uint16_t &expectedId)
+bool DataPacketDisassembler::processPacket(const std::vector<uint8_t> &packet, const uint32_t &expectedId)
 {
-    if (packet.size() < 7)
+    if (packet.size() < 8)
     {
         throw std::invalid_argument("DataPacketDisassembler: Packets cannot have a size < 7.");
     }
 
-    uint16_t packetId = packetDisassembly_getId(packet);
+    uint32_t packetId = packetDisassembly_getId(packet);
     std::vector<uint8_t> data = packetDisassembly_getData(packet);
     uint32_t crc = packetDisassembly_getCrc(packet);
 

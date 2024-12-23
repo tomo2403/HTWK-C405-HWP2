@@ -10,7 +10,7 @@
 struct SenderResources
 {
     uint8_t timeOutCounter;
-    uint16_t nextPacketToBeSent_id;
+    uint32_t nextPacketToBeSent_id;
     bool shutDownAsap;
 
     AtomicQueue<uint8_t>* datastreamQueue_outgoing;

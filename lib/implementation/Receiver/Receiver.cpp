@@ -63,12 +63,12 @@ void Receiver::dataBlockReceived(const std::vector<uint8_t> &dataVector)
     }
 }
 
-void Receiver::on_received_received(const uint16_t &id)
+void Receiver::on_received_received(const uint32_t &id)
 {
     notificationQueue_outgoing->push(InterthreadNotification(InterthreadNotification::Type::OWN_PACKET_RECEIVED, id));
 }
 
-void Receiver::on_resend_received(const uint16_t &id)
+void Receiver::on_resend_received(const uint32_t &id)
 {
     notificationQueue_outgoing->push(InterthreadNotification(InterthreadNotification::Type::OWN_PACKET_RESEND, id));
 }

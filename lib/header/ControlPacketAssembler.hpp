@@ -22,7 +22,7 @@ private:
     
     ControlPacketAssembler() = delete;
 
-    static const void packetAssembly_addId(std::vector<uint8_t> &packet, const uint16_t &id);
+    static const void packetAssembly_addId(std::vector<uint8_t> &packet, const uint32_t &id);
     static const void packetAssembly_addFlags(std::vector<uint8_t> &packet, const uint8_t &flags);
     static const void packetAssembly_addCrc(std::vector<uint8_t> &packet);
     
