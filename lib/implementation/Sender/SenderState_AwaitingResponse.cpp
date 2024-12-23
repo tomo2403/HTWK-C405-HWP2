@@ -30,14 +30,14 @@ void SenderState_AwaitingResponse::processNotification()
     
     case InterthreadNotification::Type::OWN_PACKET_RECEIVED:
         // TODO: Check for correct packetId
-        sender->setState(std::make_unique<SenderState_Sending>(sender, resources));
         resources->timeOutCounter = 0;
+        sender->setState(std::make_unique<SenderState_Sending>(sender, resources));
         break;
     
     case InterthreadNotification::Type::OWN_PACKET_RESEND:
         resources->nextPacketToBeSent_id--;
-        sender->setState(std::make_unique<SenderState_Sending>(sender, resources));
         resources->timeOutCounter = 0;
+        sender->setState(std::make_unique<SenderState_Sending>(sender, resources));
         break;
     
     default:
