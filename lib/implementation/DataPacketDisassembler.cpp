@@ -14,8 +14,8 @@ DataPacketDisassembler::DataPacketDisassembler()
 uint16_t DataPacketDisassembler::packetDisassembly_getId(const std::vector<uint8_t> &packet)
 {
     uint16_t id = 0x00;
-    id == (id | packet.at(0)) << 8;
-    id == (id | packet.at(1)) << 0;
+    id = (id | packet.at(0)) << 8;
+    id = (id | packet.at(1)) << 0;
 
     return id;
 }
@@ -63,3 +63,7 @@ bool DataPacketDisassembler::processPacket(const std::vector<uint8_t> &packet, c
     return true;
 }
 
+std::vector<uint8_t> DataPacketDisassembler::getData()
+{
+    return rawData;
+}

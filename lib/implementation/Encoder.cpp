@@ -122,8 +122,8 @@ uint8_t Encoder::determineEndCommand()
 	}
 
 	return taskStack.top().dataStorage.empty() || taskStack.top().dataStorage.peek_nibble() != endBlockDefault
-		       ? endBlockFallback
-		       : endBlockDefault;
+		       ? endBlockDefault
+		       : endBlockFallback;
 }
 
 uint8_t Encoder::determinePrevNibbleAgainCommand()
