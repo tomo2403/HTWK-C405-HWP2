@@ -4,7 +4,7 @@
 #include <memory>
 
 SenderResources::SenderResources(AtomicQueue<uint8_t>* datastreamQueue_outgoing, AtomicQueue<InterthreadNotification>* notificationQueue_incoming, const std::vector<uint8_t> &data)
-    : datastreamQueue_outgoing(datastreamQueue_outgoing), notificationQueue_incoming(notificationQueue_incoming), dataPacketAssembler(data)
+    : datastreamQueue_outgoing(datastreamQueue_outgoing), notificationQueue_incoming(notificationQueue_incoming), dataPacketAssembler(data), nextPacketToBeSent_id(0)
 {
 }
 
