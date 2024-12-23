@@ -10,13 +10,12 @@ SenderResources::SenderResources(AtomicQueue<uint8_t>* datastreamQueue_outgoing,
 {
 }
 
-Sender::Sender(AtomicQueue<uint8_t>* datastreamQueue_outgoing, AtomicQueue<InterthreadNotification>* notificationQueue_incoming, const std::vector<uint8_t> &data)
+Sender::Sender(AtomicQueue<uint8_t>* datastreamQueue_outgoing, AtomicQueue<InterthreadNotification>* notificationQueue_incoming, AtomicBoolean* running, const std::vector<uint8_t> &data)
+    : running(running)
 {
     resources = std::make_unique<SenderResources>(datastreamQueue_outgoing, notificationQueue_incoming, data);
     
     currentState = std::make_unique<SenderState_ReadyToConnect>(this, resources.get());
-
-    running = true;
 }
 
 void Sender::setState(std::unique_ptr<SenderState> state)
@@ -26,7 +25,7 @@ void Sender::setState(std::unique_ptr<SenderState> state)
 
 void Sender::send() const
 {
-    while(running)
+    while(*running)
     {
         if (!resources->notificationQueue_incoming->empty())
         {
@@ -45,10 +44,5 @@ void Sender::send() const
 
 void Sender::shutDown()
 {
-    running = false;
-}
-
-bool* Sender::getAtomicBoolean_pointer()
-{
-    return &running;
+    *running = false;
 }

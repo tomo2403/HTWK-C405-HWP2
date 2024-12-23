@@ -19,10 +19,13 @@ private:
     std::unique_ptr<SenderState> currentState;
     std::unique_ptr<SenderResources> resources;
 
-    bool running;
+    AtomicBoolean* running;
 
 public:
-    Sender(AtomicQueue<uint8_t>* datastreamQueue_outgoing, AtomicQueue<InterthreadNotification>* notificationQueue_incoming, const std::vector<uint8_t> &data);
+    Sender(AtomicQueue<uint8_t>* datastreamQueue_outgoing,
+           AtomicQueue<InterthreadNotification>* notificationQueue_incoming,
+           AtomicBoolean* running,
+           const std::vector<uint8_t> &data);
 
     void setState(std::unique_ptr<SenderState> state);
 
@@ -30,6 +33,4 @@ public:
     void send() const;
 
     void shutDown();
-
-    bool* getAtomicBoolean_pointer();
 };

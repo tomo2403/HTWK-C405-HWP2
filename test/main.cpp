@@ -9,16 +9,14 @@
 int main() {
     AtomicQueue<uint8_t> dataQueue;
     AtomicQueue<InterthreadNotification> notifications;
-    std::vector<uint8_t> data = ioManager::readFile("../../random.bin");
-    // std::vector<uint8_t> data = ioManager::getBinaryInput();
+    
+    AtomicBoolean running;
+    running = true;
+    
+    std::vector<uint8_t> data = ioManager::getBinaryInput();
 
-    /*
-    std::vector<uint8_t> data = {
-    };
-    */
-
-    Sender sender(&dataQueue, &notifications, data);
-    Receiver receiver (&dataQueue, &notifications, sender.getAtomicBoolean_pointer());
+    Sender sender(&dataQueue, &notifications, &running, data);
+    Receiver receiver (&dataQueue, &notifications, &running);
 
     std::thread senderThread([&sender]() {
         sender.send();

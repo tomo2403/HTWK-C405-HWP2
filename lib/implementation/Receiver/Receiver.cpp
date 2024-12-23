@@ -2,7 +2,7 @@
 #include "../../lib.hpp"
 #include <iostream>
 
-Receiver::Receiver(AtomicQueue<uint8_t>* datastreamQueue_incoming, AtomicQueue<InterthreadNotification>* notificationQueue_outgoing, bool* running)
+Receiver::Receiver(AtomicQueue<uint8_t>* datastreamQueue_incoming, AtomicQueue<InterthreadNotification>* notificationQueue_outgoing, AtomicBoolean* running)
     : datastreamQueue_incoming(datastreamQueue_incoming), notificationQueue_outgoing(notificationQueue_outgoing), running(running), connectionEstablished(false), nextPacketToBeReceived_id(0)
 {
     decoder.addObserver(this);

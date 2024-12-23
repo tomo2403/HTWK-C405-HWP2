@@ -16,12 +16,12 @@ class Receiver final : public IDecoderObserver, public IControlPacketDisassemble
 private:
     AtomicQueue<uint8_t>* datastreamQueue_incoming;
     AtomicQueue<InterthreadNotification>* notificationQueue_outgoing;
+    AtomicBoolean* running;
 
     Decoder decoder;
     DataPacketDisassembler dataPacketDisassembler;
     ControlPacketDisassembler controlPacketDisassembler;
 
-    bool* running;
     bool connectionEstablished;
     uint32_t nextPacketToBeReceived_id;
 
@@ -29,7 +29,7 @@ private:
     void dataBlockReceived(const std::vector<uint8_t> &dataVector);
 
 public:
-    Receiver(AtomicQueue<uint8_t>* datastreamQueue_incoming, AtomicQueue<InterthreadNotification>* notificationQueue_outgoing, bool* running);
+    Receiver(AtomicQueue<uint8_t>* datastreamQueue_incoming, AtomicQueue<InterthreadNotification>* notificationQueue_outgoing, AtomicBoolean* running);
 
     virtual ~Receiver();
 
