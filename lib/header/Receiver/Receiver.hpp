@@ -11,7 +11,7 @@
 
 #include <memory>
 
-class Receiver : public IDecoderObserver, public IControlPacketDisassemblerObserver
+class Receiver final : public IDecoderObserver, public IControlPacketDisassemblerObserver
 {
 private:
     AtomicQueue<uint8_t>* datastreamQueue_incoming;
@@ -30,7 +30,8 @@ private:
 
 public:
     Receiver(AtomicQueue<uint8_t>* datastreamQueue_incoming, AtomicQueue<InterthreadNotification>* notificationQueue_outgoing, bool* running);
-    ~Receiver();
+
+    virtual ~Receiver();
 
     // IDecoderObserver
 

@@ -4,7 +4,9 @@
 #include <memory>
 
 SenderResources::SenderResources(AtomicQueue<uint8_t>* datastreamQueue_outgoing, AtomicQueue<InterthreadNotification>* notificationQueue_incoming, const std::vector<uint8_t> &data)
-    : datastreamQueue_outgoing(datastreamQueue_outgoing), notificationQueue_incoming(notificationQueue_incoming), dataPacketAssembler(data), nextPacketToBeSent_id(0)
+    : nextPacketToBeSent_id(0),
+      datastreamQueue_outgoing(datastreamQueue_outgoing),
+      notificationQueue_incoming(notificationQueue_incoming), dataPacketAssembler(data)
 {
 }
 
@@ -22,7 +24,7 @@ void Sender::setState(std::unique_ptr<SenderState> state)
     currentState = std::move(state);
 }
 
-void Sender::send()
+void Sender::send() const
 {
     while(running)
     {

@@ -27,7 +27,7 @@ public:
     void setState(std::unique_ptr<SenderState> state);
 
     // To start in another thread
-    void send();
+    void send() const;
 
     void shutDown();
 

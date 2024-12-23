@@ -3,7 +3,7 @@
 #include <iostream>
 
 Receiver::Receiver(AtomicQueue<uint8_t>* datastreamQueue_incoming, AtomicQueue<InterthreadNotification>* notificationQueue_outgoing, bool* running)
-    : datastreamQueue_incoming(datastreamQueue_incoming), notificationQueue_outgoing(notificationQueue_outgoing), connectionEstablished(false), running(running), nextPacketToBeReceived_id(0)
+    : datastreamQueue_incoming(datastreamQueue_incoming), notificationQueue_outgoing(notificationQueue_outgoing), running(running), connectionEstablished(false), nextPacketToBeReceived_id(0)
 {
     decoder.addObserver(this);
     controlPacketDisassembler.addObserver(this);
@@ -18,9 +18,7 @@ void Receiver::receive()
 {
     while (*running)
     {
-        std::optional<uint8_t> optionalValue = datastreamQueue_incoming->try_pop();
-        
-        if (optionalValue) {
+        if (std::optional<uint8_t> optionalValue = datastreamQueue_incoming->try_pop()) {
             decoder.nextNibble(*optionalValue);
             // std::cerr << std::hex << (int) *optionalValue << std::endl;
         }

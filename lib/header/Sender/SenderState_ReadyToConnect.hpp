@@ -2,13 +2,11 @@
 
 #include "SenderState.hpp"
 
-class SenderState_ReadyToConnect : public SenderState
+class SenderState_ReadyToConnect final : public SenderState
 {
-private:
-
 public:
     SenderState_ReadyToConnect(Sender* sender, SenderResources* resources);
 
-    void processNotification();
-    void processDataQueueIsEmpty();
+    void processNotification() override;
+    void processDataQueueIsEmpty() override;
 };

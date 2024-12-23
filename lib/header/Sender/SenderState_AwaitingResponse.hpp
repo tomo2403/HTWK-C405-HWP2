@@ -2,7 +2,7 @@
 
 #include "SenderState.hpp"
 
-class SenderState_AwaitingResponse : public SenderState
+class SenderState_AwaitingResponse final : public SenderState
 {
 private:
     Timer timer;
@@ -10,6 +10,6 @@ private:
 public:
     SenderState_AwaitingResponse(Sender* sender, SenderResources* resources);
 
-    void processNotification();
-    void processDataQueueIsEmpty();
+    void processNotification() override;
+    void processDataQueueIsEmpty() override;
 };

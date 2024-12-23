@@ -7,15 +7,15 @@ class Sender;
 
 class SenderState
 {
-private:
-    SenderState() = delete;
-
 protected:
     Sender* sender;
     SenderResources* resources;
 
 public:
+    virtual ~SenderState() = default;
+
     SenderState(Sender* sender, SenderResources* resources);
+    SenderState() = delete;
 
     virtual void processNotification() = 0;
     virtual void processDataQueueIsEmpty() = 0;

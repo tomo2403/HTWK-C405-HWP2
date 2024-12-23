@@ -14,9 +14,7 @@ SenderState_AwaitingResponse::SenderState_AwaitingResponse(Sender* sender, Sende
 
 void SenderState_AwaitingResponse::processNotification()
 {
-    const InterthreadNotification notification = resources->notificationQueue_incoming->wait_and_pop();
-
-    switch (notification.type)
+    switch (const InterthreadNotification notification = resources->notificationQueue_incoming->wait_and_pop(); notification.type)
     {
     case InterthreadNotification::Type::FOREIGN_PACKET_RECEIVED:
         resources->encoder.pushBlock(BlockType::controlBlock, ControlPacketAssembler::assemble(Flag::RECEIVED, notification.referencedPacket_id));
@@ -49,7 +47,7 @@ void SenderState_AwaitingResponse::processNotification()
 
 void SenderState_AwaitingResponse::processDataQueueIsEmpty()
 {
-    const uint8_t secondsUntilTimeout = 10;
+    constexpr uint8_t secondsUntilTimeout = 10;
     if (timer.elapsed() >= secondsUntilTimeout)
     {
         // previous Packet again

@@ -9,9 +9,9 @@
 
 struct SenderResources
 {
-    uint8_t timeOutCounter;
+    uint8_t timeOutCounter{};
     uint32_t nextPacketToBeSent_id;
-    bool shutDownAsap;
+    bool shutDownAsap{};
 
     AtomicQueue<uint8_t>* datastreamQueue_outgoing;
     AtomicQueue<InterthreadNotification>* notificationQueue_incoming;

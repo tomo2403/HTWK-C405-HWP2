@@ -2,15 +2,13 @@
 
 #include "SenderState.hpp"
 
-class SenderState_Sending : public SenderState
+class SenderState_Sending final : public SenderState
 {
-private:
-
 public:
     SenderState_Sending(Sender* sender, SenderResources* resources);
 
-    void processNotification();
-    void processDataQueueIsEmpty();
+    void processNotification() override;
+    void processDataQueueIsEmpty() override;
 
     void OnDataPacketSentCallback();
 };
