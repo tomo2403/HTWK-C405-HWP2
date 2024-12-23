@@ -16,13 +16,13 @@ void DataPacketAssembler::packetAssembly_addId(std::vector<uint8_t> &packet, con
 
 void DataPacketAssembler::packetAssembly_addData(std::vector<uint8_t> &packet, const uint16_t &id)
 {
-    const uint8_t packetDataStartIndex = id * dataBytesPerPacket;
+    const size_t packetDataStartIndex = id * dataBytesPerPacket;
     const bool hasSufficientData = packetDataStartIndex + dataBytesPerPacket <= rawData.size();
     const uint8_t packetSize = hasSufficientData ? dataBytesPerPacket : rawData.size() - packetDataStartIndex;
 
     packet.reserve(packetSize);
 
-    std::vector<uint8_t> data = utilities::extractSubvector(rawData, packetDataStartIndex, dataBytesPerPacket);
+    std::vector<uint8_t> data = utilities::extractSubvector(rawData, packetDataStartIndex, packetSize);
     packet.insert(packet.end(), data.begin(), data.end());
 }
 
@@ -60,6 +60,6 @@ std::vector<uint8_t> DataPacketAssembler::getPacket(const uint16_t &id)
 
 bool DataPacketAssembler::packetDoesExist(const uint16_t &id)
 {
-    const uint16_t availableDatePackets = std::ceil(rawData.size() / static_cast<double>(dataBytesPerPacket));
+    const size_t availableDatePackets = std::ceil(rawData.size() / static_cast<double>(dataBytesPerPacket));
     return availableDatePackets > id;
 }

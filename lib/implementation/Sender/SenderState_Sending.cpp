@@ -41,6 +41,7 @@ void SenderState_Sending::processDataQueueIsEmpty()
         const std::vector<uint8_t> dataBlock = resources->dataPacketAssembler.getPacket(resources->nextPacketToBeSent_id);
         const auto callback = [&](){this->OnDataPacketSentCallback();};
         resources->encoder.pushBlock(BlockType::dataBlock, dataBlock, callback);
+        std::cerr << "Sent packet: " << resources->nextPacketToBeSent_id << std::endl;
         resources->nextPacketToBeSent_id++;
     }
     else
