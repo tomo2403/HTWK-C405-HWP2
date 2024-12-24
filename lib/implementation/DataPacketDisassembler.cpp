@@ -41,7 +41,8 @@ bool DataPacketDisassembler::processPacket(const std::vector<uint8_t> &packet, c
 {
     if (packet.size() < 8)
     {
-        throw std::invalid_argument("DataPacketDisassembler: Packets cannot have a size < 7.");
+        //throw std::invalid_argument("DataPacketDisassembler: Packets cannot have a size < 7.");
+        return false;
     }
 
     const uint32_t packetId = packetDisassembly_getId(packet);

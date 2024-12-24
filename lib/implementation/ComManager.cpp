@@ -7,6 +7,7 @@ ComManager::ComManager(ICommunicationInterface *com, const std::vector<uint8_t> 
 
 void ComManager::sendData()
 {
+	std::thread send(&Sender::send, &sender);
 	while (running)
 	{
 		if (!outgoingQueue.empty())
@@ -15,11 +16,13 @@ void ComManager::sendData()
 		}
 		std::this_thread::sleep_for(std::chrono::nanoseconds(100));
 	}
+	send.join();
 }
 
 
 void ComManager::receiveData()
 {
+	std::thread receive(&Receiver::receive, &receiver);
 	while (running)
 	{
 		if (com->isDataAvailable())
@@ -30,6 +33,7 @@ void ComManager::receiveData()
 		}
 		std::this_thread::sleep_for(std::chrono::nanoseconds(100));
 	}
+	receive.join();
 }
 
 
@@ -44,6 +48,5 @@ std::vector<uint8_t> ComManager::transfer2Way()
 
 	com->closeCom();
 
-	//TODO: set output
-	return outputData;
+	return receiver.getOutputData();
 }

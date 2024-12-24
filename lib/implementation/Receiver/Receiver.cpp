@@ -21,9 +21,9 @@ void Receiver::receive()
         if (std::optional<uint8_t> optionalValue = datastreamQueue_incoming->try_pop()) {
             decoder.nextNibble(*optionalValue);
 
-#ifndef NDEBUG
-            std::cerr << std::hex << static_cast<int>(*optionalValue) << std::endl;
-#endif
+//#ifndef NDEBUG
+//            std::cerr << std::hex << static_cast<int>(*optionalValue) << std::endl;
+//#endif
         }
     }
 }
