@@ -20,7 +20,8 @@ class ComManager final
 {
 	ICommunicationInterface *com;
 
-	AtomicQueue<uint8_t> dataQueue;
+	AtomicQueue<uint8_t> incomingQueue;
+	AtomicQueue<uint8_t> outgoingQueue;
 	AtomicQueue<InterthreadNotification> notifications;
 
 	std::atomic<bool> running = true;

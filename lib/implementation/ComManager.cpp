@@ -1,8 +1,7 @@
-#include <utility>
-
 #include "../header/ComManager.hpp"
 
-ComManager::ComManager(ICommunicationInterface *com, const std::vector<uint8_t> &inputData) : com(com), inputData(inputData), sender(&dataQueue, &notifications, &running, inputData), receiver(&dataQueue, &notifications, &running)
+ComManager::ComManager(ICommunicationInterface *com, const std::vector<uint8_t> &inputData) : com(com), inputData(inputData),
+	sender(&outgoingQueue, &notifications, &running, inputData), receiver(&incomingQueue, &notifications, &running)
 {
 }
 
@@ -10,8 +9,10 @@ void ComManager::sendData()
 {
 	while (running)
 	{
-		//TODO: implement sending data
-		sender.send();
+		if (!outgoingQueue.empty())
+		{
+			com->writeByte(outgoingQueue.wait_and_pop());
+		}
 		std::this_thread::sleep_for(std::chrono::nanoseconds(100));
 	}
 }
@@ -21,17 +22,15 @@ void ComManager::receiveData()
 {
 	while (running)
 	{
-		//TODO: implement receiving data
 		if (com->isDataAvailable())
 		{
 			uint8_t byte;
 			com->readByte(byte);
+			incomingQueue.push(byte);
 		}
-		receiver.receive();
 		std::this_thread::sleep_for(std::chrono::nanoseconds(100));
 	}
 }
-
 
 
 std::vector<uint8_t> ComManager::transfer2Way()
@@ -44,5 +43,7 @@ std::vector<uint8_t> ComManager::transfer2Way()
 	receiveThread.join();
 
 	com->closeCom();
+
+	//TODO: set output
 	return outputData;
 }
