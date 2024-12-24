@@ -1,20 +1,18 @@
+#include <vector>
 #include "../lib/lib.hpp"
 
 #include "ComInterface.hpp"
+#include "../lib/header/ComManager.hpp"
 
 using namespace ioManager;
 
-auto interface = ComInterface();
-//auto comManager = ComManager(&interface);
-
 int main()
 {
-	interface.openCom();
+	auto com = ComInterface();
+	auto comManager = ComManager(&com, getBinaryInput());
 
-	const std::vector<uint8_t> inputData = getBinaryInput();
-	//const std::vector<uint8_t> outputData = comManager.transfer2Way(inputData);
+	const std::vector<uint8_t> output = comManager.transfer2Way();
+	setBinaryOutput(output);
 
-	//setBinaryOutput(outputData);
-	interface.closeCom();
 	return 0;
 }

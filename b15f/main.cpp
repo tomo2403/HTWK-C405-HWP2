@@ -4,17 +4,17 @@
 
 using namespace ioManager;
 
-auto interface = ComInterface();
+auto com = ComInterface();
 //auto comManager = ComManager(&interface);
 
 int main()
 {
-	interface.openCom();
+	com.openCom();
 
 	std::vector<uint8_t> inputData = getBinaryInput();
 	//const std::vector<uint8_t> outputData = comManager.transfer2Way(inputData);
 
 	//setBinaryOutput(outputData);
-	interface.closeCom();
+	com.closeCom();
 	return 0;
 }
