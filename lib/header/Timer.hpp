@@ -4,7 +4,6 @@
 
 class Timer
 {
-private:
     bool isRunning;
     std::chrono::high_resolution_clock::time_point start_time_point;
     std::chrono::high_resolution_clock::time_point end_time_point;
@@ -20,5 +19,5 @@ public:
     // unit: seconds
     double elapsed();
 
-    bool running();
+    [[nodiscard]] bool running() const;
 };

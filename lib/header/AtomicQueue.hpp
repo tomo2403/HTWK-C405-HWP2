@@ -8,7 +8,6 @@
 template<typename T>
 class AtomicQueue
 {
-private:
     std::queue<T> queue;
     mutable std::mutex mtx;
     std::condition_variable cv;
@@ -45,11 +44,11 @@ template<typename T>
 T AtomicQueue<T>::wait_and_pop()
 {
     std::unique_lock lock(mtx);
-    cv.wait(lock, [this]()
+    cv.wait(lock, [this]
     {
         return !queue.empty();
     });
-    T item = queue.front();
+    T item = std::move(queue.front());
     queue.pop();
     return item;
 }

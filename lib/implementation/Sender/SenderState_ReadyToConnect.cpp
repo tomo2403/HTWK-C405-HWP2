@@ -2,7 +2,7 @@
 #include "../../header/Sender/SenderState_Sending.hpp"
 #include <stdexcept>
 #include "../../header/ControlPacketAssembler.hpp"
-#include <iostream>
+#include <thread>
 
 SenderState_ReadyToConnect::SenderState_ReadyToConnect(Sender* sender, SenderResources* resources)
     : SenderState(sender, resources)

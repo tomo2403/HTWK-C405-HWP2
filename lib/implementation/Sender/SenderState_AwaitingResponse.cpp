@@ -1,6 +1,5 @@
 #include "../../header/Sender/SenderState_AwaitingResponse.hpp"
 #include "../../header/Sender/SenderState_Sending.hpp"
-#include "../../header/Sender/SenderState_Sending.hpp"
 #include "../../header/ControlPacketAssembler.hpp"
 #include <stdexcept>
 

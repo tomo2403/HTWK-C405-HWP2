@@ -12,11 +12,11 @@ void NibbleCompressor::pushBack(const uint8_t &nibble)
 {
     if (nextNibbleIsHighNibble)
     {
-        buffer |= (nibble << 4);
+        buffer |= nibble << 4;
     }
     else
     {
-        buffer |= (nibble & 0x0F);
+        buffer |= nibble & 0x0F;
         dataVector_byte.push_back(buffer);
         buffer = 0x00;
     }

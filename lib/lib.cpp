@@ -42,7 +42,7 @@ namespace ioManager
 		}
 
 		file.seekg(0, std::ios::end);
-		size_t fileSize = file.tellg();
+		const size_t fileSize = file.tellg();
 		file.seekg(0, std::ios::beg);
 
 		buffer.resize(fileSize);

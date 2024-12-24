@@ -14,9 +14,8 @@
 #include "../lib/header/Logger.hpp"
 #include "../lib/header/ICommunicationInterface.hpp"
 
-class ComInterface : public ICommunicationInterface
+class ComInterface final : public ICommunicationInterface
 {
-private:
 	int serialPort{}; /**< The file descriptor for the interface port. */
 	B15F& drv = B15F::getInstance();
 	uint8_t previouslyReceivedNibble{};

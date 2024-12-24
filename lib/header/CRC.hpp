@@ -13,6 +13,8 @@
 class CRC
 {
 public:
+    CRC() = delete;
+
     /**
      * @brief Calculates a 32-bit CRC value over the given data.
      *
@@ -37,8 +39,6 @@ public:
     [[nodiscard]] static bool validateCRC(const std::vector<uint8_t> &data, uint32_t receivedCRC);
 
 private:
-	CRC() = delete;
-
-    static const uint32_t polynomial = 0x04c11db7;
-    static const uint32_t initialValue = 0xffffffff;
+    static constexpr uint32_t polynomial = 0x04c11db7;
+    static constexpr uint32_t initialValue = 0xffffffff;
 };

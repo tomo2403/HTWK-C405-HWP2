@@ -1,8 +1,6 @@
 #pragma once
 
 #include <stack>
-#include <mutex>
-
 #include "NibbleCompressor.hpp"
 #include "BlockType.hpp"
 #include "IDecoderObserver.hpp"
@@ -10,7 +8,6 @@
 
 class Decoder
 {
-private:
 	struct Task
 	{
 		NibbleCompressor nibbleCompressor;

@@ -10,7 +10,7 @@ SenderResources::SenderResources(AtomicQueue<uint8_t>* datastreamQueue_outgoing,
 {
 }
 
-Sender::Sender(AtomicQueue<uint8_t>* datastreamQueue_outgoing, AtomicQueue<InterthreadNotification>* notificationQueue_incoming, AtomicBoolean* running, const std::vector<uint8_t> &data)
+Sender::Sender(AtomicQueue<uint8_t>* datastreamQueue_outgoing, AtomicQueue<InterthreadNotification>* notificationQueue_incoming, std::atomic<bool>* running, const std::vector<uint8_t> &data)
     : running(running)
 {
     resources = std::make_unique<SenderResources>(datastreamQueue_outgoing, notificationQueue_incoming, data);
@@ -42,7 +42,7 @@ void Sender::send() const
     }
 }
 
-void Sender::shutDown()
+void Sender::shutDown() const
 {
     *running = false;
 }

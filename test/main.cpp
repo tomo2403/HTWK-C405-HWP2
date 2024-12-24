@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <thread>
-#include <chrono>
 #include "../lib/header/Sender/Sender.hpp"
 #include "../lib/header/Receiver/Receiver.hpp"
 #include "../lib/lib.hpp"
@@ -10,7 +9,7 @@ int main() {
     AtomicQueue<uint8_t> dataQueue;
     AtomicQueue<InterthreadNotification> notifications;
     
-    AtomicBoolean running;
+    std::atomic<bool> running;
     running = true;
     
     std::vector<uint8_t> data = ioManager::getBinaryInput();

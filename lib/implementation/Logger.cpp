@@ -1,5 +1,7 @@
 #include "../header/Logger.hpp"
 
+#include <iostream>
+
 Logger::Logger(const LogLevel level, const bool rewriteLine) : level_(level), rewriteLine_(rewriteLine)
 {
 }

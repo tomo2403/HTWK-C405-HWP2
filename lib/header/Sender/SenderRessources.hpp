@@ -4,7 +4,6 @@
 #include "../AtomicQueue.hpp"
 #include "../Encoder.hpp"
 #include "../DataPacketAssembler.hpp"
-#include "../Timer.hpp"
 #include "../InterthreadNotification.hpp"
 
 struct SenderResources

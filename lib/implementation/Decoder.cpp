@@ -1,5 +1,3 @@
-#include <algorithm>
-
 #include "../header/Decoder.hpp"
 #include "../header/CodecCommand.hpp"
 

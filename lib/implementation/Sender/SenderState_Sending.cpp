@@ -39,7 +39,7 @@ void SenderState_Sending::processDataQueueIsEmpty()
     if (resources->dataPacketAssembler.packetDoesExist(resources->nextPacketToBeSent_id))
     {
         const std::vector<uint8_t> dataBlock = resources->dataPacketAssembler.getPacket(resources->nextPacketToBeSent_id);
-        const auto callback = [&](){this->OnDataPacketSentCallback();};
+        const auto callback = [&] {this->OnDataPacketSentCallback();};
         resources->encoder.pushBlock(BlockType::dataBlock, dataBlock, callback);
         
         if (resources->nextPacketToBeSent_id % 10000 == 0)

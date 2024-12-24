@@ -4,13 +4,13 @@
 
 class ControlPacketDisassembler
 {
-private:
 
     std::vector<IControlPacketDisassemblerObserver *> observers;
 
-    uint32_t packetDisassembly_getId(const std::vector<uint8_t> &packet);
-    uint32_t packetDisassembly_getCrc(const std::vector<uint8_t> &packet);
-    void packetDisassembly_processFlags(const std::vector<uint8_t> &packet, const uint32_t &id);
+    static uint32_t packetDisassembly_getId(const std::vector<uint8_t> &packet);
+
+    static uint32_t packetDisassembly_getCrc(const std::vector<uint8_t> &packet);
+    void packetDisassembly_processFlags(const std::vector<uint8_t> &packet, const uint32_t &id) const;
 
 public:
 
@@ -18,5 +18,5 @@ public:
 
 	void removeObserver(IControlPacketDisassemblerObserver *observer);
 
-    void processPacket(const std::vector<uint8_t> &packet);
+    void processPacket(const std::vector<uint8_t> &packet) const;
 };

@@ -5,16 +5,16 @@
 using namespace ioManager;
 
 auto interface = ComInterface();
-auto comManager = ComManager(&interface);
+//auto comManager = ComManager(&interface);
 
 int main()
 {
 	interface.openCom();
 
 	std::vector<uint8_t> inputData = getBinaryInput();
-	std::vector<uint8_t> outputData = comManager.transfer2Way(inputData);
+	//const std::vector<uint8_t> outputData = comManager.transfer2Way(inputData);
 
-	setBinaryOutput(outputData);
+	//setBinaryOutput(outputData);
 	interface.closeCom();
 	return 0;
 }

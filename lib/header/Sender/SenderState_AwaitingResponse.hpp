@@ -1,10 +1,10 @@
 #pragma once
 
 #include "SenderState.hpp"
+#include "../Timer.hpp"
 
 class SenderState_AwaitingResponse final : public SenderState
 {
-private:
     Timer timer;
 
 public:

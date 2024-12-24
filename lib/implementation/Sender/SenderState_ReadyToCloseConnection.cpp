@@ -1,6 +1,7 @@
 #include "../../header/Sender/SenderState_ReadyToCloseConnection.hpp"
 #include "../../header/ControlPacketAssembler.hpp"
 #include <stdexcept>
+#include <thread>
 
 SenderState_ReadyToCloseConnection::SenderState_ReadyToCloseConnection(Sender* sender, SenderResources* resources)
     : SenderState(sender, resources)

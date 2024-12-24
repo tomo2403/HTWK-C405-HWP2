@@ -5,7 +5,6 @@
 
 class NibbleCompressor
 {
-private:
     uint8_t buffer;
     std::vector<uint8_t> dataVector_byte;
     bool nextNibbleIsHighNibble;

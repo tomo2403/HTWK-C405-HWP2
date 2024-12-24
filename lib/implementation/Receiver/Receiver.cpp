@@ -2,7 +2,7 @@
 #include "../../lib.hpp"
 #include <iostream>
 
-Receiver::Receiver(AtomicQueue<uint8_t>* datastreamQueue_incoming, AtomicQueue<InterthreadNotification>* notificationQueue_outgoing, AtomicBoolean* running)
+Receiver::Receiver(AtomicQueue<uint8_t>* datastreamQueue_incoming, AtomicQueue<InterthreadNotification>* notificationQueue_outgoing, std::atomic<bool>* running)
     : datastreamQueue_incoming(datastreamQueue_incoming), notificationQueue_outgoing(notificationQueue_outgoing), running(running), connectionEstablished(false), nextPacketToBeReceived_id(0)
 {
     decoder.addObserver(this);
@@ -41,10 +41,10 @@ void Receiver::endBlockReceived(const BlockType &blockType, const std::vector<ui
     }
 }
 
-void Receiver::controlBlockReceived(const std::vector<uint8_t> &dataVector)
+void Receiver::controlBlockReceived(const std::vector<uint8_t> &dataVector) const
 {
     // No further processing here, because processPacket() will callback via observer,
-    // methods 'this' is a observer of 'controlPacketDisassembler'.
+    // methods 'this' is an observer of 'controlPacketDisassembler'.
     controlPacketDisassembler.processPacket(dataVector);
 }
 

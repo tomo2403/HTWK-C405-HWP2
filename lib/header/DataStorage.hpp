@@ -11,7 +11,6 @@
  */
 class DataStorage
 {
-private:
 	/**
 	 * @brief Storage container for the data.
 	 *

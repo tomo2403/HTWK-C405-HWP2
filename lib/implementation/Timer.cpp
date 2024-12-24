@@ -25,7 +25,7 @@ double Timer::elapsed()
     return std::chrono::duration<double>(end_time_point - start_time_point).count();
 }
 
-bool Timer::running()
+bool Timer::running() const
 {
     return isRunning;
 }

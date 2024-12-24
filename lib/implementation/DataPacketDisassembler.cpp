@@ -44,9 +44,9 @@ bool DataPacketDisassembler::processPacket(const std::vector<uint8_t> &packet, c
         throw std::invalid_argument("DataPacketDisassembler: Packets cannot have a size < 7.");
     }
 
-    uint32_t packetId = packetDisassembly_getId(packet);
+    const uint32_t packetId = packetDisassembly_getId(packet);
     std::vector<uint8_t> data = packetDisassembly_getData(packet);
-    uint32_t crc = packetDisassembly_getCrc(packet);
+    const uint32_t crc = packetDisassembly_getCrc(packet);
 
     if (packetId != expectedId)
     {

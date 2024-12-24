@@ -34,7 +34,7 @@ void Encoder::pushBlock(const BlockType &blockType, const std::vector<uint8_t> &
 }
 
 
-bool Encoder::hasData()
+bool Encoder::hasData() const
 {
 	return !taskStack.empty() || escNibbleQueue != 0x00;
 }
@@ -108,7 +108,7 @@ uint8_t Encoder::determineStartCommand()
 {
 	if (taskStack.top().blockType == dataBlock)
 	{
-		return taskStack.top().dataStorage.peek_nibble() == beginDataBlockDefault ? beginDataBlockFallback : beginDataBlockFallback;
+		return taskStack.top().dataStorage.peek_nibble() == beginDataBlockDefault ? beginDataBlockFallback : beginDataBlockDefault;
 	}
 
 	return taskStack.top().dataStorage.peek_nibble() == beginControlBlockDefault ? beginControlBlockFallback : beginControlBlockDefault;

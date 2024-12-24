@@ -11,7 +11,6 @@ add_library(lib STATIC lib.cpp
         implementation/ControlPacketDisassembler.cpp
         implementation/InterthreadNotification.cpp
         implementation/Timer.cpp
-        implementation/AtomicBoolean.cpp
 
         implementation/Sender/Sender.cpp
         implementation/Sender/SenderState.cpp

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stack>
-#include <mutex>
 
 #include "BlockType.hpp"
 #include "DataStorage.hpp"
@@ -9,7 +8,6 @@
 
 class Encoder
 {
-private:
 	struct Task
 	{
 		DataStorage dataStorage;
@@ -40,7 +38,7 @@ public:
 
 	void forcePushBlock(const BlockType &blockType, const std::vector<uint8_t> &data, const std::function<void()> &callback = nullptr);
 
-	[[nodiscard]] bool hasData();
+	[[nodiscard]] bool hasData() const;
 
 	uint8_t nextNibble();
 

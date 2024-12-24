@@ -37,34 +37,32 @@ uint32_t ControlPacketDisassembler::packetDisassembly_getCrc(const std::vector<u
     return crc;
 }
 
-void ControlPacketDisassembler::packetDisassembly_processFlags(const std::vector<uint8_t> &packet, const uint32_t &id)
+void ControlPacketDisassembler::packetDisassembly_processFlags(const std::vector<uint8_t> &packet, const uint32_t &id) const
 {
-    const Flag flag = static_cast<Flag>(packet.at(3));
-
-	switch (flag)
+	switch (const auto flag = static_cast<Flag>(packet.at(3)))
 	{
 	case TRANSFER_FINISHED:
-		for (auto observer : observers)
+		for (const auto observer : observers)
 		{ observer->on_transferFinished_received(); }
 		break;
 	
 	case CLOSE_CONNECTION:
-		for (auto observer : observers)
+		for (const auto observer : observers)
 		{ observer->on_closeConnection_received(); }
 		break;
 	
 	case RESEND:
-		for (auto observer : observers)
+		for (const auto observer : observers)
 		{ observer->on_resend_received(id); }
 		break;
 
 	case CONNECT:
-		for (auto observer : observers)
+		for (const auto observer : observers)
 		{ observer->on_connect_received(); }
 		break;
 
 	case RECEIVED:
-		for (auto observer : observers)
+		for (const auto observer : observers)
 		{ observer->on_received_received(id); }
 		break;
 
@@ -73,7 +71,7 @@ void ControlPacketDisassembler::packetDisassembly_processFlags(const std::vector
 	}
 }
 
-void ControlPacketDisassembler::processPacket(const std::vector<uint8_t> &packet)
+void ControlPacketDisassembler::processPacket(const std::vector<uint8_t> &packet) const
 {
 	if (packet.size() != 8)
 	{
@@ -85,7 +83,7 @@ void ControlPacketDisassembler::processPacket(const std::vector<uint8_t> &packet
 
 	if (!CRC::validateCRC(utilities::extractSubvector(packet, 0, 4), crc))
 	{
-		for (auto observer : observers)
+		for (const auto observer : observers)
 		{
 			observer->on_packetCorrupt();
 		}
