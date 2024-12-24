@@ -9,9 +9,9 @@ Receiver::Receiver(AtomicQueue<uint8_t>* datastreamQueue_incoming, AtomicQueue<I
     controlPacketDisassembler.addObserver(this);
 }
 
-Receiver::~Receiver()
+std::vector<uint8_t> Receiver::getOutputData()
 {
-    ioManager::setBinaryOutput(dataPacketDisassembler.getData());
+    return dataPacketDisassembler.getData();
 }
 
 void Receiver::receive()

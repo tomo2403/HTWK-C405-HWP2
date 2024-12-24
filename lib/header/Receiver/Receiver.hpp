@@ -28,7 +28,7 @@ class Receiver final : public IDecoderObserver, public IControlPacketDisassemble
 public:
     Receiver(AtomicQueue<uint8_t>* datastreamQueue_incoming, AtomicQueue<InterthreadNotification>* notificationQueue_outgoing, std::atomic<bool>* running);
 
-    virtual ~Receiver();
+    [[nodiscard]] std::vector<uint8_t> getOutputData();
 
     // IDecoderObserver
 
