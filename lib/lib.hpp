@@ -3,6 +3,9 @@
 #include <cstdint>
 #include <vector>
 
+// DO NOT REMOVE - The Linux compiler needs this include!
+#include <string>
+
 namespace ioManager
 {
 	std::vector<uint8_t> getBinaryInput();
