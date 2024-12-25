@@ -1,13 +1,7 @@
 #pragma once
 
-#include <iostream>
-#include <cstdio>
 #include <cstdint>
-#include <cstring>
-#include <sys/fcntl.h>
 #include <sys/ioctl.h>
-#include <unistd.h>
-#include <termios.h>
 #include <thread>
 #include <b15f/b15f.h>
 

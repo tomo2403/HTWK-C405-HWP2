@@ -3,6 +3,7 @@
 void ComInterface::openCom()
 {
 	drv.setRegister(&DDRA, 0x0F);
+	Logger(INFO) << "B15F is connected.";
 }
 
 void ComInterface::closeCom()

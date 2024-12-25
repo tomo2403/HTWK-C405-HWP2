@@ -10,14 +10,11 @@
 #include <termios.h>
 #include <thread>
 
-#include "../lib/header/Logger.hpp"
 #include "../lib/header/ICommunicationInterface.hpp"
-
-
+#include "../lib/header/Logger.hpp"
 
 class ComInterface final : public ICommunicationInterface
 {
-private:
 	int serialPort{}; /**< The file descriptor for the interface port. */
 
 public:

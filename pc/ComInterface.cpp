@@ -2,6 +2,7 @@
 
 void ComInterface::openCom()
 {
+	std::lock_guard lock(mtx);
 	Logger(DEBUG) << "Opening serial port...";
 	const auto portName = SERIAL_PORT;
 	serialPort = open(portName, O_RDWR | O_NOCTTY | O_NDELAY);
@@ -49,12 +50,14 @@ void ComInterface::openCom()
 
 void ComInterface::closeCom()
 {
+	std::lock_guard lock(mtx);
 	Logger(DEBUG) << "Closing interface port...";
 	close(serialPort);
 }
 
 void ComInterface::writeByte(const uint8_t data)
 {
+	std::lock_guard lock(mtx);
 	if (const ssize_t n = write(serialPort, &data, sizeof(data)); n < 0)
 	{
 		throw std::runtime_error("Error writing to serial port!");
@@ -64,6 +67,7 @@ void ComInterface::writeByte(const uint8_t data)
 
 void ComInterface::readByte(uint8_t &data)
 {
+	std::lock_guard lock(mtx);
 	if (const ssize_t m = read(serialPort, &data, sizeof(data)); m < 0)
 	{
 		throw std::runtime_error("Error reading from serial port!");
@@ -72,6 +76,7 @@ void ComInterface::readByte(uint8_t &data)
 
 bool ComInterface::isDataAvailable()
 {
+	std::lock_guard lock(mtx);
 	int bytesAvailable;
 	if (ioctl(serialPort, FIONREAD, &bytesAvailable) == -1)
 	{
