@@ -2,11 +2,6 @@
 
 void ComInterface::openCom()
 {
-	//std::lock_guard lock(mtx);
-	for (const auto &byte : buffer)
-	{
-		queue.push(byte);
-	}
 }
 
 void ComInterface::closeCom()
