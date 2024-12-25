@@ -16,8 +16,6 @@ class Decoder
 		explicit Task(const BlockType &blockType);
 	};
 
-	// How is Data without proper start-Sequence treated?
-
 	bool escapeModeActive{};
 	uint8_t previousNibble{};
 

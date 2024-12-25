@@ -28,11 +28,18 @@ void Decoder::nextNibble(const uint8_t &nibble)
 		processCommand(static_cast<CodecCommand>(nibble));
 		escapeModeActive = false;
 	}
+	// The following processing can only happen if at least one task is currently being
+	// worked on. If this is not the case, a faulty command nibble has been read, and
+	// it is simply ignored. Note that escape sequences and their follow-up commands
+	// are always processed; otherwise, no task can be created in the first place.
+	else if (taskStack.empty())
+	{
+		return;
+	}
 	else
 	{
 		previousNibble = nibble;
-		//if (!taskStack.empty())
-			taskStack.top().nibbleCompressor.pushBack(nibble);
+		taskStack.top().nibbleCompressor.pushBack(nibble);
 	}
 }
 
@@ -49,7 +56,18 @@ void Decoder::processCommand(const CodecCommand &command)
 		case beginControlBlockFallback:
 			processBeginControlBlockCommand();
 			break;
+		
+		default:
+			break;
+	}
 
+	// The following commands can only be processed if a task is currently being
+	// worked on. If this is not the case, a faulty command nibble has been read. In
+	// this case, it is simply ignored.
+	if (taskStack.empty()) return;
+
+	switch (command)
+	{
 		case endBlockDefault:
 		case endBlockFallback:
 			processEndBlockCommand();
@@ -64,7 +82,7 @@ void Decoder::processCommand(const CodecCommand &command)
 		case insertEscSeqAsDataFallback:
 			processInsertEscSeqAsDefaultCommand();
 			break;
-
+		
 		default:
 			break;
 	}
@@ -92,12 +110,10 @@ void Decoder::processEndBlockCommand()
 
 void Decoder::processInsertPrevNibbleAgainCommand()
 {
-	if (!taskStack.empty())
-		taskStack.top().nibbleCompressor.pushBack(previousNibble);
+	taskStack.top().nibbleCompressor.pushBack(previousNibble);
 }
 
 void Decoder::processInsertEscSeqAsDefaultCommand()
 {
-	if (!taskStack.empty())
-		taskStack.top().nibbleCompressor.pushBack(escapeSequence);
+	taskStack.top().nibbleCompressor.pushBack(escapeSequence);
 }
