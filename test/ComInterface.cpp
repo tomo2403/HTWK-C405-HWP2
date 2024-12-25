@@ -2,28 +2,33 @@
 
 void ComInterface::openCom()
 {
-	std::lock_guard lock(mtx);
+	//std::lock_guard lock(mtx);
+	for (const auto &byte : buffer)
+	{
+		queue.push(byte);
+	}
 }
 
 void ComInterface::closeCom()
 {
-	std::lock_guard lock(mtx);
+	//std::lock_guard lock(mtx);
 }
 
 void ComInterface::writeByte(const uint8_t data)
 {
-	std::lock_guard lock(mtx);
-	Logger(DEBUG) << "Writing byte: " << std::hex << static_cast<int>(data);
+	//std::lock_guard lock(mtx);
+	//Logger(DEBUG) << "Writing byte: " << std::hex << static_cast<int>(data);
+    queue.push(data);
 }
 
 void ComInterface::readByte(uint8_t &data)
 {
-	std::lock_guard lock(mtx);
-    data = buffer[index++];
+	//std::lock_guard lock(mtx);
+    data = queue.wait_and_pop();
 	Logger(DEBUG) << "Reading byte: " << std::hex << static_cast<int>(data);
 }
 
 bool ComInterface::isDataAvailable()
 {
-	return index < buffer.size();
+	return !queue.empty();
 }
