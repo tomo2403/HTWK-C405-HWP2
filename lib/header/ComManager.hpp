@@ -5,11 +5,6 @@
 #include <thread>
 
 #include "AtomicQueue.hpp"
-#include "Logger.hpp"
-#include "Encoder.hpp"
-#include "Decoder.hpp"
-#include "CRC.hpp"
-#include "IDecoderObserver.hpp"
 #include "ICommunicationInterface.hpp"
 #include "Receiver/Receiver.hpp"
 #include "Sender/Sender.hpp"

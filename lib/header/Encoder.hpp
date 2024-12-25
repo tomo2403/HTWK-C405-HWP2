@@ -41,8 +41,4 @@ public:
 	[[nodiscard]] bool hasData() const;
 
 	uint8_t nextNibble();
-
-	[[deprecated("Use pushBlock(...) instead")]] void inputDataBlock(const std::vector<uint8_t> &dataVector);
-
-	[[deprecated("Use pushBlock(...) instead")]] void interruptWithControlBlock(const std::vector<uint8_t> &controlVector);
 };

@@ -27,7 +27,8 @@ void Encoder::pushBlock(const BlockType &blockType, const std::vector<uint8_t> &
 
 	if (blockType == controlBlock && callback != nullptr)
 	{
-		throw std::invalid_argument("Encoder: WARNING - A control block does not require a callback function. Callbacks are intended for data blocks only. If you still wish to add a callback, use forcePushBlock(...) to bypass this check.");
+		throw std::invalid_argument(
+			"Encoder: WARNING - A control block does not require a callback function. Callbacks are intended for data blocks only. If you still wish to add a callback, use forcePushBlock(...) to bypass this check.");
 	}
 
 	forcePushBlock(blockType, data, callback);
@@ -51,7 +52,7 @@ uint8_t Encoder::nextNibble()
 	// This condition can only become true, if a callback was provided and
 	// if the nibbleToReturn is the very last nibble (the endCommand) of a
 	// block.
-	if(callbackQueue != nullptr)
+	if (callbackQueue != nullptr)
 	{
 		callbackQueue();
 		callbackQueue = nullptr;
@@ -82,7 +83,7 @@ uint8_t Encoder::nextNibble()
 	// The current task has no more data.
 	else if (taskStack.top().dataStorage.empty())
 	{
-		callbackQueue = taskStack.top().callback;	
+		callbackQueue = taskStack.top().callback;
 		taskStack.pop();
 		escNibbleQueue = determineEndCommand();
 		nibbleToReturn = escapeSequence;
@@ -146,18 +147,4 @@ uint8_t Encoder::determineEscSeqAsDataCommand()
 	}
 
 	return taskStack.top().dataStorage.peek_nibble() == insertEscSeqAsDataDefault ? insertEscSeqAsDataFallback : insertEscSeqAsDataDefault;
-}
-
-// ==============================================================================================
-// DEPRECATED methods DEPRECATED methods DEPRECATED methods DEPRECATED methods DEPRECATED methods 
-// ==============================================================================================
-
-void Encoder::inputDataBlock(const std::vector<uint8_t> &dataVector)
-{
-	pushBlock(dataBlock, dataVector);
-}
-
-void Encoder::interruptWithControlBlock(const std::vector<uint8_t> &controlVector)
-{
-	pushBlock(controlBlock, controlVector);
 }
