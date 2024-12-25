@@ -20,7 +20,7 @@ void Receiver::receive()
 {
     while (*running)
     {
-        if (datastreamQueue_incoming->empty())
+        if (!datastreamQueue_incoming->empty())
         {
             decoder.nextNibble(datastreamQueue_incoming->wait_and_pop());
         }
