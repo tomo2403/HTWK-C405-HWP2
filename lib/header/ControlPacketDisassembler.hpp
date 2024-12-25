@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "IControlPacketDisassemblerObserver.hpp"
 
 class ControlPacketDisassembler

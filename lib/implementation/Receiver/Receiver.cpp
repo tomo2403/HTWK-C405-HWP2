@@ -1,9 +1,10 @@
 #include "../../header/Receiver/Receiver.hpp"
 #include "../../lib.hpp"
-#include <iostream>
 
-Receiver::Receiver(AtomicQueue<uint8_t>* datastreamQueue_incoming, AtomicQueue<InterthreadNotification>* notificationQueue_outgoing, std::atomic<bool>* running)
-    : datastreamQueue_incoming(datastreamQueue_incoming), notificationQueue_outgoing(notificationQueue_outgoing), running(running), connectionEstablished(false), nextPacketToBeReceived_id(0)
+Receiver::Receiver(AtomicQueue<uint8_t> *datastreamQueue_incoming, AtomicQueue<InterthreadNotification> *notificationQueue_outgoing,
+                   std::atomic<bool> *running)
+    : datastreamQueue_incoming(datastreamQueue_incoming), notificationQueue_outgoing(notificationQueue_outgoing), running(running),
+      connectionEstablished(false), nextPacketToBeReceived_id(0)
 {
     decoder.addObserver(this);
     controlPacketDisassembler.addObserver(this);
@@ -18,13 +19,14 @@ void Receiver::receive()
 {
     while (*running)
     {
-        if (std::optional<uint8_t> optionalValue = datastreamQueue_incoming->try_pop()) {
-            decoder.nextNibble(*optionalValue);
-
-//#ifndef NDEBUG
-//            std::cerr << std::hex << static_cast<int>(*optionalValue) << std::endl;
-//#endif
+        if (datastreamQueue_incoming->empty())
+        {
+            decoder.nextNibble(datastreamQueue_incoming->wait_and_pop());
         }
+
+        //#ifndef NDEBUG
+        //            std::cerr << std::hex << static_cast<int>(*optionalValue) << std::endl;
+        //#endif
     }
 }
 
@@ -53,14 +55,16 @@ void Receiver::controlBlockReceived(const std::vector<uint8_t> &dataVector) cons
 
 void Receiver::dataBlockReceived(const std::vector<uint8_t> &dataVector)
 {
-    if(dataPacketDisassembler.processPacket(dataVector, nextPacketToBeReceived_id))
+    if (dataPacketDisassembler.processPacket(dataVector, nextPacketToBeReceived_id))
     {
-        notificationQueue_outgoing->push(InterthreadNotification(InterthreadNotification::Type::FOREIGN_PACKET_RECEIVED, nextPacketToBeReceived_id));
+        notificationQueue_outgoing->push(InterthreadNotification(InterthreadNotification::Type::FOREIGN_PACKET_RECEIVED,
+                                                                 nextPacketToBeReceived_id));
         nextPacketToBeReceived_id++;
     }
     else
     {
-        notificationQueue_outgoing->push(InterthreadNotification(InterthreadNotification::Type::FOREIGN_PACKET_RESEND, nextPacketToBeReceived_id));
+        notificationQueue_outgoing->push(InterthreadNotification(InterthreadNotification::Type::FOREIGN_PACKET_RESEND,
+                                                                 nextPacketToBeReceived_id));
     }
 }
 

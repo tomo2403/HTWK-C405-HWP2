@@ -15,7 +15,8 @@ void SenderState_ReadyToConnect::processNotification()
 
     if (notification.type != InterthreadNotification::Type::START_SENDING_DATA)
     {
-        throw std::runtime_error("SenderState_ReadyToConnect: Received illegal notification. No connection was established, it's unclear how to proceed.");
+        //throw std::runtime_error("SenderState_ReadyToConnect: Received illegal notification. No connection was established, it's unclear how to proceed.");
+        return;
     }
 
     sender->setState(std::make_unique<SenderState_Sending>(sender, resources));

@@ -31,7 +31,8 @@ void Decoder::nextNibble(const uint8_t &nibble)
 	else
 	{
 		previousNibble = nibble;
-		taskStack.top().nibbleCompressor.pushBack(nibble);
+		//if (!taskStack.empty())
+			taskStack.top().nibbleCompressor.pushBack(nibble);
 	}
 }
 
