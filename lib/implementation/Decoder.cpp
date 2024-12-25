@@ -32,11 +32,7 @@ void Decoder::nextNibble(const uint8_t &nibble)
 	// worked on. If this is not the case, a faulty command nibble has been read, and
 	// it is simply ignored. Note that escape sequences and their follow-up commands
 	// are always processed; otherwise, no task can be created in the first place.
-	else if (taskStack.empty())
-	{
-		return;
-	}
-	else
+	else if (!taskStack.empty())
 	{
 		previousNibble = nibble;
 		taskStack.top().nibbleCompressor.pushBack(nibble);
