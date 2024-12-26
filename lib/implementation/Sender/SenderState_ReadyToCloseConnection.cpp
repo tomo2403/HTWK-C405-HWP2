@@ -3,10 +3,11 @@
 #include <stdexcept>
 #include <thread>
 
-SenderState_ReadyToCloseConnection::SenderState_ReadyToCloseConnection(Sender* sender, SenderResources* resources)
+SenderState_ReadyToCloseConnection::SenderState_ReadyToCloseConnection(Sender *sender, SenderResources *resources)
     : SenderState(sender, resources)
 {
-
+    if (resources->globalTimer.running())
+        resources->globalTimer.stop();
 }
 
 void SenderState_ReadyToCloseConnection::processNotification()
@@ -15,20 +16,22 @@ void SenderState_ReadyToCloseConnection::processNotification()
 
     switch (notification.type)
     {
-    case InterthreadNotification::Type::FOREIGN_PACKET_RECEIVED:
-        resources->encoder.pushBlock(BlockType::controlBlock, ControlPacketAssembler::assemble(Flag::RECEIVED, notification.referencedPacket_id));
-        break;
+        case InterthreadNotification::Type::FOREIGN_PACKET_RECEIVED:
+            resources->encoder.pushBlock(BlockType::controlBlock,
+                                         ControlPacketAssembler::assemble(Flag::RECEIVED, notification.referencedPacket_id));
+            break;
 
-    case InterthreadNotification::Type::FOREIGN_PACKET_RESEND:
-        resources->encoder.pushBlock(BlockType::controlBlock, ControlPacketAssembler::assemble(Flag::RESEND, notification.referencedPacket_id));
-        break;
+        case InterthreadNotification::Type::FOREIGN_PACKET_RESEND:
+            resources->encoder.pushBlock(BlockType::controlBlock,
+                                         ControlPacketAssembler::assemble(Flag::RESEND, notification.referencedPacket_id));
+            break;
 
-    case InterthreadNotification::Type::CLOSE_CONNECTION:
-        sender->shutDown();
-        break;
-    
-    default:
-        throw std::runtime_error("SenderState_Sending: Received illegal notification. It's unclear how to proceed.");
+        case InterthreadNotification::Type::CLOSE_CONNECTION:
+            sender->shutDown();
+            break;
+
+        default:
+            throw std::runtime_error("SenderState_Sending: Received illegal notification. It's unclear how to proceed.");
     }
 }
 

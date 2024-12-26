@@ -33,7 +33,7 @@ void Receiver::beginBlockReceived(const BlockType &blockType)
 
 void Receiver::endBlockReceived(const BlockType &blockType, const std::vector<uint8_t> &dataVector)
 {
-    Logger(DEBUG) << "Received block of type " << blockType;
+    //Logger(DEBUG) << "Received block of type " << blockType;
     if (blockType == BlockType::dataBlock)
     {
         dataBlockReceived(dataVector);
@@ -97,6 +97,6 @@ void Receiver::on_connect_received()
 
 void Receiver::on_packetCorrupt()
 {
-    // Idea: Tell sender about corrupt packet. Let him decide how to act.
     // TODO: Idea: Tell sender about corrupt packet. Let him decide how to act.
+    //throw std::runtime_error("Corrupt control packet received.");
 }

@@ -5,6 +5,7 @@
 #include "../Encoder.hpp"
 #include "../DataPacketAssembler.hpp"
 #include "../InterthreadNotification.hpp"
+#include "../Timer.hpp"
 
 struct SenderResources
 {
@@ -17,6 +18,8 @@ struct SenderResources
 
     Encoder encoder;
     DataPacketAssembler dataPacketAssembler;
+
+    Timer globalTimer;
 
     SenderResources(AtomicQueue<uint8_t>* datastreamQueue_outgoing, AtomicQueue<InterthreadNotification>* notificationQueue_incoming, const std::vector<uint8_t> &data);
 };
