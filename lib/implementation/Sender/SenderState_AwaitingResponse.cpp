@@ -34,7 +34,7 @@ void SenderState_AwaitingResponse::processNotification()
         break;
     
     case InterthreadNotification::Type::OWN_PACKET_RESEND:
-        resources->nextPacketToBeSent_id--;
+        resources->nextPacketToBeSent_id = notification.referencedPacket_id;
         resources->timeOutCounter = 0;
         sender->setState(std::make_unique<SenderState_Sending>(sender, resources));
         break;

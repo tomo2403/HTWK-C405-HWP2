@@ -65,7 +65,7 @@ void ComInterface::writeByte(const uint8_t data)
 
 #ifndef OUTPUT_RO
 	//Logger(DEBUG) << "Wrote byte: " << std::hex << static_cast<int>(data);
-	Logger(DEBUG) << std::hex << static_cast<int>(data);
+	//Logger(DEBUG) << std::hex << static_cast<int>(data);
 #endif
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(10));
@@ -80,7 +80,7 @@ void ComInterface::readByte(uint8_t &data)
 	}
 #ifdef OUTPUT_RO
 	//Logger(DEBUG) << "Read byte: " << std::hex << static_cast<int>(data);
-	Logger(DEBUG) << std::hex << static_cast<int>(data);
+	//Logger(DEBUG) << std::hex << static_cast<int>(data);
 #endif
 }
 

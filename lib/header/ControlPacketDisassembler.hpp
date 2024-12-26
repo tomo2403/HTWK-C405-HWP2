@@ -14,6 +14,8 @@ class ControlPacketDisassembler
     static uint32_t packetDisassembly_getCrc(const std::vector<uint8_t> &packet);
     void packetDisassembly_processFlags(const std::vector<uint8_t> &packet, const uint32_t &id) const;
 
+    void notifyOnCorrupt() const;
+
 public:
 
     void addObserver(IControlPacketDisassemblerObserver *observer);

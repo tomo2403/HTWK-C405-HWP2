@@ -98,5 +98,5 @@ void Receiver::on_connect_received()
 void Receiver::on_packetCorrupt()
 {
     // Idea: Tell sender about corrupt packet. Let him decide how to act.
-    throw std::runtime_error("Corrupt control packet received.");
+    // TODO: Idea: Tell sender about corrupt packet. Let him decide how to act.
 }

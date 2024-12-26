@@ -71,11 +71,20 @@ void ControlPacketDisassembler::packetDisassembly_processFlags(const std::vector
 	}
 }
 
+void ControlPacketDisassembler::notifyOnCorrupt() const
+{
+	for (const auto observer : observers)
+	{
+		observer->on_packetCorrupt();
+	}
+}
+
 void ControlPacketDisassembler::processPacket(const std::vector<uint8_t> &packet) const
 {
 	if (packet.size() != 8)
 	{
-		throw std::invalid_argument("ControlPacketDisassembler: Packets must be exactly of size 8.");
+		//throw std::invalid_argument("ControlPacketDisassembler: Packets must be exactly of size 8.");
+		notifyOnCorrupt();
 	}
 
 	const uint32_t id = packetDisassembly_getId(packet);
@@ -83,10 +92,7 @@ void ControlPacketDisassembler::processPacket(const std::vector<uint8_t> &packet
 
 	if (!CRC::validateCRC(utilities::extractSubvector(packet, 0, 4), crc))
 	{
-		for (const auto observer : observers)
-		{
-			observer->on_packetCorrupt();
-		}
+		notifyOnCorrupt();
 	}
 	else
 	{
