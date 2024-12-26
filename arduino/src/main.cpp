@@ -53,7 +53,8 @@ void setup()
 void loop()
 {
 	const uint8_t received = readNibble();
-	if (received != lastReceived)
+	const uint8_t received2 = readNibble();
+	if (received == received2 && received != lastReceived)
 	{
 		lastReceived = received;
 		Serial.write(received);
