@@ -3,8 +3,10 @@
 #include <stdexcept>
 #include <thread>
 
+#define minNumberOfPacketsToSent 2
+
 SenderState_ReadyToCloseConnection::SenderState_ReadyToCloseConnection(Sender *sender, SenderResources *resources)
-    : SenderState(sender, resources)
+    : SenderState(sender, resources), numberOfCloseConnectionPacketsSent(0)
 {
     if (resources->globalTimer.running())
         resources->globalTimer.stop();
@@ -30,7 +32,10 @@ void SenderState_ReadyToCloseConnection::processNotification()
             break;
 
         case InterthreadNotification::Type::CLOSE_CONNECTION:
-            sender->shutDown();
+            if (numberOfCloseConnectionPacketsSent >= minNumberOfPacketsToSent)
+            { sender->shutDown(); }
+            else
+            { resources->shutDownAsap = true; }
             break;
 
         default:
@@ -40,20 +45,22 @@ void SenderState_ReadyToCloseConnection::processNotification()
 
 void SenderState_ReadyToCloseConnection::processDataQueueIsEmpty()
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(2500));
-    const std::vector<uint8_t> controlBlock = ControlPacketAssembler::assemble(Flag::CLOSE_CONNECTION, 0);
-    resources->encoder.pushBlock(BlockType::controlBlock, controlBlock);
-
-    // Shutdown is already scheduled.
-    if (resources->shutDownAsap)
+    // Shutdown is already scheduled and specified number of closeConnectionPackets was sent.
+    if (resources->shutDownAsap && numberOfCloseConnectionPacketsSent >= minNumberOfPacketsToSent)
     {
         sender->shutDown();
     }
 
-    // The time since the last received notification, and therefore control-Packet, exceeds 60s.
-    if (timeSinceLastReceivedPacket_timer.elapsed() >= 60)
+    // The time since the last received notification, and therefore control-Packet, exceeds 60s and
+    // no shutDown is scheduled yet.
+    if (timeSinceLastReceivedPacket_timer.elapsed() >= 60 && !resources->shutDownAsap)
     {
         sender->shutDown();
         Logger(WARNING) << "Waiting to close the connection but did not receive any packets for 60 seconds. Closing connection due to timeout.\n";
     }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+    const std::vector<uint8_t> controlBlock = ControlPacketAssembler::assemble(Flag::CLOSE_CONNECTION, 0);
+    resources->encoder.pushBlock(BlockType::controlBlock, controlBlock);
+    numberOfCloseConnectionPacketsSent++;
 }
