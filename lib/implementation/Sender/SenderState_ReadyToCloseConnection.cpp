@@ -59,8 +59,13 @@ void SenderState_ReadyToCloseConnection::processDataQueueIsEmpty()
         Logger(WARNING) << "Waiting to close the connection but did not receive any packets for 60 seconds. Closing connection due to timeout.\n";
     }
 
-    std::this_thread::sleep_for(std::chrono::milliseconds(2500));
-    const std::vector<uint8_t> controlBlock = ControlPacketAssembler::assemble(Flag::CLOSE_CONNECTION, 0);
-    resources->encoder.pushBlock(BlockType::controlBlock, controlBlock);
-    numberOfCloseConnectionPacketsSent++;
+    // Ensures CloseConnection packets are sent at least 3s apart.
+    if (timeSinceLastCloseConnectionPacket_timer.elapsed() >= 3 || !timeSinceLastCloseConnectionPacket_timer.running())
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(2500));
+        const std::vector<uint8_t> controlBlock = ControlPacketAssembler::assemble(Flag::CLOSE_CONNECTION, 0);
+        resources->encoder.pushBlock(BlockType::controlBlock, controlBlock);
+        numberOfCloseConnectionPacketsSent++;
+        timeSinceLastCloseConnectionPacket_timer.start();
+    }
 }

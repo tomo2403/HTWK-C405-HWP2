@@ -24,7 +24,10 @@ void SenderState_ReadyToConnect::processNotification()
 
 void SenderState_ReadyToConnect::processDataQueueIsEmpty()
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(2500));
-    const std::vector<uint8_t> controlBlock = ControlPacketAssembler::assemble(Flag::CONNECT, 0);
-    resources->encoder.pushBlock(BlockType::controlBlock, controlBlock);
+    if (timeSinceLastConnectPacket_timer.elapsed() >= 3 || !timeSinceLastConnectPacket_timer.running())
+    {
+        const std::vector<uint8_t> controlBlock = ControlPacketAssembler::assemble(Flag::CONNECT, 0);
+        resources->encoder.pushBlock(BlockType::controlBlock, controlBlock);
+        timeSinceLastConnectPacket_timer.start();
+    }
 }

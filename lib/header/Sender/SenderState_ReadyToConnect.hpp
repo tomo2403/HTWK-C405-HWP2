@@ -4,6 +4,9 @@
 
 class SenderState_ReadyToConnect final : public SenderState
 {
+private:
+    Timer timeSinceLastConnectPacket_timer;
+
 public:
     SenderState_ReadyToConnect(Sender* sender, SenderResources* resources);
 
