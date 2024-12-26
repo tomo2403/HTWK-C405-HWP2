@@ -46,8 +46,7 @@ void SenderState_AwaitingResponse::processNotification()
 
 void SenderState_AwaitingResponse::processDataQueueIsEmpty()
 {
-    constexpr uint8_t secondsUntilTimeout = 10;
-    if (timer.elapsed() >= secondsUntilTimeout)
+    if (timer.elapsed() >= TIMEOUT_SECONDS)
     {
         // previous Packet again
         resources->nextPacketToBeSent_id--;

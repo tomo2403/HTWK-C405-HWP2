@@ -25,6 +25,7 @@ void Sender::setState(std::unique_ptr<SenderState> state)
 
 void Sender::send() const
 {
+    Logger(INFO) << "Sending...";
     while(*running)
     {
         if (!resources->notificationQueue_incoming->empty())

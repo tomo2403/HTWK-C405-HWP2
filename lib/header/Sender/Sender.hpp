@@ -4,9 +4,9 @@
 #include "SenderRessources.hpp"
 
 #include "../AtomicQueue.hpp"
-#include "../Encoder.hpp"
 #include "../DataPacketAssembler.hpp"
 #include "../InterthreadNotification.hpp"
+#include "../Logger.hpp"
 
 class SenderState;
 

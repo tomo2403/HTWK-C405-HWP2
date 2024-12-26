@@ -12,7 +12,6 @@ void ComManager::sendData()
 	{
 		if (!outgoingQueue.empty())
 		{
-			//Logger(DEBUG) << "Sending byte";
 			com->writeByte(outgoingQueue.wait_and_pop());
 		}
 		std::this_thread::sleep_for(std::chrono::nanoseconds(100));
@@ -26,7 +25,6 @@ void ComManager::receiveData()
 	{
 		if (com->isDataAvailable())
 		{
-			//Logger(DEBUG) << "Receiving byte";
 			uint8_t byte;
 			com->readByte(byte);
 			incomingQueue.push(byte);

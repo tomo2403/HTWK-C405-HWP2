@@ -8,6 +8,13 @@ Logger::Logger(const LogLevel level, const bool rewriteLine) : level_(level), re
 
 Logger::~Logger()
 {
+#ifdef NDEBUG
+	if (level_ == DEBUG)
+	{
+		return;
+	}
+#endif
+
 	if (rewriteLine_)
 	{
 		std::cerr << "\r";

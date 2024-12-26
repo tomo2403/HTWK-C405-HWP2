@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SenderState.hpp"
+#include "../Logger.hpp"
 
 class SenderState_Sending final : public SenderState
 {

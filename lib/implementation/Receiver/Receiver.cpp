@@ -24,10 +24,6 @@ void Receiver::receive()
         {
             decoder.nextNibble(datastreamQueue_incoming->wait_and_pop());
         }
-
-        //#ifndef NDEBUG
-        //            std::cerr << std::hex << static_cast<int>(*optionalValue) << std::endl;
-        //#endif
     }
 }
 
