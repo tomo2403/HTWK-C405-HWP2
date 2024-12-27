@@ -57,36 +57,24 @@ void ComInterface::closeCom()
 
 void ComInterface::writeByte(const uint8_t data)
 {
-	//std::lock_guard lock(mtx);
 	if (const ssize_t n = write(serialPort, &data, sizeof(data)); n < 0)
 	{
 		throw std::runtime_error("Error writing to serial port!");
 	}
 
-#ifndef OUTPUT_RO
-	//Logger(DEBUG) << "Wrote byte: " << std::hex << static_cast<int>(data);
-	//Logger(DEBUG) << std::hex << static_cast<int>(data);
-#endif
-
-	std::this_thread::sleep_for(std::chrono::milliseconds(10));
+	std::this_thread::sleep_for(std::chrono::milliseconds(35));
 }
 
 void ComInterface::readByte(uint8_t &data)
 {
-	//std::lock_guard lock(mtx);
 	if (const ssize_t m = read(serialPort, &data, sizeof(data)); m < 0)
 	{
 		throw std::runtime_error("Error reading from serial port!");
 	}
-#ifdef OUTPUT_RO
-	//Logger(DEBUG) << "Read byte: " << std::hex << static_cast<int>(data);
-	//Logger(DEBUG) << std::hex << static_cast<int>(data);
-#endif
 }
 
 bool ComInterface::isDataAvailable()
 {
-	//std::lock_guard lock(mtx);
 	int bytesAvailable;
 	if (ioctl(serialPort, FIONREAD, &bytesAvailable) == -1)
 	{
