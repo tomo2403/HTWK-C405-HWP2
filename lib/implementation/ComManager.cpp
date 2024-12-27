@@ -13,7 +13,7 @@ void ComManager::sendData()
 		{
 			com->writeByte(outgoingQueue.wait_and_pop());
 		}
-		std::this_thread::sleep_for(std::chrono::nanoseconds(100));
+		std::this_thread::sleep_for(std::chrono::nanoseconds(1));
 	}
 }
 
@@ -28,7 +28,7 @@ void ComManager::receiveData()
 			com->readByte(byte);
 			incomingQueue.push(byte);
 		}
-		std::this_thread::sleep_for(std::chrono::nanoseconds(100));
+		std::this_thread::sleep_for(std::chrono::nanoseconds(1));
 	}
 }
 

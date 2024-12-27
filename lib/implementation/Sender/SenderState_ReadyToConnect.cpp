@@ -4,7 +4,7 @@
 #include "../../header/ControlPacketAssembler.hpp"
 #include <thread>
 
-SenderState_ReadyToConnect::SenderState_ReadyToConnect(Sender* sender, SenderResources* resources)
+SenderState_ReadyToConnect::SenderState_ReadyToConnect(Sender *sender, SenderResources *resources)
     : SenderState(sender, resources)
 {
 }
@@ -24,7 +24,12 @@ void SenderState_ReadyToConnect::processNotification()
 
 void SenderState_ReadyToConnect::processDataQueueIsEmpty()
 {
-    if (timeSinceLastConnectPacket_timer.elapsed() >= 3 || !timeSinceLastConnectPacket_timer.running())
+    if (!timeSinceLastConnectPacket_timer.running())
+    {
+        timeSinceLastConnectPacket_timer.start();
+    }
+
+    if (timeSinceLastConnectPacket_timer.elapsed() >= 3)
     {
         const std::vector<uint8_t> controlBlock = ControlPacketAssembler::assemble(Flag::CONNECT, 0);
         resources->encoder.pushBlock(BlockType::controlBlock, controlBlock);

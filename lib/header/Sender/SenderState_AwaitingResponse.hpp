@@ -3,7 +3,7 @@
 #include "SenderState.hpp"
 #include "../Timer.hpp"
 
-#define TIMEOUT_SECONDS 5
+#define TIMEOUT_SECONDS 30
 
 class SenderState_AwaitingResponse final : public SenderState
 {
