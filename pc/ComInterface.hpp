@@ -32,13 +32,7 @@ public:
 	 * @brief Reads a byte of data from the interface port.
 	 * @return The byte of data read, or -1 on error.
 	 */
-	void readByte(uint8_t &data) override;
-
-	/**
- 	 * @brief Checks if data is available in the interface buffer.
-	 * @return True if data is available, false otherwise.
-	 */
-	[[nodiscard]] bool isDataAvailable() override;
+	std::optional<uint8_t> readByte() override;
 
 	/**
 	 * @brief Sets up the interface port with the specified settings.

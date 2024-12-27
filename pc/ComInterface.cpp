@@ -65,20 +65,23 @@ void ComInterface::writeByte(const uint8_t data)
 	std::this_thread::sleep_for(std::chrono::milliseconds(WRITE_DELAY));
 }
 
-void ComInterface::readByte(uint8_t &data)
-{
-	if (const ssize_t m = read(serialPort, &data, sizeof(data)); m < 0)
-	{
-		throw std::runtime_error("Error reading from serial port!");
-	}
-}
-
-bool ComInterface::isDataAvailable()
+std::optional<uint8_t> ComInterface::readByte()
 {
 	int bytesAvailable;
 	if (ioctl(serialPort, FIONREAD, &bytesAvailable) == -1)
 	{
 		throw std::runtime_error("Error checking available data on serial port!");
 	}
-	return bytesAvailable > 0;
+
+	if (bytesAvailable <= 0)
+	{
+		return std::nullopt;
+	}
+
+	uint8_t data;
+	if (const ssize_t m = read(serialPort, &data, sizeof(data)); m < 0)
+	{
+		throw std::runtime_error("Error reading from serial port!");
+	}
+	return data;
 }

@@ -22,11 +22,9 @@ void ComManager::receiveData()
 {
 	while (running)
 	{
-		if (com->isDataAvailable())
+		if (std::optional<uint8_t> byte = com->readByte())
 		{
-			uint8_t byte;
-			com->readByte(byte);
-			incomingQueue.push(byte);
+			incomingQueue.push(byte.value());
 		}
 		std::this_thread::sleep_for(std::chrono::nanoseconds(1));
 	}
