@@ -8,6 +8,7 @@
 #include "ICommunicationInterface.hpp"
 #include "Receiver/Receiver.hpp"
 #include "Sender/Sender.hpp"
+#include "../header/Logger.hpp"
 
 struct InterthreadNotification;
 
