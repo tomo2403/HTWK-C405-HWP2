@@ -62,8 +62,7 @@ void ComInterface::writeByte(const uint8_t data)
 		throw std::runtime_error("Error writing to serial port!");
 	}
 
-	// SAVE WORKING: 35ms
-	std::this_thread::sleep_for(std::chrono::milliseconds(32));
+	std::this_thread::sleep_for(std::chrono::milliseconds(WRITE_DELAY));
 }
 
 void ComInterface::readByte(uint8_t &data)

@@ -13,6 +13,9 @@
 #include "../lib/header/ICommunicationInterface.hpp"
 #include "../lib/header/Logger.hpp"
 
+// SAVE WORKING: 35ms to 32ms
+#define WRITE_DELAY 0
+
 class ComInterface final : public ICommunicationInterface
 {
 	int serialPort{}; /**< The file descriptor for the interface port. */
