@@ -1,3 +1,4 @@
+#include <iostream>
 #include "../../header/Receiver/Receiver.hpp"
 #include "../../lib.hpp"
 #include "../../header/Logger.hpp"
