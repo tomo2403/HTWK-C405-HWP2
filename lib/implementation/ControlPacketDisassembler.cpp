@@ -18,62 +18,56 @@ void ControlPacketDisassembler::removeObserver(IControlPacketDisassemblerObserve
 
 uint32_t ControlPacketDisassembler::packetDisassembly_getId(const std::vector<uint8_t> &packet)
 {
-    uint32_t id = 0x00;
-    id = (id | packet.at(0)) << 8;
-    id = (id | packet.at(1)) << 8;
+	uint32_t id = 0x00;
+	id = (id | packet.at(0)) << 8;
+	id = (id | packet.at(1)) << 8;
 	id = (id | packet.at(2)) << 0;
 
-    return id;
+	return id;
 }
 
 uint32_t ControlPacketDisassembler::packetDisassembly_getCrc(const std::vector<uint8_t> &packet)
 {
-    uint32_t crc = 0x00;
-    crc = (crc | packet.at(packet.size()-4)) << 8;
-    crc = (crc | packet.at(packet.size()-3)) << 8;
-    crc = (crc | packet.at(packet.size()-2)) << 8;
-    crc = (crc | packet.at(packet.size()-1)) << 0;
+	uint32_t crc = 0x00;
+	crc = (crc | packet.at(packet.size() - 4)) << 8;
+	crc = (crc | packet.at(packet.size() - 3)) << 8;
+	crc = (crc | packet.at(packet.size() - 2)) << 8;
+	crc = (crc | packet.at(packet.size() - 1)) << 0;
 
-    return crc;
+	return crc;
 }
 
 void ControlPacketDisassembler::packetDisassembly_processFlags(const std::vector<uint8_t> &packet, const uint32_t &id) const
 {
-	switch (const auto flag = static_cast<Flag>(packet.at(3)))
+	const auto flag = static_cast<Flag>(packet.at(3));
+	for (const auto observer: observers)
 	{
-	case TRANSFER_FINISHED:
-		for (const auto observer : observers)
-		{ observer->on_transferFinished_received(); }
-		break;
-	
-	case CLOSE_CONNECTION:
-		for (const auto observer : observers)
-		{ observer->on_closeConnection_received(); }
-		break;
-	
-	case RESEND:
-		for (const auto observer : observers)
-		{ observer->on_resend_received(id); }
-		break;
-
-	case CONNECT:
-		for (const auto observer : observers)
-		{ observer->on_connect_received(); }
-		break;
-
-	case RECEIVED:
-		for (const auto observer : observers)
-		{ observer->on_received_received(id); }
-		break;
-
-	default:
-		break;
+		switch (flag)
+		{
+			case TRANSFER_FINISHED:
+				observer->on_transferFinished_received();
+				break;
+			case CLOSE_CONNECTION:
+				observer->on_closeConnection_received();
+				break;
+			case RESEND:
+				observer->on_resend_received(id);
+				break;
+			case CONNECT:
+				observer->on_connect_received();
+				break;
+			case RECEIVED:
+				observer->on_received_received(id);
+				break;
+			default:
+				break;
+		}
 	}
 }
 
 void ControlPacketDisassembler::notifyOnCorrupt() const
 {
-	for (const auto observer : observers)
+	for (const auto observer: observers)
 	{
 		observer->on_packetCorrupt();
 	}

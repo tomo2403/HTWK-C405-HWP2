@@ -6,18 +6,21 @@
 
 #include <memory>
 
-SenderResources::SenderResources(AtomicQueue<uint8_t>* datastreamQueue_outgoing, AtomicQueue<InterthreadNotification>* notificationQueue_incoming, const std::vector<uint8_t> &data, ControlPanel* cp)
+SenderResources::SenderResources(AtomicQueue<uint8_t> *datastreamQueue_outgoing,
+                                 AtomicQueue<InterthreadNotification> *notificationQueue_incoming, const std::vector<uint8_t> &data,
+                                 ControlPanel *cp)
     : nextPacketToBeSent_id(0),
       datastreamQueue_outgoing(datastreamQueue_outgoing),
       notificationQueue_incoming(notificationQueue_incoming), dataPacketAssembler(data), cp(cp)
 {
 }
 
-Sender::Sender(AtomicQueue<uint8_t>* datastreamQueue_outgoing, AtomicQueue<InterthreadNotification>* notificationQueue_incoming, std::atomic<bool>* running, const std::vector<uint8_t> &data, ControlPanel* cp)
+Sender::Sender(AtomicQueue<uint8_t> *datastreamQueue_outgoing, AtomicQueue<InterthreadNotification> *notificationQueue_incoming,
+               std::atomic<bool> *running, const std::vector<uint8_t> &data, ControlPanel *cp)
     : running(running)
 {
     resources = std::make_unique<SenderResources>(datastreamQueue_outgoing, notificationQueue_incoming, data, cp);
-    
+
     currentState = std::make_unique<SenderState_ReadyToConnect>(this, resources.get());
 }
 
@@ -28,7 +31,7 @@ void Sender::setState(std::unique_ptr<SenderState> state)
 
 void Sender::send() const
 {
-    while(*running)
+    while (*running)
     {
         if (!resources->notificationQueue_incoming->empty())
         {
