@@ -46,8 +46,8 @@ void SenderState_Sending::processDataQueueIsEmpty()
         const auto callback = [&] { this->OnDataPacketSentCallback(); };
         resources->encoder.pushBlock(BlockType::dataBlock, dataBlock, callback);
 
-        Logger(INFO, true) << "Sent packet: " << resources->nextPacketToBeSent_id << " | " << resources->globalTimer.elapsed() <<
-                "s elapsed";
+        Logger(INFO, true) << "Sent packet: " << resources->nextPacketToBeSent_id << " | " << std::fixed << std::setprecision(4) <<
+                resources->globalTimer.elapsed() << "s elapsed";
         resources->nextPacketToBeSent_id++;
     }
     else
