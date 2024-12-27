@@ -10,7 +10,7 @@ class NibbleCompressor
     bool nextNibbleIsHighNibble;
 
 public:
-    explicit NibbleCompressor(const size_t &size = 0);
+    explicit NibbleCompressor(const std::size_t &size = 0);
 
     void pushBack(const uint8_t &nibble);
 

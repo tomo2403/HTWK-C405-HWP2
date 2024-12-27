@@ -1,5 +1,4 @@
 #include "../header/ComManager.hpp"
-#include "../header/Logger.hpp"
 
 ComManager::ComManager(ICommunicationInterface *com, const std::vector<uint8_t> &inputData) : com(com), inputData(inputData),
                                                                                               sender(&outgoingQueue, &notifications, &running, inputData), receiver(&incomingQueue, &notifications, &running)
