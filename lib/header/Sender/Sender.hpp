@@ -4,9 +4,9 @@
 #include "SenderRessources.hpp"
 
 #include "../AtomicQueue.hpp"
+#include "../ControlPanel.hpp"
 #include "../DataPacketAssembler.hpp"
 #include "../InterthreadNotification.hpp"
-#include "../Logger.hpp"
 
 class SenderState;
 
@@ -22,7 +22,7 @@ public:
     Sender(AtomicQueue<uint8_t>* datastreamQueue_outgoing,
            AtomicQueue<InterthreadNotification>* notificationQueue_incoming,
            std::atomic<bool>* running,
-           const std::vector<uint8_t> &data);
+           const std::vector<uint8_t> &data, ControlPanel* cp);
 
     void setState(std::unique_ptr<SenderState> state);
 

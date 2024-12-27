@@ -9,11 +9,14 @@
 #include "../ControlPacketDisassembler.hpp"
 
 
+class ControlPanel;
+
 class Receiver final : public IDecoderObserver, public IControlPacketDisassemblerObserver
 {
     AtomicQueue<uint8_t>* datastreamQueue_incoming;
     AtomicQueue<InterthreadNotification>* notificationQueue_outgoing;
     std::atomic<bool>* running;
+    ControlPanel* cp;
 
     Decoder decoder;
     DataPacketDisassembler dataPacketDisassembler;
@@ -26,7 +29,7 @@ class Receiver final : public IDecoderObserver, public IControlPacketDisassemble
     void dataBlockReceived(const std::vector<uint8_t> &dataVector);
 
 public:
-    Receiver(AtomicQueue<uint8_t>* datastreamQueue_incoming, AtomicQueue<InterthreadNotification>* notificationQueue_outgoing, std::atomic<bool>* running);
+    Receiver(AtomicQueue<uint8_t>* datastreamQueue_incoming, AtomicQueue<InterthreadNotification>* notificationQueue_outgoing, std::atomic<bool>* running, ControlPanel* cp);
 
     [[nodiscard]] std::vector<uint8_t> getOutputData();
 

@@ -5,6 +5,7 @@
 #include <thread>
 
 #include "AtomicQueue.hpp"
+#include "ControlPanel.hpp"
 #include "ICommunicationInterface.hpp"
 #include "Receiver/Receiver.hpp"
 #include "Sender/Sender.hpp"
@@ -26,10 +27,13 @@ class ComManager final
 
 	Sender sender;
 	Receiver receiver;
+	ControlPanel cp;
 
 	void sendData();
 
 	void receiveData();
+
+	void updateDisplay();
 
 public:
 	explicit ComManager(ICommunicationInterface *com, const std::vector<uint8_t> &inputData);

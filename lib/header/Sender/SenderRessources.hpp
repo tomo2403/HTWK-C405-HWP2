@@ -7,6 +7,8 @@
 #include "../InterthreadNotification.hpp"
 #include "../Timer.hpp"
 
+class ControlPanel;
+
 struct SenderResources
 {
     uint8_t timeOutCounter{};
@@ -20,6 +22,7 @@ struct SenderResources
     DataPacketAssembler dataPacketAssembler;
 
     Timer globalTimer;
+    ControlPanel* cp;
 
-    SenderResources(AtomicQueue<uint8_t>* datastreamQueue_outgoing, AtomicQueue<InterthreadNotification>* notificationQueue_incoming, const std::vector<uint8_t> &data);
+    SenderResources(AtomicQueue<uint8_t>* datastreamQueue_outgoing, AtomicQueue<InterthreadNotification>* notificationQueue_incoming, const std::vector<uint8_t> &data, ControlPanel* cp);
 };

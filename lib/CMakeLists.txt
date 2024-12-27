@@ -1,5 +1,6 @@
 add_library(lib STATIC lib.cpp
         implementation/ComManager.cpp
+        implementation/ControlPanel.cpp
         implementation/CRC.cpp
         implementation/DataStorage.cpp
         implementation/Decoder.cpp

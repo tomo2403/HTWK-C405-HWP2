@@ -21,6 +21,7 @@ void SenderState_AwaitingResponse::processNotification()
 
     case InterthreadNotification::Type::FOREIGN_PACKET_RESEND:
         resources->encoder.pushBlock(BlockType::controlBlock, ControlPacketAssembler::assemble(Flag::RESEND, notification.referencedPacket_id));
+        resources->cp->incrementResentPackets();
         break;
 
     case InterthreadNotification::Type::CLOSE_CONNECTION:
@@ -57,6 +58,7 @@ void SenderState_AwaitingResponse::processDataQueueIsEmpty()
             throw std::runtime_error("SenderState_AwaitingResponse: Had 10 timeouts while awaiting response for sent packet.");
         }
 
+        resources->cp->incrementLostPackets();
         sender->setState(std::make_unique<SenderState_Sending>(sender, resources));
     }
 }

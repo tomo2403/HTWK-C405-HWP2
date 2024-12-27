@@ -33,9 +33,14 @@ void SenderState_ReadyToCloseConnection::processNotification()
 
         case InterthreadNotification::Type::CLOSE_CONNECTION:
             if (numberOfCloseConnectionPacketsSent >= minNumberOfPacketsToSent)
-            { sender->shutDown(); }
+            {
+                sender->shutDown();
+            }
             else
-            { resources->shutDownAsap = true; }
+            {
+                resources->shutDownAsap = true;
+                resources->cp->finishReceiving();
+            }
             break;
 
         default:
@@ -45,6 +50,7 @@ void SenderState_ReadyToCloseConnection::processNotification()
 
 void SenderState_ReadyToCloseConnection::processDataQueueIsEmpty()
 {
+    resources->cp->finishSending();
     // Shutdown is already scheduled and specified number of closeConnectionPackets was sent.
     if (resources->shutDownAsap && numberOfCloseConnectionPacketsSent >= minNumberOfPacketsToSent)
     {
@@ -56,7 +62,8 @@ void SenderState_ReadyToCloseConnection::processDataQueueIsEmpty()
     if (timeSinceLastReceivedPacket_timer.elapsed() >= 60 && !resources->shutDownAsap)
     {
         sender->shutDown();
-        Logger(WARNING) << "Waiting to close the connection but did not receive any packets for 60 seconds. Closing connection due to timeout.\n";
+        Logger(WARNING) <<
+                "Waiting to close the connection but did not receive any packets for 60 seconds. Closing connection due to timeout.\n";
     }
 
     // Ensures CloseConnection packets are sent at least 3s apart.
