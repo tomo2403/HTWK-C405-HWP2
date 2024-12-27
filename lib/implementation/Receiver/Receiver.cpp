@@ -1,7 +1,6 @@
 #include <iostream>
 #include "../../header/Receiver/Receiver.hpp"
 #include "../../lib.hpp"
-#include "../../header/Logger.hpp"
 
 Receiver::Receiver(AtomicQueue<uint8_t> *datastreamQueue_incoming, AtomicQueue<InterthreadNotification> *notificationQueue_outgoing,
                    std::atomic<bool> *running)
@@ -43,10 +42,6 @@ void Receiver::endBlockReceived(const BlockType &blockType, const std::vector<ui
     {
         controlBlockReceived(dataVector);
     }
-    for (const auto &byte : dataVector){
-        std::cerr << std::hex << static_cast<int>(byte);
-    }
-    std::cerr << std::endl;
 }
 
 void Receiver::controlBlockReceived(const std::vector<uint8_t> &dataVector) const
