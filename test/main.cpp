@@ -3,16 +3,20 @@
 #include "../lib/header/InterthreadNotification.hpp"
 #include "../lib/header/Sender/Sender.hpp"
 #include "../lib/header/Receiver/Receiver.hpp"
+#include "../lib/lib.hpp"
 
 B15F &drv = B15F::getInstance();
 uint8_t prevNibble{};
 
 void com(AtomicQueue<uint8_t> *outgoingQueue, AtomicQueue<uint8_t> *incomingQueue, std::atomic<bool> *running)
 {
-    while (running)
+    while (*running)
     {
         if (!outgoingQueue->empty())
+        {
             drv.setRegister(&PORTA, outgoingQueue->wait_and_pop());
+            //std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
 
         const uint8_t nibble = drv.getRegister(&PINA) >> 4;
 
@@ -32,7 +36,7 @@ int main()
     AtomicQueue<InterthreadNotification> notifications;
 
     std::atomic<bool> running = true;
-    std::vector<uint8_t> inputData{};
+    std::vector<uint8_t> inputData = ioManager::getBinaryInput();
     std::vector<uint8_t> outputData{};
 
     Sender sender(&outgoingQueue, &notifications, &running, inputData);
@@ -44,6 +48,12 @@ int main()
     std::thread receive(&Receiver::receive, &receiver);
 
     std::thread comTh(com, &outgoingQueue, &incomingQueue, &running);
+
+    comTh.join();
+    send.join();
+    receive.join();
+
+    ioManager::setBinaryOutput(receiver.getOutputData());
 
     return 0;
 }
