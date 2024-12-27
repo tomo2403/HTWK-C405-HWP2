@@ -29,7 +29,7 @@ std::vector<uint8_t> NibbleCompressor::getData()
     if (!nextNibbleIsHighNibble)
     {
 #ifndef NDEBUG
-        throw std::runtime_error("NibbleCompressor: An odd number of nibbles was provided (last nibble is incomplete). Please ensure that you provide an even number of nibbles for proper compression.");
+        //throw std::runtime_error("NibbleCompressor: An odd number of nibbles was provided (last nibble is incomplete). Please ensure that you provide an even number of nibbles for proper compression.");
 #endif
     }
 

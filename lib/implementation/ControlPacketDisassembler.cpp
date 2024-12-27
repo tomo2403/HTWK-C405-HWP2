@@ -85,6 +85,7 @@ void ControlPacketDisassembler::processPacket(const std::vector<uint8_t> &packet
 	{
 		//throw std::invalid_argument("ControlPacketDisassembler: Packets must be exactly of size 8.");
 		notifyOnCorrupt();
+		return;
 	}
 
 	const uint32_t id = packetDisassembly_getId(packet);

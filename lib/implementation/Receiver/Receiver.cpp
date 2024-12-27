@@ -42,6 +42,10 @@ void Receiver::endBlockReceived(const BlockType &blockType, const std::vector<ui
     {
         controlBlockReceived(dataVector);
     }
+    for (const auto &byte : dataVector){
+        std::cerr << std::hex << static_cast<int>(byte);
+    }
+    std::cerr << std::endl;
 }
 
 void Receiver::controlBlockReceived(const std::vector<uint8_t> &dataVector) const
