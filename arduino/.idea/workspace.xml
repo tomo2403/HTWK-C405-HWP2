@@ -24,12 +24,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7c1b7ff7-a82d-4675-b206-ebbcf78e05a5" name="Changes" comment="added arduino project">
+      <change beforePath="$PROJECT_DIR$/.idea/editor.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/editor.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/implementation/ControlPacketDisassembler.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/implementation/ControlPacketDisassembler.cpp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../lib/implementation/Receiver/Receiver.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/implementation/Receiver/Receiver.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/header/Sender/SenderState_AwaitingResponse.hpp" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/header/Sender/SenderState_AwaitingResponse.hpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/implementation/ComManager.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/implementation/ComManager.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lib/implementation/Sender/SenderState_ReadyToConnect.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../lib/implementation/Sender/SenderState_ReadyToConnect.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../pc/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../pc/CMakeLists.txt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../pc/ComInterface.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../pc/ComInterface.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../test/CMakeLists.txt" beforeDir="false" afterPath="$PROJECT_DIR$/../test/CMakeLists.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../test/main.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/../test/main.cpp" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,7 +43,7 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="nanoatmega328" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="nanoatmega328new" />
   <component name="ExternalProjectsData">
     <projectState path="$PROJECT_DIR$">
       <ProjectState />
@@ -121,9 +125,9 @@
   }
 }</component>
   <component name="RunManager">
-    <configuration default="true" type="CLionExternalRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
+    <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true">
       <method v="2">
-        <option name="CLION.EXTERNAL.BUILD" enabled="true" />
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
       </method>
     </configuration>
     <configuration name="PlatformIO" type="platformio" factoryName="PlatformIO Debug" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="arduino" TARGET_NAME="PlatformIO" CONFIG_NAME="PlatformIO">
@@ -161,7 +165,8 @@
       <workItem from="1735157646198" duration="2394000" />
       <workItem from="1735206361663" duration="6005000" />
       <workItem from="1735223793217" duration="710000" />
-      <workItem from="1735290208520" duration="2973000" />
+      <workItem from="1735290208520" duration="4602000" />
+      <workItem from="1735303933465" duration="1645000" />
     </task>
     <task id="LOCAL-00001" summary="added arduino project">
       <option name="closed" value="true" />
