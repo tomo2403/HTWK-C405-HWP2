@@ -1,0 +1,19 @@
+\section{Der Sender als Zustandsautomat}
+\begin{tikzpicture} [on grid, auto, node distance=6cm]
+    \tikzstyle{every state}=[fill={rgb:black,1;white,10}, minimum size=2.5cm]
+    \tikzstyle{every path}=[>=stealth, line width=0.5mm]
+
+    \node[state,initial]    (ready)                                 {$connecting$};
+    \node[state]            (sending)   [below of=ready]            {$sending$};
+    \node[state]            (awaiting)  [below left of=sending]     {$awaiting$};
+    \node[state]            (close)     [below right of=sending]    {$closing$};
+    \node[state, accepting] (end)       [below right of=awaiting]   {$end$};
+
+    \path[->]
+    (ready)     edge            node[align=left]    {'ready to connect' received,\\data packet received}    (sending)
+    (sending)   edge[bend left] node[align=left]    {data packet\\sent}                                     (awaiting)
+    (awaiting)  edge[bend left] node[align=right]   {timeout,\\response received}                           (sending)
+    (sending)   edge            node[align=left]    {all data sent}                                         (close)
+    (close)     edge            node[align=left]    {all data received}                                     (end);
+
+\end{tikzpicture}

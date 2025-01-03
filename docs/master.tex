@@ -4,24 +4,27 @@
 \input{template.tex}
 
 \pgfqkeys{/TemplateVersion0}{
-	properties/Authors 				= {Tom Mohr&&Martin Ohmeyer},
-	properties/Title	 			= {Versuch V7},
-	properties/Subtitle 			= {C405 Hardwarepraktikum II},
-	properties/Institution 			= {HTWK Leipzig},
-	properties/Group 				= {23INB-3},
-	properties/Versioning 	      	= {true},
-	misc/Date/Prefix				= {Stand: },
-	misc/Page/CountPrefix			= {Seiten: },
-	misc/Group/Prefix				= {Gruppe: },
-	Protocol/Comment		 	    = {Abnahme: 20. Januar 2025}
+    properties/Authors 				= {Tom Mohr&&Martin Ohmeyer},
+    properties/Title	 			= {Versuch V7},
+    properties/Subtitle 			= {C405 Hardwarepraktikum II},
+    properties/Institution 			= {HTWK Leipzig},
+    properties/Group 				= {23INB-3},
+    properties/Versioning 	      	= {true},
+    misc/Date/Prefix				= {Stand: },
+    misc/Page/CountPrefix			= {Seiten: },
+    misc/Group/Prefix				= {Gruppe: },
+    Protocol/Comment		 	    = {Abnahme: 20. Januar 2025}
 }
 
 %\usepackage{minted}
 %\usepackage{subcaption}
 %\usepackage{siunitx}
+\usepackage{tikz}
+\usetikzlibrary{arrows, automata, positioning}
 \graphicspath{{./images/}}
 
-
 \begin{document}
+
+    \include{sender}
 
 \end{document}
