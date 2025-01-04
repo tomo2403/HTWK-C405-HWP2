@@ -1,0 +1,31 @@
+\chapter{Implantation}
+\section{Der Sender als Zustandsautomat}
+\vspace{0.5cm}
+\begin{figure}[h!]
+    \centering
+    \label{fig:zustandsautomat}
+    \begin{tikzpicture} [on grid, auto, node distance=3.5cm]
+        \tikzstyle{every state}=[fill={rgb:black,1;white,10}, minimum size=1.4cm]
+        \tikzstyle{every path}=[>=stealth, line width=0.3mm]
+        \tikzset{font=\scriptsize}
+
+        \node[state,initial]    (ready)                                 {$connect$};
+        \node[state]            (sending)   [below of=ready]            {$send$};
+        \node[state]            (awaiting)  [below left of=sending]     {$await$};
+        \node[state]            (close)     [below right of=sending]    {$close$};
+        \node[state, accepting] (end)       [below right of=awaiting]   {$end$};
+
+        \path[->]
+        (ready)     edge            node[align=left]                    {'ready to connect' received,\\data packet received} (sending)
+        (sending)   edge[bend left] node[align=left]                    {data\\packet sent}                                  (awaiting)
+        (awaiting)  edge[bend left] node[align=right]                   {response received,\\timeout}                        (sending)
+        (sending)   edge            node[align=right]                   {all data sent}                                      (close)
+        (close)     edge            node[align=right]                   {all data received}                                  (end)
+        (awaiting)  edge[dashed]    node[left,align=left,xshift=-0.2cm] {10x timeout}                                        (end);
+
+    \end{tikzpicture}
+    \vspace{0.5cm}
+    \caption{Zustandsautomat des Senders}
+\end{figure}
+\vspace{1cm}
+\noindent
