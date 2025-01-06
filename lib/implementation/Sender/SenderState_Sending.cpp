@@ -34,7 +34,7 @@ void SenderState_Sending::processNotification()
             break;
 
         default:
-            throw std::runtime_error("SenderState_Sending: Received illegal notification. It's unclear how to proceed.");
+            //throw std::runtime_error("SenderState_Sending: Received illegal notification. It's unclear how to proceed.");
     }
 }
 
