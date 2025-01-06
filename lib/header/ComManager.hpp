@@ -29,9 +29,7 @@ class ComManager final
 	Receiver receiver;
 	ControlPanel cp;
 
-	void sendData();
-
-	void receiveData();
+	void transferData();
 
 	void updateDisplay();
 

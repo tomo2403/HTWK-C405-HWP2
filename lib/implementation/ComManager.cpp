@@ -5,7 +5,7 @@ ComManager::ComManager(ICommunicationInterface *com, const std::vector<uint8_t> 
 {
 }
 
-void ComManager::sendData()
+void ComManager::transferData()
 {
 	while (running)
 	{
@@ -13,15 +13,6 @@ void ComManager::sendData()
 		{
 			com->writeByte(outgoingQueue.wait_and_pop());
 		}
-		std::this_thread::sleep_for(std::chrono::nanoseconds(1));
-	}
-}
-
-
-void ComManager::receiveData()
-{
-	while (running)
-	{
 		if (std::optional<uint8_t> byte = com->readByte())
 		{
 			incomingQueue.push(byte.value());
@@ -46,14 +37,12 @@ std::vector<uint8_t> ComManager::transfer2Way()
 
 	std::thread send(&Sender::send, &sender);
 	std::thread receive(&Receiver::receive, &receiver);
-	std::thread sendThread(&ComManager::sendData, this);
-	std::thread receiveThread(&ComManager::receiveData, this);
+	std::thread transferThread(&ComManager::transferData, this);
 	std::thread cpThread(&ComManager::updateDisplay, this);
 
 	send.join();
 	receive.join();
-	sendThread.join();
-	receiveThread.join();
+	transferThread.join();
 	cpThread.join();
 
 	cp.updateLog();
