@@ -14,7 +14,7 @@
 #include "../lib/header/Logger.hpp"
 
 // SAVE WORKING: 35ms to 32ms
-#define WRITE_DELAY 0
+#define WRITE_DELAY 35
 
 class ComInterface final : public ICommunicationInterface
 {
