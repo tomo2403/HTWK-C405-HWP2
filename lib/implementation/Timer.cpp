@@ -7,20 +7,14 @@ Timer::Timer()
 
 void Timer::start()
 {
-    if (!running())
-    {
-        start_time_point = std::chrono::high_resolution_clock::now();
-        isRunning = true;
-    }
+    start_time_point = std::chrono::high_resolution_clock::now();
+    isRunning = true;
 }
 
 void Timer::stop()
 {
-    if (running())
-    {
-        end_time_point = std::chrono::high_resolution_clock::now();
-        isRunning = false;
-    }
+    end_time_point = std::chrono::high_resolution_clock::now();
+    isRunning = false;
 }
 
 double Timer::elapsed()
