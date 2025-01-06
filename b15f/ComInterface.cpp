@@ -17,22 +17,16 @@ void ComInterface::writeByte(uint8_t data)
 	drv.setRegister(&PORTA, data);
 }
 
-void ComInterface::readByte(uint8_t &data)
+std::optional<uint8_t> ComInterface::readByte()
 {
 	std::lock_guard lock(drvMutex);
-	data = drv.getRegister(&PINA) >> 4;
-}
+	uint8_t byte = drv.getRegister(&PINA) >> 4;
 
-bool ComInterface::isDataAvailable()
-{
-	uint8_t nibble;
-	readByte(nibble);
-	if (nibble != previouslyReceivedNibble)
+	if (byte == previouslyReceivedNibble)
 	{
-		previouslyReceivedNibble = nibble;
-		return true;
+		return std::nullopt;
 	}
 
-	std::this_thread::sleep_for(std::chrono::milliseconds(1));
-	return false;
+	previouslyReceivedNibble = byte;
+	return byte;
 }

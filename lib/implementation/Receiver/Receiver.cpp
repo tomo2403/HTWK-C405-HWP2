@@ -1,11 +1,12 @@
 #include <iostream>
 #include "../../header/Receiver/Receiver.hpp"
 #include "../../lib.hpp"
+#include "../../header/ControlPanel.hpp"
 
 Receiver::Receiver(AtomicQueue<uint8_t> *datastreamQueue_incoming, AtomicQueue<InterthreadNotification> *notificationQueue_outgoing,
-                   std::atomic<bool> *running)
+                   std::atomic<bool> *running, ControlPanel *cp)
     : datastreamQueue_incoming(datastreamQueue_incoming), notificationQueue_outgoing(notificationQueue_outgoing), running(running),
-      connectionEstablished(false), nextPacketToBeReceived_id(0)
+      cp(cp), connectionEstablished(false), nextPacketToBeReceived_id(0)
 {
     decoder.addObserver(this);
     controlPacketDisassembler.addObserver(this);
@@ -33,7 +34,6 @@ void Receiver::beginBlockReceived(const BlockType &blockType)
 
 void Receiver::endBlockReceived(const BlockType &blockType, const std::vector<uint8_t> &dataVector)
 {
-    //Logger(DEBUG) << "Received block of type " << blockType;
     if (blockType == BlockType::dataBlock)
     {
         dataBlockReceived(dataVector);
@@ -58,6 +58,7 @@ void Receiver::dataBlockReceived(const std::vector<uint8_t> &dataVector)
         notificationQueue_outgoing->push(InterthreadNotification(InterthreadNotification::Type::FOREIGN_PACKET_RECEIVED,
                                                                  nextPacketToBeReceived_id));
         nextPacketToBeReceived_id++;
+        cp->incrementReceivedPackets();
     }
     else
     {
@@ -74,16 +75,19 @@ void Receiver::on_received_received(const uint32_t &id)
 void Receiver::on_resend_received(const uint32_t &id)
 {
     notificationQueue_outgoing->push(InterthreadNotification(InterthreadNotification::Type::OWN_PACKET_RESEND, id));
+    cp->incrementResentPackets();
 }
 
 void Receiver::on_transferFinished_received()
 {
     notificationQueue_outgoing->push(InterthreadNotification(InterthreadNotification::Type::CLOSE_CONNECTION));
+    cp->finishReceiving();
 }
 
 void Receiver::on_closeConnection_received()
 {
     notificationQueue_outgoing->push(InterthreadNotification(InterthreadNotification::Type::CLOSE_CONNECTION));
+    cp->setConnected(false);
 }
 
 void Receiver::on_connect_received()
@@ -92,11 +96,13 @@ void Receiver::on_connect_received()
     {
         notificationQueue_outgoing->push(InterthreadNotification(InterthreadNotification::Type::START_SENDING_DATA));
         connectionEstablished = true;
+        cp->setConnected(true);
     }
 }
 
 void Receiver::on_packetCorrupt()
 {
+    cp->incrementReceivedFaultyPackets();
     // TODO: Idea: Tell sender about corrupt packet. Let him decide how to act.
     //throw std::runtime_error("Corrupt control packet received.");
 }

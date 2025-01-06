@@ -18,11 +18,14 @@ enum Flag : uint8_t
 
 class ControlPacketAssembler
 {
-    static void packetAssembly_addId(std::vector<uint8_t> &packet, const uint32_t &id);
-    static void packetAssembly_addFlags(std::vector<uint8_t> &packet, const uint8_t &flags);
-    static void packetAssembly_addCrc(std::vector<uint8_t> &packet);
-    
+	static void packetAssembly_addId(std::vector<uint8_t> &packet, const uint32_t &id);
+
+	static void packetAssembly_addFlags(std::vector<uint8_t> &packet, const uint8_t &flags);
+
+	static void packetAssembly_addCrc(std::vector<uint8_t> &packet);
+
 public:
 	ControlPacketAssembler() = delete;
-    static std::vector<uint8_t> assemble(const uint8_t &flag, const uint32_t &packetId);
+
+	static std::vector<uint8_t> assemble(const uint8_t &flag, const uint32_t &packetId);
 };

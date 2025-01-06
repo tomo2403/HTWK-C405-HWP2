@@ -19,7 +19,8 @@ void Timer::stop()
 
 double Timer::elapsed()
 {
-    if (isRunning) {
+    if (isRunning)
+    {
         end_time_point = std::chrono::high_resolution_clock::now();
     }
     return std::chrono::duration<double>(end_time_point - start_time_point).count();

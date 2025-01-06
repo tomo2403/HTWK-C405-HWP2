@@ -34,21 +34,20 @@ void SenderState_Sending::processNotification()
             break;
 
         default:
-            throw std::runtime_error("SenderState_Sending: Received illegal notification. It's unclear how to proceed.");
+            //throw std::runtime_error("SenderState_Sending: Received illegal notification. It's unclear how to proceed.");
     }
 }
 
 void SenderState_Sending::processDataQueueIsEmpty()
 {
-    if (resources->dataPacketAssembler.packetDoesExist(resources->nextPacketToBeSent_id))
+    const uint32_t nextPacketId = resources->nextPacketToBeSent_id;
+    if (resources->dataPacketAssembler.packetDoesExist(nextPacketId))
     {
-        const std::vector<uint8_t> dataBlock = resources->dataPacketAssembler.getPacket(resources->nextPacketToBeSent_id);
+        const std::vector<uint8_t> dataBlock = resources->dataPacketAssembler.getPacket(nextPacketId);
         const auto callback = [&] { this->OnDataPacketSentCallback(); };
         resources->encoder.pushBlock(BlockType::dataBlock, dataBlock, callback);
-
-        Logger(INFO, true) << "Sent packet: " << resources->nextPacketToBeSent_id << " | " << std::fixed << std::setprecision(4) <<
-                resources->globalTimer.elapsed() << "s elapsed";
         resources->nextPacketToBeSent_id++;
+        resources->cp->incrementSendPackets();
     }
     else
     {
