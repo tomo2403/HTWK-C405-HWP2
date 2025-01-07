@@ -38,7 +38,7 @@
   \newcommand*\fsize{\dimexpr\f@size pt\relax}%
   \newcommand*\lineheight[1]{\fontsize{\fsize}{#1\fsize}\selectfont}%
   \ifx\svgwidth\undefined%
-    \setlength{\unitlength}{670.95538763bp}%
+    \setlength{\unitlength}{674.67239981bp}%
     \ifx\svgscale\undefined%
       \relax%
     \else%
@@ -50,75 +50,75 @@
   \global\let\svgwidth\undefined%
   \global\let\svgscale\undefined%
   \makeatother%
-  \begin{picture}(1,0.87130236)%
+  \begin{picture}(1,0.86650204)%
     \lineheight{1}%
     \setlength\tabcolsep{0pt}%
     \put(0,0){\includegraphics[width=\unitlength,page=1]{multithread.pdf}}%
-    \put(0.21869471,0.03709846){\color[rgb]{0.10196078,0.10196078,0.10196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Thread - Sender-Logik\end{tabular}}}}%
-    \put(0.22350352,0.09209531){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Vektor mit Rohdaten\end{tabular}}}}%
+    \put(0.22299918,0.03689407){\color[rgb]{0.10196078,0.10196078,0.10196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Thread - Sender-Logik\end{tabular}}}}%
+    \put(0.2277815,0.09158793){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Vektor mit Rohdaten\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=2]{multithread.pdf}}%
-    \put(0.23127676,0.15996658){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Packet-Assembler\end{tabular}}}}%
+    \put(0.23551192,0.15908526){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Packet-Assembler\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=3]{multithread.pdf}}%
-    \put(0.26160515,0.29879441){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Encoder\end{tabular}}}}%
+    \put(0.26567321,0.29714824){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Encoder\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=4]{multithread.pdf}}%
-    \put(0.21871485,0.23092308){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Nibble Dekompressor\end{tabular}}}}%
-    \put(0.13576005,0.30872055){\color[rgb]{0,0,0}\makebox(0,0)[rt]{\lineheight{1.25}\smash{\begin{tabular}[t]{r}Injektion\\kodierende Sequnzen\end{tabular}}}}%
-    \put(0.13576005,0.16930926){\color[rgb]{0,0,0}\makebox(0,0)[rt]{\lineheight{1.25}\smash{\begin{tabular}[t]{r}Zusammenfügen\\ID, CRC, Daten\end{tabular}}}}%
-    \put(0.13551861,0.09893629){\color[rgb]{0,0,0}\makebox(0,0)[rt]{\lineheight{1.25}\smash{\begin{tabular}[t]{r}Holen von Daten\\für nächstes Paket\end{tabular}}}}%
-    \put(0.13582712,0.23776406){\color[rgb]{0,0,0}\makebox(0,0)[rt]{\lineheight{1.25}\smash{\begin{tabular}[t]{r}Pakete zu\\Datenstrom\end{tabular}}}}%
+    \put(0.22301922,0.22965084){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Nibble Dekompressor\end{tabular}}}}%
+    \put(0.14052144,0.3070197){\color[rgb]{0,0,0}\makebox(0,0)[rt]{\lineheight{1.25}\smash{\begin{tabular}[t]{r}Injektion\\kodierender Sequnzen\end{tabular}}}}%
+    \put(0.14052144,0.16837647){\color[rgb]{0,0,0}\makebox(0,0)[rt]{\lineheight{1.25}\smash{\begin{tabular}[t]{r}Zusammenfügen\\ID, CRC, Daten\end{tabular}}}}%
+    \put(0.14028133,0.09839122){\color[rgb]{0,0,0}\makebox(0,0)[rt]{\lineheight{1.25}\smash{\begin{tabular}[t]{r}Holen von Daten\\für nächstes Paket\end{tabular}}}}%
+    \put(0.14058814,0.23645413){\color[rgb]{0,0,0}\makebox(0,0)[rt]{\lineheight{1.25}\smash{\begin{tabular}[t]{r}Pakete zu\\Datenstrom\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=5]{multithread.pdf}}%
-    \put(0.50171585,0.57618706){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}Thread - Hardwarekommunikation\end{tabular}}}}%
+    \put(0.50446106,0.57301264){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}Thread - Hardwarekommunikation\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=6]{multithread.pdf}}%
-    \put(0.50162827,0.69905507){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}Hardwareschnittstelle\end{tabular}}}}%
+    \put(0.50437397,0.69520372){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}Treiber konkreter Hardware (Implementation ICommunicationinterface)\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=7]{multithread.pdf}}%
-    \put(0.41083489,0.62960767){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Kommunikationsinterface\end{tabular}}}}%
+    \put(0.41408079,0.62613893){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Kommunikationsinterface\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=8]{multithread.pdf}}%
-    \put(0.28784905,0.03709846){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}Thread - Sender-Logic\end{tabular}}}}%
-    \put(0.18842895,0.08985973){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Rohdaten vector\textless uint8 \_t\textgreater\end{tabular}}}}%
+    \put(0.29177253,0.03689407){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}Thread - Sender-Logik\end{tabular}}}}%
+    \put(0.19290017,0.08936466){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Rohdaten vector\textless uint8 \_t\textgreater\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=9]{multithread.pdf}}%
-    \put(0.28668207,0.15996658){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}PacketAssembler\end{tabular}}}}%
+    \put(0.29061198,0.15908526){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}PacketAssembler\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=10]{multithread.pdf}}%
-    \put(0.28668207,0.29879441){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}Encoder\end{tabular}}}}%
+    \put(0.29061198,0.29714824){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}Encoder\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=11]{multithread.pdf}}%
-    \put(0.28668207,0.23092308){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}NibbleDecompressor\end{tabular}}}}%
+    \put(0.29061198,0.22965084){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}NibbleDecompressor\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=12]{multithread.pdf}}%
-    \put(0.1903047,0.44503697){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}AtomicQueue\textless uint8 \_t\textgreater\end{tabular}}}}%
+    \put(0.19476559,0.4425851){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}AtomicQueue\textless uint8 \_t\textgreater\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=13]{multithread.pdf}}%
-    \put(0.62680181,0.44503697){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}AtomicQueue\textless uint8 \_t\textgreater\end{tabular}}}}%
+    \put(0.62885788,0.4425851){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}AtomicQueue\textless uint8 \_t\textgreater\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=14]{multithread.pdf}}%
-    \put(0.50075124,0.84514826){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}Hardware\end{tabular}}}}%
+    \put(0.50350176,0.84049204){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}Hardware\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=15]{multithread.pdf}}%
-    \put(0.64848465,0.03709846){\color[rgb]{0.10196078,0.10196078,0.10196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Thread - Sender-Logik\end{tabular}}}}%
-    \put(0.65329343,0.09209531){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Vektor mit Rohdaten\end{tabular}}}}%
+    \put(0.65042125,0.03689407){\color[rgb]{0.10196078,0.10196078,0.10196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Thread - Sender-Logik\end{tabular}}}}%
+    \put(0.65520354,0.09158793){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Vektor mit Rohdaten\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=16]{multithread.pdf}}%
-    \put(0.6610667,0.15996658){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Packet-Assembler\end{tabular}}}}%
+    \put(0.66293399,0.15908526){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Packet-Assembler\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=17]{multithread.pdf}}%
-    \put(0.69139506,0.29879441){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Encoder\end{tabular}}}}%
+    \put(0.69309525,0.29714824){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Encoder\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=18]{multithread.pdf}}%
-    \put(0.64850483,0.23092308){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Nibble Dekompressor\end{tabular}}}}%
+    \put(0.65044132,0.22965084){\color[rgb]{0.70196078,0.70196078,0.70196078}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Nibble Dekompressor\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=19]{multithread.pdf}}%
-    \put(0.71763741,0.03709846){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}Thread - Receiver-Logik\end{tabular}}}}%
-    \put(0.61821908,0.08985973){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Rohdaten vector\textless uint8 \_t\textgreater\end{tabular}}}}%
+    \put(0.71919303,0.03689407){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}Thread - Empfänger-Logik\end{tabular}}}}%
+    \put(0.62032243,0.08936466){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Rohdaten vector\textless uint8 \_t\textgreater\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=20]{multithread.pdf}}%
-    \put(0.71647195,0.15996658){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}PacketDisassembler\end{tabular}}}}%
+    \put(0.71803399,0.15908526){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}PacketDisassembler\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=21]{multithread.pdf}}%
-    \put(0.71647201,0.29879441){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}Decoder\end{tabular}}}}%
+    \put(0.71803405,0.29714824){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}Decoder\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=22]{multithread.pdf}}%
-    \put(0.71647208,0.23092308){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}NibbleCompressor\end{tabular}}}}%
-    \put(0.13576006,0.45389002){\color[rgb]{0,0,0}\makebox(0,0)[rt]{\lineheight{1.25}\smash{\begin{tabular}[t]{r}Warten auf\\nächsten Lese-Zyklus\end{tabular}}}}%
-    \put(0.13576006,0.64014543){\color[rgb]{0,0,0}\makebox(0,0)[rt]{\lineheight{1.25}\smash{\begin{tabular}[t]{r}Abstraktion\\Schreibschnittstelle\end{tabular}}}}%
-    \put(0.13576006,0.70297077){\color[rgb]{0,0,0}\makebox(0,0)[rt]{\lineheight{1.25}\smash{\begin{tabular}[t]{r}Implentation\\Schreibschnittstelle\end{tabular}}}}%
-    \put(0.86897598,0.30872053){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Wiederherstellung\\Original-Datenstrom\end{tabular}}}}%
-    \put(0.86914774,0.16870232){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Auswerten\\ID, CRC, Daten\end{tabular}}}}%
-    \put(0.86904588,0.09518042){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Speichern der Daten\end{tabular}}}}%
-    \put(0.86784664,0.23953692){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Datenstrom zu\\Paketen\end{tabular}}}}%
-    \put(0.87004798,0.45389002){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Warten auf nächsten\\Dekodier-Zyklus\end{tabular}}}}%
-    \put(0.86861943,0.6380247){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Abstraktion\\Leseschnittstelle\end{tabular}}}}%
-    \put(0.86967239,0.70743862){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Implentation \\Leseschnittstelle\end{tabular}}}}%
+    \put(0.71803411,0.22965084){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}NibbleCompressor\end{tabular}}}}%
+    \put(0.14052145,0.45138938){\color[rgb]{0,0,0}\makebox(0,0)[rt]{\lineheight{1.25}\smash{\begin{tabular}[t]{r}Warten auf\\nächsten Lese-Zyklus\end{tabular}}}}%
+    \put(0.14052145,0.63661864){\color[rgb]{0,0,0}\makebox(0,0)[rt]{\lineheight{1.25}\smash{\begin{tabular}[t]{r}Abstraktion der\\Schreibschnittstelle\end{tabular}}}}%
+    \put(0.14052144,0.69909785){\color[rgb]{0,0,0}\makebox(0,0)[rt]{\lineheight{1.25}\smash{\begin{tabular}[t]{r}Implentation der\\Schreibschnittstelle\end{tabular}}}}%
+    \put(0.86969782,0.30701968){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Wiederherstellung\\Original-Datenstrom\end{tabular}}}}%
+    \put(0.86986863,0.16777288){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Auswerten\\ID, CRC, Daten\end{tabular}}}}%
+    \put(0.86976734,0.09465604){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Speichern der Daten\end{tabular}}}}%
+    \put(0.8685747,0.23821722){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Datenstrom zu\\Paketen\end{tabular}}}}%
+    \put(0.87076392,0.45138938){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Warten auf nächsten\\Dekodier-Zyklus\end{tabular}}}}%
+    \put(0.86934324,0.6345096){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Abstraktion der\\Leseschnittstelle\end{tabular}}}}%
+    \put(0.87039039,0.70354108){\color[rgb]{0,0,0}\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}Implentation der \\Leseschnittstelle\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=23]{multithread.pdf}}%
-    \put(0.50130187,0.62960769){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}IComminicationinterface\end{tabular}}}}%
+    \put(0.50404936,0.62613896){\color[rgb]{0,0,0}\makebox(0,0)[t]{\lineheight{1.25}\smash{\begin{tabular}[t]{c}ICommunicationinterface\end{tabular}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=24]{multithread.pdf}}%
-    \put(0.50690943,0.03034131){\color[rgb]{0,0,0}\rotatebox{90.01959947}{\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}AtomicQueue\textless Interthreadnotification\textgreater\end{tabular}}}}}%
+    \put(0.50962602,0.03017415){\color[rgb]{0,0,0}\rotatebox{90.01959947}{\makebox(0,0)[lt]{\lineheight{1.25}\smash{\begin{tabular}[t]{l}AtomicQueue\textless Interthreadnotification\textgreater\end{tabular}}}}}%
     \put(0,0){\includegraphics[width=\unitlength,page=25]{multithread.pdf}}%
   \end{picture}%
 \endgroup%

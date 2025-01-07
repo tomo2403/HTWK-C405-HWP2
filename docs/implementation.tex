@@ -1,14 +1,23 @@
 \chapter{Implementation}
 \section{Parallelisierung}
+Zeitmessungen des Schreib- und Lesezugriffs auf das B15 Board haben ergeben, dass diese Vorgänge jeweils 15,8ms - 16,2ms dauern. Da wir eine Voll-Duplex Kommunikation erreichen sollen, müssen wir beides im Wechsel tun. Ein Leseaufruf kann also im schnellsten Fall ca. alle 32ms erfolgen.
+
+Das Abarbeiten eingehender Nibble dauert unterschiedlich lang, abhängig davon an welcher Stelle, des zugehörigen Datenpakets, sich das Nibble befindet. 4 Bit in der Mitte eines Pakets werden einfach an einen Vektor hinten angehängt und sind abgearbeitet, während das letzte Nibble der End-Sequenz einen umfangreichen Validierungsprozess des gesamten aktuellen Pakets anstößt. Diese unterschiedlichen Bearbeitungszeiten erschweren ein präzises Timen der Lese- und Schreibzugriffe auf die Hardware. Als Konsequenz scheiterte ein früherer Single-Thread-Ansatz daran, dass einzelne Nibble in unregelmäßigen Abständen vom B15 Board überlesen wurden. Daher ist es notwendig, die verarbeitende Logik und die Hardwarezugriffe voneinander zu trennen. Dies wir durch das Aufspalten jener Vorgänge in separate Threads erreicht. Ein vereinfachtes Modell der Threads ist in Abbildung \ref{fig:datenfluss} dargestellt.
+
+Das Grundkonzept ist eine mini Pipeline, in welcher jeder Thread, dank zwischengeschalteter Warschlangen, unabhängig von der Geschwindigkeit aller anderen Threads operieren kann. Der Hardwarethread ist dadurch der Lage in jedem Fall alle vordefinierten $n$ Sekunden zu lesen und zu schreiben. Die Wartezeit zwischen jedem Zyklus kann präzise mittels Delay eingestellt werden, ohne dass die Berechnungszeit anderer Vorgänge abfälschend einwirkt.
 
 \begin{figure}[H]
     \centering
     \begin{adjustbox}{scale=0.6}
         \input{../images/multithread.pdf_tex}
     \end{adjustbox}
+    \caption{Datenfluss innerhalb eines Kommunikationsteilnehmers (abstrakt)}
+    \label{fig:datenfluss}
 \end{figure}
 
-\section{Der Sender als Zustandsautomat}
+\section{Der Sender}
+Der Sender ist das Herzstück des Programms. Er verfügt von Haus aus über die Information, wie weit er mit dem Sendefortschritt ist und wann ein Paket vollständig auf die Leitung gebracht wurde. Folglich ist er auch für Timeout-Erkennung nach dem Versand zuständig. Die Funktionalität des Senders wurde als Zustandsautomat modelliert und implementiert. Die Verbildlichung dieses Automaten ist in der folgenden Darstellung \ref{fig:zustandsautomat} zu sehen. Zustandswechsel werden durch interne Ereignisse (z.B. Datenpaket gesendet) oder externe Informationen aus dem Empfänger (z.B. Neusenden eines Paketes erforderlich) ausgelöst.
+
 \vspace{0.5cm}
 \begin{figure}[H]
     \centering
@@ -25,12 +34,12 @@
         \node[state, accepting] (end)       [below right of=awaiting]   {$end$};
 
         \path[->]
-        (ready)     edge            node[align=left]                    {'ready to connect' received,\\data packet received} (sending)
-        (sending)   edge[bend left] node[align=left]                    {data\\packet sent}                                  (awaiting)
-        (awaiting)  edge[bend left] node[align=right]                   {response received,\\timeout}                        (sending)
-        (sending)   edge            node[align=right]                   {all data sent}                                      (close)
-        (close)     edge            node[align=right]                   {all data received}                                  (end)
-        (awaiting)  edge[dashed]    node[left,align=left,xshift=-0.2cm] {10x timeout}                                        (end);
+        (ready)     edge            node[align=left]                    {'ready to connect' erhalten,\\Datenpaket erhalten}  (sending)
+        (sending)   edge[bend left] node[align=left]                    {Datenpaket\\gesendet}                               (awaiting)
+        (awaiting)  edge[bend left] node[align=right]                   {Antwort erhalten,\\Timeout}                         (sending)
+        (sending)   edge            node[align=left]                   {alle Rohdaten\\gesendet}                            (close)
+        (close)     edge            node[align=left]                   {'close connection' erhalten,\\60s Timeout}          (end)
+        (awaiting)  edge[dashed]    node[left,align=left,xshift=-0.2cm] {10x Timeout}                                        (end);
 
     \end{tikzpicture}
     \vspace{0.5cm}
@@ -38,3 +47,32 @@
 \end{figure}
 \vspace{1cm}
 \noindent
+
+\noindent
+Im \textbf{Connect-Zustand} wird in 3s Intervallen ein 'ready to connect'-Kontrollpaket auf die Leitung gesendet. Wird ein solches Paket, oder ein Datenpaket, empfangen findet ein Wechsel in den nächsten Zustand statt.
+Im \textbf{send-Zustand} wird dann ein Datenpaket gesendet. Ist sein Versand abgeschlossen, wird in den \textbf{await-Zustand} gewechselt und auf eine Antwort des Kommunikationspartners gewartet. Entweder diese wird erhalten, oder es kommt noch 30s zu einem Timeout. Wurde bereits 10 Mal ohne erhaltene Rückmeldung versucht ein Paket zu senden, wird eine Timeout-Exception ausgelöst und das Programm kontrolliert zum Absturz gebracht. Sonst geht es zurück in den send-Zustand, wo entweder das nächste oder erneut das vorherige Paket gesendet wird, je nach Verhalten des Kommunikationspartners. Wurden alle Rohdaten gesendet, kann die Verbindung geschlossen werden. Dafür wird in den \textbf{close-Zustand} gewechselt. In diesem werden keine neuen Daten mehr gesendet und nur noch auf eingehende Pakete geantwortet. Zusätzlich wird dem Kommunikationspartner in 3s Intervallen mitgeteilt, dass alle Daten gesendet wurden und die Verbindung geschlossen werden kann. Gibt auch der Kommunikationspartner diese Meldung zurück, terminiert das Programm. Sollten die 'close connection'-Kontrollpakete verloren gehen, schließt sich die Verbindung nach 60s ohne neuem eingehenden Nibble selbstständig.
+
+
+\section{Der Empfänger}
+Der Empfänger hat deutlich weniger komplexe Logik als der Sender und kommt ohne Zustandsautomat aus. Seine Hauptaufgabe im Versand- und Empfangsprozess ist das Auswerten erhaltender Daten- und Kontrollblöcke und das Informieren des Senders. Dafür nutzt der Empfänger eine threadsichere Nachrichtenwarteschlange, über welche er dem Sender Informationen zukommen lassen kann. Die Nutzung dieses Nachrichtensystems ist in Abbildung \ref{fig:datenfluss} durch den pinken Pfeil angedeutet. Nach Erhalt eines Datenpaketes veranlasst dort der Empfänger den Sender dazu, eine Antwort an den Kommunikationspartner zu schicken. Eine Auflistung der Benachrichtigungen erfolgt in Tabelle \ref{tab:benachrichtigungen}.
+
+\begin{table}[H]
+    \center
+    \def\arraystretch{1.3}
+    \rowcolors{2}{gray!15}{white}
+    \begin{tabular}{|l|l|}
+        \rowcolor{gray!50}
+        \hline
+        \textbf{Bezeichnung}  & \textbf{Bedeutung}                                      \\
+        \hline
+        startSendingData      & 'ready to connect'-Paket empfangen; Kom.-Partner online \\
+        closeConnection       & 'close connection'-Paket empfangen; Kom.-Partner fertig \\
+        foreignPacketResend   & Fordere Neusenden eines Paktes von Kom.-Partner         \\
+        foreignPacketReceived & Bestätige Kom.-Partner  Paketerhalt                     \\
+        ownPacketResend       & Kom.-Partner fordert Neusenden eines Pakets             \\
+        ownPacketReceived     & Kom.-Partner bestätigt Paketerhalt                      \\
+        \hline
+    \end{tabular}
+    \caption{Interthreadbeanchrichtigungen}
+    \label{tab:benachrichtigungen}
+\end{table}
