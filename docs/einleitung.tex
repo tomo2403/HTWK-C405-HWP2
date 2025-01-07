@@ -1,0 +1,13 @@
+\chapter{Einleitung}
+Im Nachfolgenden finden Sie unser Versuchsprotokoll zu V7. Es beleuchtet nur unseren finalen, erfolgreichen Ansatz. Was es nicht beinhaltet, sind die insgesamt vier gescheiterten Ansätze über einen Zeitraum von mehr als 2 Monaten, welche uns bis hierher gebracht haben. Während der Bearbeitung des Versuches mussten wir auf Basis neuer Erkenntnisse ständig nachjustieren und ganze Programme verwerfen. Die Kodierung hat sich von einer fixen Escape-Sequenz zur jetzigen dynamischen entwickelt, die Threadaufteilung wurde mehrmals verworfen und die Modularisierung des Programms hat fortlaufend zugenommen. Nun sind wir an einem Punkt, an dem unser Programm mit jeder Hardware funktioniert, welche die Methoden \texttt{send()} und \texttt{receive()} unseres Kommunikations-Interfaces in C++ implementieren kann. Unsere Anwendung setzt sich in ihrer finalen Version aus über 25 Klassen und vielen ungebunden Funktionen zusammen. Optimierungspotential gibt es sicherlich noch immer, aber wie es eben in der Informatik so ist, muss man sich irgendwann mit einer Lösung abfinden, welche gut genug ist.
+
+\vspace{0.5cm}
+\noindent
+Unseren gesamten Code finden Sie im Git-Repository unter dem folgendem Link.
+\begin{tcolorbox}[colback=gray!10,colframe=black,boxrule=0.5pt]
+\href{https://github.com/tomo2403/HTWK-C405-HWP2.git}{https://github.com/tomo2403/HTWK-C405-HWP2.git}
+\end{tcolorbox}
+\vspace{0.5cm}
+
+\noindent
+Bitte beachten Sie, dass einige Bezeichner hier im Protokoll vereinfacht und/oder übersetzt wurden. Viele Klassen wurden zur simpleren Funktionserläuterung des Programms wegabstrahiert. Dieses Protokoll soll einen groben Überblick über unsere Software geben und sie nicht ausgiebig dokumentieren. Sie finden alle erwähnten Konzepte und Module des Protokolls im Code wieder, dies aber vielleicht unter anderem Namen oder in noch mehr Module aufgespalten, als hier gezeigt.

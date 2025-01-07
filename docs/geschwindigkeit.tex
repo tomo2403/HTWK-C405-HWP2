@@ -1,1 +1,39 @@
+
+
 \chapter{Geschwindigkeit}
+\section{B15 zu Arduino}
+In der Kommunikation zwischen B15 Board und Arduino ist ersteres der Flaschenhals. Mit einer maximalen Schreib- und Lesegeschwindigkeit von einem Nibble in 32ms im Best-Case, ist mit viel Glück eine Geschwindigkeit von 15,625 B/s das erreichbare Maximum der rohen Übertragungsgeschwindigkeit. Bei Praxistests dieser Werte, ist durch das Schwanken der Antwortzeiten des B15-Interfaces die Übertragung jedoch instabil und fehlerlastgig geworden. Zur Kompensation musste ein Lese-/Schreibzyklus auf 35ms erhöht werden, was nur noch eine rohe Geschwindigkeit von 14,285 B/s erlaubt. Dazu kommt Overhead durch das Mitsenden von Start- und Endsequenzen, dem CRC, einer Paket-ID und vor allem der Übermittlung von Antworten. All dies berücksichtigt, übertragen wir nun mit ca. 10.5 B/s die tatsächlichen Nutzdaten. Als Erwähnung sei hinzugefügt: Bei Tests mit 2 Arduinos haben wir Geschwindigkeiten von ca. 1200 kB/s bei der Nutzdatenübertragung erreicht.
+
+\section{netcat}
+Auf der Senderseite werden die Rohdaten mit folgenden Befehl in netcat gepiped und die Übertragungsziet gestoppt.
+\begin{tcolorbox}[colback=gray!10,colframe=black,boxrule=0.5pt]
+\begin{verbatim}
+time cat input_file | nc -q 0 141.57.56.143 20000
+\end{verbatim}
+\end{tcolorbox}
+
+\noindent
+Die Empfängerseite lässt sich über folgenden Befehl starten.
+
+\begin{tcolorbox}[colback=gray!10,colframe=black,boxrule=0.5pt]
+\begin{verbatim}
+nc -q 0 -l -p 20000 > received_file
+\end{verbatim}
+\end{tcolorbox}
+
+\noindent
+Dabei haben wir für eine 10.671.180B große Datei 3.054s benötigt. Das entspricht einer Übertragungsgeschwindigkeit von 3,49 MB/s.
+
+\newpage
+
+\section{scp}
+Zum Zeitmessen des Sendens einer Datei mittels scp haben wir einen SSH-Key auf dem Zielrechner hinterlegt, um die Messung nicht durch eine menschliche Passworteingabe zu verfälschen. Mit folgendem Command wurde die Datei im Anschluss auf ada3 hochgeladen.
+
+\begin{tcolorbox}[colback=gray!10,colframe=black,boxrule=0.5pt]
+\begin{verbatim}
+scp input_file mohmeyer@142.57.6.153:/home/mohmeyer
+\end{verbatim}
+\end{tcolorbox}
+
+\noindent
+Die erreichte Geschwindigkeit wurde nach der Übertragung von scp direkt selbst angezeigt und lag bei 19,1MB/s.

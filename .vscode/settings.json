@@ -1,6 +1,7 @@
 {
     "cSpell.language": "en,de-DE",
     "cSpell.words": [
+        "Arduinos",
         "Bitsequenzen",
         "Hardwarethread",
         "Interthreadbeanchrichtigungen",
@@ -9,6 +10,7 @@
         "Kontrollflags",
         "Nachrichtenwareschlange",
         "threadsichere",
-        "Validierungsprozess"
+        "Validierungsprozess",
+        "wegabstrahiert"
     ]
 }
