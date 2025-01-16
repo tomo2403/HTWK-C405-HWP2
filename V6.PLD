@@ -1,0 +1,14 @@
+Name     V6 ;
+PartNo   00 ;
+Date     16.01.2025 ;
+Revision 01 ;
+Designer Tom Mohr, Martin Ohmeyer ;
+Company  HTWK Leipzig ;
+Assembly None ;
+Location  ;
+Device   g16v8 ;
+
+
+
+
+PIN 1 = clock;
