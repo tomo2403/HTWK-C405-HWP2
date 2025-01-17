@@ -1,5 +1,5 @@
 Name     V6 ;
-PartNo   00 ;
+PartNo   C538D18 ;
 Date     16.01.2025 ;
 Revision 01 ;
 Designer Tom Mohr, Martin Ohmeyer ;
@@ -9,6 +9,23 @@ Location  ;
 Device   g16v8 ;
 
 
+PIN 1 = clock ;
+PIN 2 = i ;
 
+PIN 16 = w0 ;
+PIN 17 = w1 ;
+PIN 18 = w2 ;
+PIN 19 = w3 ;
 
-PIN 1 = clock;
+c0 = 'b'0;
+c1 = 'b'0;
+c2 = 'b'0;
+
+c2.d = !c2 & c1 & i # c2 & !c1 & !c0 # c1 & c0;
+c1.d = c1 & !c0 # !c2 & !c1 & c0;
+c0.d = !c0 & !i # !c1 & !c0 # c2 & c1;
+
+w3.d = !c2 # !c1 & !c0;
+w2.d = !c2 & !c0 # !c2 & !c1;
+w1.d = !c2 & !c1 & !c0;
+w0.d = c0 # c2 & c1;
