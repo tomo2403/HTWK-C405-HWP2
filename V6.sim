@@ -1,9 +1,0 @@
-%SIGNAL
-PIN   1 =  clock 
-%END
-
-%FIELD
-%END
-
-%EQUATION
-%END

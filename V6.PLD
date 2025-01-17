@@ -1,12 +1,12 @@
 Name     V6 ;
-PartNo   C538D18 ;
+PartNo   00 ;
 Date     16.01.2025 ;
 Revision 01 ;
 Designer Tom Mohr, Martin Ohmeyer ;
 Company  HTWK Leipzig ;
 Assembly None ;
 Location  ;
-Device   g16v8 ;
+Device   G16V8 ;
 
 
 PIN 1 = clock ;
@@ -16,10 +16,6 @@ PIN 16 = w0 ;
 PIN 17 = w1 ;
 PIN 18 = w2 ;
 PIN 19 = w3 ;
-
-c0 = 'b'0;
-c1 = 'b'0;
-c2 = 'b'0;
 
 c2.d = !c2 & c1 & i # c2 & !c1 & !c0 # c1 & c0;
 c1.d = c1 & !c0 # !c2 & !c1 & c0;
