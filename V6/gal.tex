@@ -379,6 +379,29 @@
     \label{gal-kv-2}
 \end{table}
 
+\section{Code}
+\begin{tcolorbox}[colback=gray!10,colframe=black,boxrule=0.5pt]
+\begin{verbatim}
+PIN 1 = clock ;
+PIN 2 = i ;
+
+PIN 16 = w0 ;
+PIN 17 = w1 ;
+PIN 18 = w2 ;
+PIN 19 = w3 ;
+
+z2.d = !z2 & z1 & i # z2 & !z1 & !z0 # z1 & z0;
+z1.d = z1 & !z0 # !z2 & !z1 & z0;
+z0.d = !z0 & !i # !z1 & !z0 # z2 & z1;
+
+w3.d = !z2 # !z1 & !z0;
+w2.d = !z2 & !z0 # !z2 & !z1;
+w1.d = !z2 & !z1 & !z0;
+w0.d = z0 # z2 & z1;
+\end{verbatim}
+\end{tcolorbox}
+
+
 \section{Aufbau}
 \begin{figure}[H]
     \centering
