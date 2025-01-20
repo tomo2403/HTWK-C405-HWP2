@@ -1,0 +1,35 @@
+\chapter{Allgemeines}
+\section{Zähler}
+Variablen, die zu einem Zähler gehören, tragen die Bezeichnung $z_n$. 
+
+\section{Würfel}
+Variablen, die zum Würfel gehören, tragen die Bezeichnung $w_n$. Sie sind wie in Abbildung \ref{fig:dice} dargestellt auf die Augen des Würfels verteilt.
+\vspace{2cm}
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[scale=2.0]
+        % Draw the dice outline
+        \draw[thick] (0.3,0.3) rectangle (2.7,2.7);
+
+        % Draw the dots
+        % Group 1: Center dot
+        \fill[blue, opacity=0.6] (1.5,1.5) circle (0.2); % Center dot
+
+        % Group 2: Top-left and Bottom-right dots
+        \fill[red, opacity=0.6] (0.75,2.25) circle (0.2); % Top-left dot
+        \fill[red, opacity=0.6] (2.25,0.75) circle (0.2); % Bottom-right dot
+
+        % Group 3: Bottom-left and Top-right dots
+        \fill[darkgreen, opacity=0.6] (0.75,0.75) circle (0.2); % Bottom-left dot
+        \fill[darkgreen, opacity=0.6] (2.25,2.25) circle (0.2); % Top-right dot
+
+        % Group 4: Middle-left and Middle-right dots
+        \fill[orange, opacity=0.6] (0.75,1.5) circle (0.2); % Middle-left dot
+        \fill[orange, opacity=0.6] (2.25,1.5) circle (0.2); % Middle-right dot
+
+        % Add colored and thick text to the right of the dice
+        \node at (1.5, 0.0) {\textcolor{orange}{$w_3$} \ \textcolor{red}{$w_2$} \ \textcolor{darkgreen}{$w_1$} \ \textcolor{blue}{$w_0$}};
+    \end{tikzpicture}
+    \caption{Der Würfel}
+    \label{fig:dice}
+\end{figure}

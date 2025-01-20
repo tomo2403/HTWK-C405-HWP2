@@ -1,0 +1,41 @@
+\def\documentType{Protocol}
+\def\mainLanguage{ngerman}
+
+\input{../template.tex}
+
+\pgfqkeys{/TemplateVersion0}{
+    properties/Authors 				= {Tom Mohr&&Martin Ohmeyer},
+    properties/Title	 			= {Versuch V6},
+    properties/Subtitle 			= {C405 Hardwarepraktikum II},
+    properties/Institution 			= {HTWK Leipzig},
+    properties/Group 				= {23INB-3},
+    properties/Versioning 	      	        = {true},
+    misc/Date/Prefix				= {Stand: },
+    misc/Page/CountPrefix			= {Seiten: },
+    misc/Group/Prefix				= {Gruppe: },
+    Protocol/Comment		 	        = {Abnahme: 20. Januar 2025}
+}
+
+\usepackage{tikz}
+\usepackage[table]{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage{color,soul}
+\usepackage{mathtools}
+\usepackage{transparent}
+\usepackage{adjustbox}
+\usepackage{tcolorbox}
+\usepackage{inconsolata}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\usetikzlibrary{matrix}
+
+\definecolor{darkgreen}{rgb}{0.0, 0.5, 0.0}
+
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{arrows, automata, positioning}
+\graphicspath{{../images/}}
+
+\begin{document}
+        \include{general}
+        \include{logic-gates}
+\end{document}
