@@ -17,13 +17,13 @@ Mealy-Automaten entworfen.
 
         \path[->,line width=0.3mm]
         (N0) edge[bend left] node[right] {$i=x$} (N1)
-        (N1) edge[bend left] node[above] {$i=x$} (N2)
+        (N1) edge[bend left] node[below] {$i=x$} (N2)
         (N2) edge[bend left] node[left] {$i=0$} (N3)
-        (N2) edge[bend right] node[above right] {$i=1$} (N6)
+        (N2) edge[bend right] node[below right] {$i=1$} (N6)
         (N3) edge[bend left] node[left] {$i=x$} (N4)
-        (N4) edge[bend left] node[below] {$i=x$} (N5)
+        (N4) edge[bend left] node[above] {$i=x$} (N5)
         (N5) edge[bend left] node[right] {$i=x$} (N0)
-        (N6) edge[bend right] node[below] {$i=x$} (N3);
+        (N6) edge[bend right] node[above] {$i=x$} (N3);
     \end{tikzpicture}
     \label{fig:gal-stateMachine}
 \end{figure}
