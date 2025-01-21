@@ -28,8 +28,10 @@ Mealy-Automaten entworfen.
     \label{fig:gal-stateMachine}
 \end{figure}
 
+\newpage
+
 \subsection{Wahrheitswerttabelle}
-Aus dem Automat \ref{fig:gal-stateMachine} lässt sich leicht die Wahrheitswerttabelle für den Zähler 
+Aus dem Automaten \ref{fig:gal-stateMachine} lässt sich leicht die Wahrheitswerttabelle für den Zähler 
 ablesen. Diese finden Sie im Anschluss.
 
 \begin{table}[H]
@@ -59,12 +61,13 @@ ablesen. Diese finden Sie im Anschluss.
         15   & 1     & 1     & 1     & 1   & x       & x       & x       \\
         \hline
     \end{tabular}
-    \caption{Wahrheitstabelle}
     \label{tab:gal-counter-truthtable}
 \end{table}
 
+\newpage
+
 \subsection{KV-Diagramme und vereinfachte Formeln}
-Hier die vereinfachten Formeln, welche aus der Wahrheitswerttabelle \ref{tab:gal-counter-truthtable} folgen.
+Hier entwickeln die vereinfachten Formeln, welche aus der Wahrheitswerttabelle \ref{tab:gal-counter-truthtable} folgen.
 
 \begin{table}[H]
     \centering
@@ -213,10 +216,12 @@ Hier die vereinfachten Formeln, welche aus der Wahrheitswerttabelle \ref{tab:gal
     \label{fig:gal-counter-karnaugMaps}
 \end{table}
 
-\section{Mapping Zähler auf Würfel}
-Es ist nun der Zählerzustände \ref{fig:gal-counter-karnaugMaps} auf die Pins des Würfels zu mappen. Dafür haben wir die folgenden Wahrheitswerttabelle aufgestellt.
+\newpage
 
+\section{Mapping Zähler auf Würfel}
 \subsection{Wahrheitswerttabelle}
+Es sind nun die Zählerzustände \ref{fig:gal-counter-karnaugMaps} auf die Pins des Würfels zu mappen. Dafür haben wir die folgenden Wahrheitswerttabelle aufgestellt.
+
 \begin{table}[H]
     \centering
     \def\arraystretch{1.3}
@@ -235,11 +240,13 @@ Es ist nun der Zählerzustände \ref{fig:gal-counter-karnaugMaps} auf die Pins d
         6    & 6   & 1     & 1     & 0     & 0     & 0     & 0     & 1     \\
         \hline
     \end{tabular}
-    \caption{Wahrheitstabelle}
     \label{tab:gal-mapping-truthtable}
 \end{table}
 
+ \newpage
+
 \subsection{KV-Diagramme und vereinfachte Formeln}
+Aus Tabelle \ref{tab:gal-mapping-truthtable} ergeben sich die folgenden Formeln.
 \begin{table}[H]
     \centering
     \renewcommand{\arraystretch}{7.5}
@@ -389,7 +396,10 @@ Es ist nun der Zählerzustände \ref{fig:gal-counter-karnaugMaps} auf die Pins d
     \label{gal-mapping-karnaugMaps}
 \end{table}
 
+\newpage
+
 \section{Code}
+Die Implementation der Formeln \ref{gal-mapping-karnaugMaps} im GAL können Sie dem folgenden Code-Block entnehmen.
 \begin{tcolorbox}[colback=gray!10,colframe=black,boxrule=0.5pt]
 \begin{verbatim}
 PIN 1 = clock ;
@@ -415,11 +425,12 @@ w0.d = z0 # z2 & z1;
 \end{verbatim}
 \end{tcolorbox}
 
+\newpage
 
 \section{Aufbau}
+Der Aufgebaue Gal.
 \begin{figure}[H]
     \centering
      \includegraphics[width=0.8\textwidth]{dice_gal.jpeg}
-     \caption{Aufbau der Schaltung mit Gal}
      \label{fig:gal-setup}
 \end{figure}
