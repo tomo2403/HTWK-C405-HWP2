@@ -8,22 +8,22 @@ Mealy-Automaten entworfen.
     \centering
     \begin{tikzpicture}
         \node[circle, draw, minimum size=1cm] (N0) at (0:4cm) {$000$};
-        \node[circle, draw, minimum size=1cm] (N1) at (60:4cm) {$001$};
-        \node[circle, draw, minimum size=1cm] (N2) at (120:4cm) {$010$};
+        \node[circle, draw, minimum size=1cm] (N1) at (300:4cm) {$001$};
+        \node[circle, draw, minimum size=1cm] (N2) at (240:4cm) {$010$};
         \node[circle, draw, minimum size=1cm] (N3) at (180:4cm) {$011$};
-        \node[circle, draw, minimum size=1cm] (N4) at (240:4cm) {$100$};
-        \node[circle, draw, minimum size=1cm] (N5) at (300:4cm) {$101$};
+        \node[circle, draw, minimum size=1cm] (N4) at (120:4cm) {$100$};
+        \node[circle, draw, minimum size=1cm] (N5) at (60:4cm) {$101$};
         \node[circle, draw, minimum size=1cm] (N6) at (0,0) {$110$};
 
         \path[->,line width=0.3mm]
-        (N0) edge[bend right] node[right] {$i=x$} (N1)
-        (N1) edge[bend right] node[above] {$i=x$} (N2)
-        (N2) edge[bend right] node[left] {$i=0$} (N3)
-        (N2) edge[bend left] node[above right] {$i=1$} (N6)
-        (N3) edge[bend right] node[left] {$i=x$} (N4)
-        (N4) edge[bend right] node[below] {$i=x$} (N5)
-        (N5) edge[bend right] node[right] {$i=x$} (N0)
-        (N6) edge[bend left] node[below] {$i=x$} (N3);
+        (N0) edge[bend left] node[right] {$i=x$} (N1)
+        (N1) edge[bend left] node[above] {$i=x$} (N2)
+        (N2) edge[bend left] node[left] {$i=0$} (N3)
+        (N2) edge[bend right] node[above right] {$i=1$} (N6)
+        (N3) edge[bend left] node[left] {$i=x$} (N4)
+        (N4) edge[bend left] node[below] {$i=x$} (N5)
+        (N5) edge[bend left] node[right] {$i=x$} (N0)
+        (N6) edge[bend right] node[below] {$i=x$} (N3);
     \end{tikzpicture}
     \label{fig:gal-stateMachine}
 \end{figure}
