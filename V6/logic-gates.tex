@@ -1,6 +1,9 @@
 \chapter{Logikgatter}
 \section{Wahrheitswerttabelle}
 
+Im Nachfolgenden finden Sie die Wahrheitswerttabelle für das Abbilden des Zählers auf die
+low-active Pins des Würfels.
+
 \begin{table}[H]
     \centering
     \def\arraystretch{1.3}
@@ -18,11 +21,12 @@
         5      & 6      & 1     & 0     & 1     & 0     & 0     & 0     & 1     \\
         \hline
     \end{tabular}
-    \caption{Mapping: Zähler auf Würfel}
     \label{tab:logicGates-truthtable}
 \end{table}
 
 \section{KV-Diagramme und vereinfachte Formeln}
+Hier wird die Wahrheitswerttabelle \ref{tab:logicGates-truthtable} in Formeln umgewandelt, welche
+dabei direkt grafisch vereinfacht werden.
 
 \begin{table}[H]
     \centering
@@ -170,6 +174,9 @@
 \end{table}
 
 \section{Aufbau}
+Die in \ref{fig:logicGates-karnaugMaps} ermittelten Formeln wurden in Gleichungen aus nur NANDs umgewandelt
+und anschließend Aufgebaut.
+
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.8\textwidth]{dice_nand.jpeg}
